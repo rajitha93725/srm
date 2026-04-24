@@ -596,6 +596,19 @@ tr:hover td { background: var(--bg-secondary); }
   margin-bottom: 0.75rem;
 }
 
+/* ===== Form + Pricing Two-Column Layout ===== */
+.form-with-pricing {
+  display: grid;
+  grid-template-columns: 1fr 290px;
+  gap: 1.5rem;
+}
+.form-col { min-width: 0; }
+.pricing-col { min-width: 0; }
+.pricing-sticky-wrap {
+  position: sticky;
+  top: 4.5rem;
+}
+
 /* ===== Domain Option Cards ===== */
 .domain-options {
   display: grid;
@@ -750,6 +763,9 @@ tr:hover td { background: var(--bg-secondary); }
 /* ===== Responsive ===== */
 @media (max-width: 900px) {
   .admin-layout { grid-template-columns: 1fr; }
+  .form-with-pricing { grid-template-columns: 1fr; }
+  .pricing-col { order: -1; }
+  .pricing-sticky-wrap { position: static; }
 }
 @media (max-width: 768px) {
   .main, .admin-main { padding: 1rem; }
@@ -759,6 +775,9 @@ tr:hover td { background: var(--bg-secondary); }
   .radio-inline, .checkbox-inline { flex-direction: column; }
   .design-packages { grid-template-columns: 1fr; }
   .domain-options { grid-template-columns: repeat(3, 1fr); }
+  .form-with-pricing { grid-template-columns: 1fr; }
+  .pricing-col { order: -1; }
+  .pricing-sticky-wrap { position: static; }
   .header, .admin-header { padding: 0.75rem 1rem; }
   .toast { right: 1rem; left: 1rem; max-width: none; }
   .btn-submit { width: 100%; }

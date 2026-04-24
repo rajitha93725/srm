@@ -66,9 +66,10 @@ function handleExistingSocial() {
   toggle('existingSocialNo',  val === 'no');
 
   if (val === 'yes') {
-    document.querySelectorAll('input[name="createProfiles"], input[name="wantMaintenance"], input[name="createPlatform"]').forEach(r => r.checked = false);
+    document.querySelectorAll('input[name="createProfiles"], input[name="wantMaintenance"], input[name="createPlatform"], input[name="maintainNewPlatform"]').forEach(r => r.checked = false);
     toggle('createPlatformsField', false);
     toggle('wantMaintenanceField', false);
+    toggle('maintainNewPlatformsField', false);
   } else {
     document.querySelectorAll('input[name="maintainExisting"], input[name="maintainPlatform"]').forEach(r => r.checked = false);
     toggle('maintainPlatformsField', false);
@@ -79,7 +80,14 @@ function handleExistingSocial() {
 function handleMaintainExisting() {
   const val = document.querySelector('input[name="maintainExisting"]:checked')?.value;
   toggle('maintainPlatformsField', val === 'yes');
+  if (val === 'no') document.querySelectorAll('input[name="maintainPlatform"]').forEach(r => r.checked = false);
   updatePricing();
+}
+
+function handleWantMaintenance() {
+  const val = document.querySelector('input[name="wantMaintenance"]:checked')?.value;
+  toggle('maintainNewPlatformsField', val === 'yes');
+  if (val === 'no') document.querySelectorAll('input[name="maintainNewPlatform"]').forEach(r => r.checked = false);
 }
 
 function handleCreateProfiles() {
@@ -87,7 +95,8 @@ function handleCreateProfiles() {
   toggle('createPlatformsField', val === 'yes');
   toggle('wantMaintenanceField', val === 'yes');
   if (val === 'no') {
-    document.querySelectorAll('input[name="wantMaintenance"], input[name="createPlatform"]').forEach(r => r.checked = false);
+    document.querySelectorAll('input[name="wantMaintenance"], input[name="createPlatform"], input[name="maintainNewPlatform"]').forEach(r => r.checked = false);
+    toggle('maintainNewPlatformsField', false);
   }
   updatePricing();
 }
@@ -126,6 +135,7 @@ const DEFAULT_PRICING = {
   hosting: 12000,
   linkedinIntegration: 2500, youtubeIntegration: 2500,
   smCreateStandard: 2000, smCreatePremium: 2500,
+  maintainStandard: 2000, maintainPremium: 2500,
   package1: 3500, package2: 5000, package3: 10000, package4: 20000, package5: 50000,
   designCustom1: 10000, designCustom2: 12000,
   designPremium1: 17500, designPremium2: 25000
@@ -193,9 +203,29 @@ async function updatePricing() {
     });
   }
 
-  // Social media package (maintenance)
+  // Per-platform maintenance (existing social media)
   const maintainExisting = document.querySelector('input[name="maintainExisting"]:checked')?.value;
-  const wantMaintenance  = document.querySelector('input[name="wantMaintenance"]:checked')?.value;
+  if (maintainExisting === 'yes') {
+    const premiumPlatforms = ['LinkedIn', 'YouTube'];
+    document.querySelectorAll('input[name="maintainPlatform"]:checked').forEach(cb => {
+      const cost = premiumPlatforms.includes(cb.value) ? pricing.maintainPremium : pricing.maintainStandard;
+      items.push({ label: `${cb.value} maintenance (monthly)`, amount: cost });
+      total += cost;
+    });
+  }
+
+  // Per-platform maintenance (newly created profiles)
+  const wantMaintenance = document.querySelector('input[name="wantMaintenance"]:checked')?.value;
+  if (wantMaintenance === 'yes') {
+    const premiumPlatforms = ['LinkedIn', 'YouTube'];
+    document.querySelectorAll('input[name="maintainNewPlatform"]:checked').forEach(cb => {
+      const cost = premiumPlatforms.includes(cb.value) ? pricing.maintainPremium : pricing.maintainStandard;
+      items.push({ label: `${cb.value} maintenance (monthly)`, amount: cost });
+      total += cost;
+    });
+  }
+
+  // Social media package (maintenance)
   const needsMaint = maintainExisting === 'yes' || wantMaintenance === 'yes';
   const pkgVal = document.getElementById('smPackage')?.value;
   if (pkgVal && needsMaint) {
@@ -288,7 +318,8 @@ async function collectWebsiteData() {
   const wantMaint      = document.querySelector('input[name="wantMaintenance"]:checked')?.value  || '';
   const pkgVal         = document.getElementById('smPackage').value;
   const designPkg      = document.querySelector('input[name="designPackage"]:checked')?.value || 'default';
-  const createPlatforms = [...document.querySelectorAll('input[name="createPlatform"]:checked')].map(c => c.value);
+  const createPlatforms     = [...document.querySelectorAll('input[name="createPlatform"]:checked')].map(c => c.value);
+  const maintainNewPlatforms = [...document.querySelectorAll('input[name="maintainNewPlatform"]:checked')].map(c => c.value);
 
   let total = 0;
   const pg = parseInt(pages) || 0;
@@ -307,6 +338,18 @@ async function collectWebsiteData() {
   if (createProfiles === 'yes') {
     const premiumPlatforms = ['LinkedIn', 'YouTube'];
     createPlatforms.forEach(p => { total += premiumPlatforms.includes(p) ? pricing.smCreatePremium : pricing.smCreateStandard; });
+  }
+
+  if (maintainExist === 'yes') {
+    const premiumPlatforms = ['LinkedIn', 'YouTube'];
+    [...document.querySelectorAll('input[name="maintainPlatform"]:checked')].forEach(cb => {
+      total += premiumPlatforms.includes(cb.value) ? pricing.maintainPremium : pricing.maintainStandard;
+    });
+  }
+
+  if (wantMaint === 'yes') {
+    const premiumPlatforms = ['LinkedIn', 'YouTube'];
+    maintainNewPlatforms.forEach(p => { total += premiumPlatforms.includes(p) ? pricing.maintainPremium : pricing.maintainStandard; });
   }
 
   if (pkgVal && (maintainExist === 'yes' || wantMaint === 'yes')) total += pricing[`package${pkgVal}`] || 0;
@@ -335,6 +378,7 @@ async function collectWebsiteData() {
     maintainPlatforms:  [...document.querySelectorAll('input[name="maintainPlatform"]:checked')].map(c => c.value),
     createProfiles,
     createPlatforms,
+    maintainNewPlatforms,
     wantMaintenance:    wantMaint,
     smPackage:          pkgVal,
     designPackage:      designPkg,
@@ -460,8 +504,10 @@ async function loadAdminPricing() {
   set('priceHosting',       p.hosting);
   set('priceLinkedinInt',   p.linkedinIntegration);
   set('priceYoutubeInt',    p.youtubeIntegration);
-  set('priceSMCreateStd',   p.smCreateStandard);
-  set('priceSMCreatePrem',  p.smCreatePremium);
+  set('priceSMCreateStd',    p.smCreateStandard);
+  set('priceSMCreatePrem',   p.smCreatePremium);
+  set('priceMaintainStd',    p.maintainStandard);
+  set('priceMaintainPrem',   p.maintainPremium);
   set('pricePackage1',      p.package1);
   set('pricePackage2',      p.package2);
   set('pricePackage3',      p.package3);
@@ -488,6 +534,8 @@ async function savePricing() {
     youtubeIntegration:  get('priceYoutubeInt'),
     smCreateStandard:    get('priceSMCreateStd'),
     smCreatePremium:     get('priceSMCreatePrem'),
+    maintainStandard:    get('priceMaintainStd'),
+    maintainPremium:     get('priceMaintainPrem'),
     package1:            get('pricePackage1'),
     package2:            get('pricePackage2'),
     package3:            get('pricePackage3'),
