@@ -54,102 +54,187 @@
         <p class="sidebar-heading">Pricing Configuration</p>
         <div class="pricing-settings">
 
-          <!-- Base Website -->
+          <!-- Website -->
           <div class="price-card">
             <div class="price-card-header">
               <div class="price-card-icon">🌐</div>
-              <h3>Base Website (1 Page)</h3>
+              <h3>Website Pages</h3>
             </div>
-            <p class="price-link-label">
-              <span class="link-icon">🔗</span>
-              Linked to: Customer form → Number of Pages = 1
-            </p>
-            <div class="price-input-group">
-              <span class="currency">LKR</span>
-              <input type="number" class="price-input" id="priceBase" value="15000" min="0" onchange="savePricing()" />
+            <div class="package-row">
+              <div class="package-item">
+                <label>Base website (1 page)</label>
+                <div class="price-input-group">
+                  <span class="currency">LKR</span>
+                  <input type="number" class="price-input" id="priceBase" value="15000" min="0" onchange="savePricing()" />
+                </div>
+              </div>
+              <div class="package-item">
+                <label>Each additional page</label>
+                <div class="price-input-group">
+                  <span class="currency">LKR</span>
+                  <input type="number" class="price-input" id="pricePerPage" value="5000" min="0" onchange="savePricing()" />
+                </div>
+              </div>
             </div>
           </div>
 
-          <!-- Per Additional Page -->
+          <!-- Domain -->
           <div class="price-card">
             <div class="price-card-header">
-              <div class="price-card-icon">📄</div>
-              <h3>Price per Additional Page</h3>
+              <div class="price-card-icon">🔗</div>
+              <h3>Domain Registration (yearly)</h3>
             </div>
-            <p class="price-link-label">
-              <span class="link-icon">🔗</span>
-              Linked to: Each page beyond the first
-            </p>
-            <div class="price-input-group">
-              <span class="currency">LKR</span>
-              <input type="number" class="price-input" id="pricePerPage" value="5000" min="0" onchange="savePricing()" />
+            <p class="price-link-label"><span class="link-icon">🔗</span> Linked to: Domain Selection section</p>
+            <div class="package-row">
+              <div class="package-item">
+                <label>.com</label>
+                <div class="price-input-group"><span class="currency">LKR</span>
+                  <input type="number" class="price-input" id="priceDomainCom" value="3000" min="0" onchange="savePricing()" /></div>
+              </div>
+              <div class="package-item">
+                <label>.lk</label>
+                <div class="price-input-group"><span class="currency">LKR</span>
+                  <input type="number" class="price-input" id="priceDomainLk" value="6000" min="0" onchange="savePricing()" /></div>
+              </div>
+              <div class="package-item">
+                <label>.net</label>
+                <div class="price-input-group"><span class="currency">LKR</span>
+                  <input type="number" class="price-input" id="priceDomainNet" value="4000" min="0" onchange="savePricing()" /></div>
+              </div>
+              <div class="package-item">
+                <label>.org</label>
+                <div class="price-input-group"><span class="currency">LKR</span>
+                  <input type="number" class="price-input" id="priceDomainOrg" value="4000" min="0" onchange="savePricing()" /></div>
+              </div>
+              <div class="package-item">
+                <label>Premium domain</label>
+                <div class="price-input-group"><span class="currency">LKR</span>
+                  <input type="number" class="price-input" id="priceDomainPremium" value="10000" min="0" onchange="savePricing()" /></div>
+              </div>
             </div>
           </div>
 
-          <!-- Social Media Creation -->
+          <!-- Hosting -->
+          <div class="price-card">
+            <div class="price-card-header">
+              <div class="price-card-icon">🖥️</div>
+              <h3>Managed Hosting (yearly)</h3>
+            </div>
+            <p class="price-link-label"><span class="link-icon">🔗</span> Linked to: Web Hosting section</p>
+            <div class="price-input-group">
+              <span class="currency">LKR</span>
+              <input type="number" class="price-input" id="priceHosting" value="12000" min="0" onchange="savePricing()" />
+            </div>
+          </div>
+
+          <!-- SM Integration -->
+          <div class="price-card">
+            <div class="price-card-header">
+              <div class="price-card-icon">🔌</div>
+              <h3>Social Media Integration</h3>
+            </div>
+            <p class="price-link-label"><span class="link-icon">🔗</span> Facebook / Instagram / TikTok are always free</p>
+            <div class="package-row">
+              <div class="package-item">
+                <label>LinkedIn integration</label>
+                <div class="price-input-group"><span class="currency">LKR</span>
+                  <input type="number" class="price-input" id="priceLinkedinInt" value="2500" min="0" onchange="savePricing()" /></div>
+              </div>
+              <div class="package-item">
+                <label>YouTube integration</label>
+                <div class="price-input-group"><span class="currency">LKR</span>
+                  <input type="number" class="price-input" id="priceYoutubeInt" value="2500" min="0" onchange="savePricing()" /></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SM Profile Creation -->
           <div class="price-card">
             <div class="price-card-header">
               <div class="price-card-icon">📱</div>
-              <h3>Social Media Profile Creation</h3>
+              <h3>Profile Creation (per platform)</h3>
             </div>
-            <p class="price-link-label">
-              <span class="link-icon">🔗</span>
-              Linked to: "Create professional profiles" = Yes
-            </p>
-            <div class="price-input-group">
-              <span class="currency">LKR</span>
-              <input type="number" class="price-input" id="priceSMCreation" value="10000" min="0" onchange="savePricing()" />
+            <p class="price-link-label"><span class="link-icon">🔗</span> Linked to: Create social media profiles</p>
+            <div class="package-row">
+              <div class="package-item">
+                <label>Standard (Facebook, Instagram, WhatsApp, TikTok)</label>
+                <div class="price-input-group"><span class="currency">LKR</span>
+                  <input type="number" class="price-input" id="priceSMCreateStd" value="2000" min="0" onchange="savePricing()" /></div>
+              </div>
+              <div class="package-item">
+                <label>Premium (LinkedIn, YouTube)</label>
+                <div class="price-input-group"><span class="currency">LKR</span>
+                  <input type="number" class="price-input" id="priceSMCreatePrem" value="2500" min="0" onchange="savePricing()" /></div>
+              </div>
             </div>
           </div>
 
-          <!-- Packages -->
+          <!-- SM Packages -->
           <div class="price-card">
             <div class="price-card-header">
               <div class="price-card-icon">📦</div>
-              <h3>Social Media Packages</h3>
+              <h3>Social Media Packages (monthly)</h3>
             </div>
-            <p class="price-link-label">
-              <span class="link-icon">🔗</span>
-              Linked to: "Social Media Package" dropdown (monthly)
-            </p>
+            <p class="price-link-label"><span class="link-icon">🔗</span> Linked to: Social Media Package dropdown</p>
             <div class="package-row">
               <div class="package-item">
                 <label>Package 1 – Starter</label>
-                <div class="price-input-group">
-                  <span class="currency">LKR</span>
-                  <input type="number" class="price-input" id="pricePackage1" value="5000" min="0" onchange="savePricing()" />
-                </div>
+                <div class="price-input-group"><span class="currency">LKR</span>
+                  <input type="number" class="price-input" id="pricePackage1" value="3500" min="0" onchange="savePricing()" /></div>
               </div>
               <div class="package-item">
                 <label>Package 2 – Growth</label>
-                <div class="price-input-group">
-                  <span class="currency">LKR</span>
-                  <input type="number" class="price-input" id="pricePackage2" value="10000" min="0" onchange="savePricing()" />
-                </div>
+                <div class="price-input-group"><span class="currency">LKR</span>
+                  <input type="number" class="price-input" id="pricePackage2" value="5000" min="0" onchange="savePricing()" /></div>
               </div>
               <div class="package-item">
-                <label>Package 3 – Professional</label>
-                <div class="price-input-group">
-                  <span class="currency">LKR</span>
-                  <input type="number" class="price-input" id="pricePackage3" value="15000" min="0" onchange="savePricing()" />
-                </div>
+                <label>Package 3 – Professional ⭐ Recommended</label>
+                <div class="price-input-group"><span class="currency">LKR</span>
+                  <input type="number" class="price-input" id="pricePackage3" value="10000" min="0" onchange="savePricing()" /></div>
               </div>
               <div class="package-item">
                 <label>Package 4 – Business</label>
-                <div class="price-input-group">
-                  <span class="currency">LKR</span>
-                  <input type="number" class="price-input" id="pricePackage4" value="20000" min="0" onchange="savePricing()" />
-                </div>
+                <div class="price-input-group"><span class="currency">LKR</span>
+                  <input type="number" class="price-input" id="pricePackage4" value="20000" min="0" onchange="savePricing()" /></div>
               </div>
               <div class="package-item">
                 <label>Package 5 – Enterprise</label>
-                <div class="price-input-group">
-                  <span class="currency">LKR</span>
-                  <input type="number" class="price-input" id="pricePackage5" value="25000" min="0" onchange="savePricing()" />
-                </div>
+                <div class="price-input-group"><span class="currency">LKR</span>
+                  <input type="number" class="price-input" id="pricePackage5" value="50000" min="0" onchange="savePricing()" /></div>
               </div>
             </div>
-            <button class="save-btn" onclick="savePricing(); showToast('Pricing saved successfully!', '✅')">
+          </div>
+
+          <!-- Design Packages -->
+          <div class="price-card">
+            <div class="price-card-header">
+              <div class="price-card-icon">🎨</div>
+              <h3>Design &amp; UI Enhancement</h3>
+            </div>
+            <p class="price-link-label"><span class="link-icon">🔗</span> Linked to: Design &amp; UI Enhancement section</p>
+            <div class="package-row">
+              <div class="package-item">
+                <label>Custom UI Design — Package 1 ⭐ Recommended</label>
+                <div class="price-input-group"><span class="currency">LKR</span>
+                  <input type="number" class="price-input" id="priceDesignCustom1" value="10000" min="0" onchange="savePricing()" /></div>
+              </div>
+              <div class="package-item">
+                <label>Custom UI Design — Package 2 (20% off from 15,000)</label>
+                <div class="price-input-group"><span class="currency">LKR</span>
+                  <input type="number" class="price-input" id="priceDesignCustom2" value="12000" min="0" onchange="savePricing()" /></div>
+              </div>
+              <div class="package-item">
+                <label>Premium Animations &amp; Effects — Package 1</label>
+                <div class="price-input-group"><span class="currency">LKR</span>
+                  <input type="number" class="price-input" id="priceDesignPrem1" value="17500" min="0" onchange="savePricing()" /></div>
+              </div>
+              <div class="package-item">
+                <label>Premium Animations / Effects — Package 2</label>
+                <div class="price-input-group"><span class="currency">LKR</span>
+                  <input type="number" class="price-input" id="priceDesignPrem2" value="25000" min="0" onchange="savePricing()" /></div>
+              </div>
+            </div>
+            <button class="save-btn" onclick="savePricing(); showToast('All pricing saved!', '✅')">
               💾 Save All Pricing
             </button>
           </div>

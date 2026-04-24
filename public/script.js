@@ -66,7 +66,8 @@ function handleExistingSocial() {
   toggle('existingSocialNo',  val === 'no');
 
   if (val === 'yes') {
-    document.querySelectorAll('input[name="createProfiles"], input[name="wantMaintenance"]').forEach(r => r.checked = false);
+    document.querySelectorAll('input[name="createProfiles"], input[name="wantMaintenance"], input[name="createPlatform"]').forEach(r => r.checked = false);
+    toggle('createPlatformsField', false);
     toggle('wantMaintenanceField', false);
   } else {
     document.querySelectorAll('input[name="maintainExisting"], input[name="maintainPlatform"]').forEach(r => r.checked = false);
@@ -83,8 +84,11 @@ function handleMaintainExisting() {
 
 function handleCreateProfiles() {
   const val = document.querySelector('input[name="createProfiles"]:checked')?.value;
+  toggle('createPlatformsField', val === 'yes');
   toggle('wantMaintenanceField', val === 'yes');
-  if (val === 'no') document.querySelectorAll('input[name="wantMaintenance"]').forEach(r => r.checked = false);
+  if (val === 'no') {
+    document.querySelectorAll('input[name="wantMaintenance"], input[name="createPlatform"]').forEach(r => r.checked = false);
+  }
   updatePricing();
 }
 
@@ -117,9 +121,14 @@ async function apiDelete(url) {
 // PRICING
 // ----------------------------------------------------------------
 const DEFAULT_PRICING = {
-  base: 15000, perPage: 5000, smCreation: 10000,
-  package1: 5000, package2: 10000, package3: 15000,
-  package4: 20000, package5: 25000
+  base: 15000, perPage: 5000,
+  domainCom: 3000, domainLk: 6000, domainNet: 4000, domainOrg: 4000, domainPremium: 10000,
+  hosting: 12000,
+  linkedinIntegration: 2500, youtubeIntegration: 2500,
+  smCreateStandard: 2000, smCreatePremium: 2500,
+  package1: 3500, package2: 5000, package3: 10000, package4: 20000, package5: 50000,
+  designCustom1: 10000, designCustom2: 12000,
+  designPremium1: 17500, designPremium2: 25000
 };
 
 async function fetchPricing() {
@@ -136,6 +145,7 @@ async function updatePricing() {
   const items = [];
   let total = 0;
 
+  // Pages
   const pages = parseInt(document.getElementById('numPages')?.value) || 0;
   if (pages > 0) {
     items.push({ label: 'Base website (1 page)', amount: pricing.base });
@@ -148,23 +158,59 @@ async function updatePricing() {
     }
   }
 
-  const createProfiles = document.querySelector('input[name="createProfiles"]:checked')?.value;
-  if (createProfiles === 'yes') {
-    items.push({ label: 'Social media profile creation', amount: pricing.smCreation });
-    total += pricing.smCreation;
+  // Domain
+  const domainVal = document.querySelector('input[name="domainExt"]:checked')?.value || 'none';
+  const domainPriceMap = { none: 0, com: pricing.domainCom, lk: pricing.domainLk, net: pricing.domainNet, org: pricing.domainOrg, premium: pricing.domainPremium };
+  const domainLabelMap = { com: 'Domain (.com) – yearly', lk: 'Domain (.lk) – yearly', net: 'Domain (.net) – yearly', org: 'Domain (.org) – yearly', premium: 'Premium domain – yearly' };
+  const domainCost = domainPriceMap[domainVal] || 0;
+  if (domainCost > 0) { items.push({ label: domainLabelMap[domainVal], amount: domainCost }); total += domainCost; }
+
+  // Hosting
+  if (document.querySelector('input[name="includeHosting"]:checked')?.value === 'yes') {
+    items.push({ label: 'Managed web hosting – yearly', amount: pricing.hosting });
+    total += pricing.hosting;
   }
 
+  // Social media integration (LinkedIn & YouTube charged)
+  if (document.querySelector('input[name="socialIntegration"]:checked')?.value === 'yes') {
+    if (document.querySelector('input[name="socialPlatform"][value="LinkedIn"]:checked')) {
+      items.push({ label: 'LinkedIn integration', amount: pricing.linkedinIntegration });
+      total += pricing.linkedinIntegration;
+    }
+    if (document.querySelector('input[name="socialPlatform"][value="YouTube"]:checked')) {
+      items.push({ label: 'YouTube integration', amount: pricing.youtubeIntegration });
+      total += pricing.youtubeIntegration;
+    }
+  }
+
+  // Social media profile creation (per platform)
+  if (document.querySelector('input[name="createProfiles"]:checked')?.value === 'yes') {
+    const premiumPlatforms = ['LinkedIn', 'YouTube'];
+    document.querySelectorAll('input[name="createPlatform"]:checked').forEach(cb => {
+      const cost = premiumPlatforms.includes(cb.value) ? pricing.smCreatePremium : pricing.smCreateStandard;
+      items.push({ label: `${cb.value} profile creation`, amount: cost });
+      total += cost;
+    });
+  }
+
+  // Social media package (maintenance)
   const maintainExisting = document.querySelector('input[name="maintainExisting"]:checked')?.value;
   const wantMaintenance  = document.querySelector('input[name="wantMaintenance"]:checked')?.value;
   const needsMaint = maintainExisting === 'yes' || wantMaintenance === 'yes';
   const pkgVal = document.getElementById('smPackage')?.value;
-
   if (pkgVal && needsMaint) {
     const pkgPrice = pricing[`package${pkgVal}`] || 0;
     const pkgLabels = { '1':'Starter','2':'Growth','3':'Professional','4':'Business','5':'Enterprise' };
-    items.push({ label: `Package ${pkgVal} – ${pkgLabels[pkgVal]} (monthly)`, amount: pkgPrice });
+    items.push({ label: `SM Package ${pkgVal} – ${pkgLabels[pkgVal]} (monthly)`, amount: pkgPrice });
     total += pkgPrice;
   }
+
+  // Design package
+  const designPkg = document.querySelector('input[name="designPackage"]:checked')?.value || 'default';
+  const designPriceMap = { default: 0, customUI1: pricing.designCustom1, customUI2: pricing.designCustom2, premiumAnim1: pricing.designPremium1, premiumAnim2: pricing.designPremium2 };
+  const designLabelMap = { customUI1: 'Custom UI Design — Package 1', customUI2: 'Custom UI Design — Package 2 (20% off)', premiumAnim1: 'Premium Animations & Effects — Package 1', premiumAnim2: 'Premium Animations / Effects — Package 2' };
+  const designCost = designPriceMap[designPkg] || 0;
+  if (designCost > 0) { items.push({ label: designLabelMap[designPkg], amount: designCost }); total += designCost; }
 
   const itemsEl = document.getElementById('pricingItems');
   if (itemsEl) {
@@ -184,11 +230,11 @@ function updatePackageHint(pkgVal, pricing, needsMaint) {
   if (!el || !pkgVal) { if (el) el.textContent = ''; return; }
   const price = pricing[`package${pkgVal}`] || 0;
   const descs = {
-    '1':'Basic posting schedule & monitoring',
-    '2':'Content creation + posting schedule',
-    '3':'Full management + analytics report',
-    '4':'Advanced campaigns + monthly report',
-    '5':'Complete digital marketing suite'
+    '1': 'Basic posting schedule & monitoring',
+    '2': 'Content creation + posting schedule',
+    '3': 'Full management + analytics report ⭐ Recommended',
+    '4': 'Advanced campaigns + monthly report',
+    '5': 'Complete digital marketing suite'
   };
   const applied = needsMaint ? ' — applied to total' : ' — select maintenance above to apply';
   el.textContent = `${descs[pkgVal] || ''} · ${formatLKR(price)}/month${applied}`;
@@ -233,46 +279,69 @@ function validateBusinessForm() {
 // COLLECT FORM DATA
 // ----------------------------------------------------------------
 async function collectWebsiteData() {
-  const pricing = await fetchPricing();
+  const pricing        = await fetchPricing();
   const pages          = document.getElementById('numPages').value;
+  const domainVal      = document.querySelector('input[name="domainExt"]:checked')?.value || 'none';
+  const includeHosting = document.querySelector('input[name="includeHosting"]:checked')?.value || 'no';
   const createProfiles = document.querySelector('input[name="createProfiles"]:checked')?.value || '';
   const maintainExist  = document.querySelector('input[name="maintainExisting"]:checked')?.value || '';
   const wantMaint      = document.querySelector('input[name="wantMaintenance"]:checked')?.value  || '';
   const pkgVal         = document.getElementById('smPackage').value;
+  const designPkg      = document.querySelector('input[name="designPackage"]:checked')?.value || 'default';
+  const createPlatforms = [...document.querySelectorAll('input[name="createPlatform"]:checked')].map(c => c.value);
 
   let total = 0;
   const pg = parseInt(pages) || 0;
-  if (pg > 0) {
-    total += pricing.base;
-    if (pg > 1) total += (pg - 1) * pricing.perPage;
+  if (pg > 0) { total += pricing.base; if (pg > 1) total += (pg - 1) * pricing.perPage; }
+
+  const domainPriceMap = { none: 0, com: pricing.domainCom, lk: pricing.domainLk, net: pricing.domainNet, org: pricing.domainOrg, premium: pricing.domainPremium };
+  total += domainPriceMap[domainVal] || 0;
+  if (includeHosting === 'yes') total += pricing.hosting;
+
+  const socialInt = document.querySelector('input[name="socialIntegration"]:checked')?.value || 'no';
+  if (socialInt === 'yes') {
+    if (document.querySelector('input[name="socialPlatform"][value="LinkedIn"]:checked')) total += pricing.linkedinIntegration;
+    if (document.querySelector('input[name="socialPlatform"][value="YouTube"]:checked')) total += pricing.youtubeIntegration;
   }
-  if (createProfiles === 'yes') total += pricing.smCreation;
+
+  if (createProfiles === 'yes') {
+    const premiumPlatforms = ['LinkedIn', 'YouTube'];
+    createPlatforms.forEach(p => { total += premiumPlatforms.includes(p) ? pricing.smCreatePremium : pricing.smCreateStandard; });
+  }
+
   if (pkgVal && (maintainExist === 'yes' || wantMaint === 'yes')) total += pricing[`package${pkgVal}`] || 0;
+
+  const designPriceMap = { default: 0, customUI1: pricing.designCustom1, customUI2: pricing.designCustom2, premiumAnim1: pricing.designPremium1, premiumAnim2: pricing.designPremium2 };
+  total += designPriceMap[designPkg] || 0;
 
   const bizType = document.getElementById('businessType').value;
   const otherBiz = document.getElementById('otherBusiness')?.value || '';
 
   return {
-    type: 'website',
-    businessType:        bizType === 'Other' && otherBiz ? `Other (${otherBiz})` : bizType,
-    clientCount:         document.getElementById('clientCount').value,
-    marketingScope:      document.getElementById('marketingScope').value,
-    marketingCustom:     document.getElementById('marketingCustom').value,
-    websiteRequirement:  document.getElementById('websiteRequirement').value,
-    exampleWebsite:      document.getElementById('exampleWebsite').value,
-    numPages:            pages,
-    socialIntegration:   document.querySelector('input[name="socialIntegration"]:checked')?.value || 'no',
-    socialPlatforms:     [...document.querySelectorAll('input[name="socialPlatform"]:checked')].map(c => c.value),
-    hasExistingSocial:   document.querySelector('input[name="hasExistingSocial"]:checked')?.value || '',
-    maintainExisting:    maintainExist,
-    maintainPlatforms:   [...document.querySelectorAll('input[name="maintainPlatform"]:checked')].map(c => c.value),
+    type:               'website',
+    businessType:       bizType === 'Other' && otherBiz ? `Other (${otherBiz})` : bizType,
+    clientCount:        document.getElementById('clientCount').value,
+    marketingScope:     document.getElementById('marketingScope').value,
+    marketingCustom:    document.getElementById('marketingCustom').value,
+    websiteRequirement: document.getElementById('websiteRequirement').value,
+    exampleWebsite:     document.getElementById('exampleWebsite').value,
+    numPages:           pages,
+    domain:             domainVal,
+    hosting:            includeHosting,
+    socialIntegration:  socialInt,
+    socialPlatforms:    [...document.querySelectorAll('input[name="socialPlatform"]:checked')].map(c => c.value),
+    hasExistingSocial:  document.querySelector('input[name="hasExistingSocial"]:checked')?.value || '',
+    maintainExisting:   maintainExist,
+    maintainPlatforms:  [...document.querySelectorAll('input[name="maintainPlatform"]:checked')].map(c => c.value),
     createProfiles,
-    wantMaintenance:     wantMaint,
-    smPackage:           pkgVal,
-    totalPrice:          total,
-    contactName:         document.getElementById('contactName').value.trim(),
-    contactEmail:        document.getElementById('contactEmail').value.trim(),
-    contactPhone:        document.getElementById('contactPhone').value.trim()
+    createPlatforms,
+    wantMaintenance:    wantMaint,
+    smPackage:          pkgVal,
+    designPackage:      designPkg,
+    totalPrice:         total,
+    contactName:        document.getElementById('contactName').value.trim(),
+    contactEmail:       document.getElementById('contactEmail').value.trim(),
+    contactPhone:       document.getElementById('contactPhone').value.trim()
   };
 }
 
@@ -381,22 +450,53 @@ function showToast(message, icon) {
 async function loadAdminPricing() {
   const p = await fetchPricing();
   const set = (id, v) => { const el = document.getElementById(id); if (el) el.value = v; };
-  set('priceBase',     p.base);
-  set('pricePerPage',  p.perPage);
-  set('priceSMCreation', p.smCreation);
-  set('pricePackage1', p.package1);
-  set('pricePackage2', p.package2);
-  set('pricePackage3', p.package3);
-  set('pricePackage4', p.package4);
-  set('pricePackage5', p.package5);
+  set('priceBase',          p.base);
+  set('pricePerPage',       p.perPage);
+  set('priceDomainCom',     p.domainCom);
+  set('priceDomainLk',      p.domainLk);
+  set('priceDomainNet',     p.domainNet);
+  set('priceDomainOrg',     p.domainOrg);
+  set('priceDomainPremium', p.domainPremium);
+  set('priceHosting',       p.hosting);
+  set('priceLinkedinInt',   p.linkedinIntegration);
+  set('priceYoutubeInt',    p.youtubeIntegration);
+  set('priceSMCreateStd',   p.smCreateStandard);
+  set('priceSMCreatePrem',  p.smCreatePremium);
+  set('pricePackage1',      p.package1);
+  set('pricePackage2',      p.package2);
+  set('pricePackage3',      p.package3);
+  set('pricePackage4',      p.package4);
+  set('pricePackage5',      p.package5);
+  set('priceDesignCustom1', p.designCustom1);
+  set('priceDesignCustom2', p.designCustom2);
+  set('priceDesignPrem1',   p.designPremium1);
+  set('priceDesignPrem2',   p.designPremium2);
 }
 
 async function savePricing() {
   const get = id => parseFloat(document.getElementById(id)?.value) || 0;
   const pricing = {
-    base: get('priceBase'), perPage: get('pricePerPage'), smCreation: get('priceSMCreation'),
-    package1: get('pricePackage1'), package2: get('pricePackage2'), package3: get('pricePackage3'),
-    package4: get('pricePackage4'), package5: get('pricePackage5')
+    base:                get('priceBase'),
+    perPage:             get('pricePerPage'),
+    domainCom:           get('priceDomainCom'),
+    domainLk:            get('priceDomainLk'),
+    domainNet:           get('priceDomainNet'),
+    domainOrg:           get('priceDomainOrg'),
+    domainPremium:       get('priceDomainPremium'),
+    hosting:             get('priceHosting'),
+    linkedinIntegration: get('priceLinkedinInt'),
+    youtubeIntegration:  get('priceYoutubeInt'),
+    smCreateStandard:    get('priceSMCreateStd'),
+    smCreatePremium:     get('priceSMCreatePrem'),
+    package1:            get('pricePackage1'),
+    package2:            get('pricePackage2'),
+    package3:            get('pricePackage3'),
+    package4:            get('pricePackage4'),
+    package5:            get('pricePackage5'),
+    designCustom1:       get('priceDesignCustom1'),
+    designCustom2:       get('priceDesignCustom2'),
+    designPremium1:      get('priceDesignPrem1'),
+    designPremium2:      get('priceDesignPrem2'),
   };
   try {
     await apiPost('/api/pricing', pricing);

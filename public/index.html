@@ -157,10 +157,99 @@
           </div>
         </div>
 
-        <!-- 4. Social Media Integration -->
+        <!-- 4. Domain Selection -->
         <div class="form-section">
           <div class="section-header">
             <div class="section-number">4</div>
+            <h2>Domain Selection</h2>
+          </div>
+          <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:1.25rem;">Choose your preferred domain extension. Domain is registered and managed by us — yearly charge applies.</p>
+          <div class="domain-options">
+
+            <label class="domain-opt-card">
+              <input type="radio" name="domainExt" value="none" onchange="updatePricing()" checked />
+              <div class="dopt-inner">
+                <span class="dopt-ext">I have a domain</span>
+                <span class="dopt-price free-tag">FREE</span>
+              </div>
+            </label>
+
+            <label class="domain-opt-card">
+              <input type="radio" name="domainExt" value="com" onchange="updatePricing()" />
+              <div class="dopt-inner">
+                <span class="dopt-ext">.com</span>
+                <span class="dopt-price">LKR 3,000 /yr</span>
+              </div>
+            </label>
+
+            <label class="domain-opt-card">
+              <input type="radio" name="domainExt" value="lk" onchange="updatePricing()" />
+              <div class="dopt-inner">
+                <span class="dopt-ext">.lk</span>
+                <span class="dopt-price">LKR 6,000 /yr</span>
+              </div>
+            </label>
+
+            <label class="domain-opt-card">
+              <input type="radio" name="domainExt" value="net" onchange="updatePricing()" />
+              <div class="dopt-inner">
+                <span class="dopt-ext">.net</span>
+                <span class="dopt-price">LKR 4,000 /yr</span>
+              </div>
+            </label>
+
+            <label class="domain-opt-card">
+              <input type="radio" name="domainExt" value="org" onchange="updatePricing()" />
+              <div class="dopt-inner">
+                <span class="dopt-ext">.org</span>
+                <span class="dopt-price">LKR 4,000 /yr</span>
+              </div>
+            </label>
+
+            <label class="domain-opt-card">
+              <input type="radio" name="domainExt" value="premium" onchange="updatePricing()" />
+              <div class="dopt-inner">
+                <span class="dopt-ext">Premium</span>
+                <span class="dopt-price">LKR 10,000 /yr</span>
+              </div>
+            </label>
+
+          </div>
+        </div>
+
+        <!-- 5. Hosting -->
+        <div class="form-section">
+          <div class="section-header">
+            <div class="section-number">5</div>
+            <h2>Web Hosting</h2>
+          </div>
+          <div class="hosting-card">
+            <div class="hosting-info">
+              <span class="hosting-icon">🖥️</span>
+              <div>
+                <strong>Managed Web Hosting</strong>
+                <p>Reliable, fast hosting with uptime monitoring — fully managed by our team.</p>
+              </div>
+            </div>
+            <span class="hosting-price">LKR 12,000 / year</span>
+          </div>
+          <div class="form-group" style="margin-top:0.9rem; margin-bottom:0;">
+            <label>Include hosting in your package? <span class="required">*</span></label>
+            <div class="radio-inline">
+              <label class="radio-option">
+                <input type="radio" name="includeHosting" value="yes" onchange="updatePricing()" checked /> Yes — include hosting
+              </label>
+              <label class="radio-option">
+                <input type="radio" name="includeHosting" value="no" onchange="updatePricing()" /> No — I'll manage my own hosting
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- 6. Social Media Integration on Website -->
+        <div class="form-section">
+          <div class="section-header">
+            <div class="section-number">6</div>
             <h2>Social Media Integration on Website</h2>
           </div>
           <div class="form-group">
@@ -175,21 +264,22 @@
             </div>
           </div>
           <div id="socialPlatformsField" class="conditional-field">
-            <p style="font-size:0.82rem; color:var(--text-secondary); margin-bottom:0.75rem; font-weight:600;">Select platforms to integrate:</p>
+            <p style="font-size:0.82rem; color:var(--text-secondary); margin-bottom:0.35rem; font-weight:600;">Select platforms to integrate:</p>
+            <p style="font-size:0.78rem; color:var(--text-secondary); margin-bottom:0.75rem;">Facebook, Instagram &amp; TikTok are free. LinkedIn and YouTube carry an additional charge.</p>
             <div class="checkbox-inline">
               <label class="checkbox-option"><input type="checkbox" name="socialPlatform" value="Facebook" onchange="updatePricing()" /> 📘 Facebook</label>
               <label class="checkbox-option"><input type="checkbox" name="socialPlatform" value="Instagram" onchange="updatePricing()" /> 📸 Instagram</label>
-              <label class="checkbox-option"><input type="checkbox" name="socialPlatform" value="LinkedIn" onchange="updatePricing()" /> 💼 LinkedIn</label>
               <label class="checkbox-option"><input type="checkbox" name="socialPlatform" value="TikTok" onchange="updatePricing()" /> 🎵 TikTok</label>
-              <label class="checkbox-option"><input type="checkbox" name="socialPlatform" value="YouTube" onchange="updatePricing()" /> ▶️ YouTube</label>
+              <label class="checkbox-option"><input type="checkbox" name="socialPlatform" value="LinkedIn" onchange="updatePricing()" /> 💼 LinkedIn <span class="platform-price-hint">(+LKR 2,500)</span></label>
+              <label class="checkbox-option"><input type="checkbox" name="socialPlatform" value="YouTube" onchange="updatePricing()" /> ▶️ YouTube <span class="platform-price-hint">(+LKR 2,500)</span></label>
             </div>
           </div>
         </div>
 
-        <!-- 5. Existing Social Media -->
+        <!-- 7. Existing Social Media -->
         <div class="form-section">
           <div class="section-header">
-            <div class="section-number">5</div>
+            <div class="section-number">7</div>
             <h2>Existing Social Media</h2>
           </div>
           <div class="form-group">
@@ -222,8 +312,9 @@
               <div class="checkbox-inline">
                 <label class="checkbox-option"><input type="checkbox" name="maintainPlatform" value="Facebook" onchange="updatePricing()" /> 📘 Facebook</label>
                 <label class="checkbox-option"><input type="checkbox" name="maintainPlatform" value="Instagram" onchange="updatePricing()" /> 📸 Instagram</label>
-                <label class="checkbox-option"><input type="checkbox" name="maintainPlatform" value="LinkedIn" onchange="updatePricing()" /> 💼 LinkedIn</label>
+                <label class="checkbox-option"><input type="checkbox" name="maintainPlatform" value="WhatsApp" onchange="updatePricing()" /> 💬 WhatsApp</label>
                 <label class="checkbox-option"><input type="checkbox" name="maintainPlatform" value="TikTok" onchange="updatePricing()" /> 🎵 TikTok</label>
+                <label class="checkbox-option"><input type="checkbox" name="maintainPlatform" value="LinkedIn" onchange="updatePricing()" /> 💼 LinkedIn</label>
                 <label class="checkbox-option"><input type="checkbox" name="maintainPlatform" value="YouTube" onchange="updatePricing()" /> ▶️ YouTube</label>
               </div>
             </div>
@@ -242,6 +333,17 @@
                 </label>
               </div>
             </div>
+            <div id="createPlatformsField" class="conditional-field">
+              <p style="font-size:0.82rem; color:var(--text-secondary); margin-bottom:0.75rem; font-weight:600;">Select platforms to create <span style="font-weight:400;">(charged per profile):</span></p>
+              <div class="checkbox-inline">
+                <label class="checkbox-option"><input type="checkbox" name="createPlatform" value="Facebook" onchange="updatePricing()" /> 📘 Facebook <span class="platform-price-hint">(LKR 2,000)</span></label>
+                <label class="checkbox-option"><input type="checkbox" name="createPlatform" value="Instagram" onchange="updatePricing()" /> 📸 Instagram <span class="platform-price-hint">(LKR 2,000)</span></label>
+                <label class="checkbox-option"><input type="checkbox" name="createPlatform" value="WhatsApp" onchange="updatePricing()" /> 💬 WhatsApp <span class="platform-price-hint">(LKR 2,000)</span></label>
+                <label class="checkbox-option"><input type="checkbox" name="createPlatform" value="TikTok" onchange="updatePricing()" /> 🎵 TikTok <span class="platform-price-hint">(LKR 2,000)</span></label>
+                <label class="checkbox-option"><input type="checkbox" name="createPlatform" value="LinkedIn" onchange="updatePricing()" /> 💼 LinkedIn <span class="platform-price-hint">(LKR 2,500)</span></label>
+                <label class="checkbox-option"><input type="checkbox" name="createPlatform" value="YouTube" onchange="updatePricing()" /> ▶️ YouTube <span class="platform-price-hint">(LKR 2,500)</span></label>
+              </div>
+            </div>
             <div id="wantMaintenanceField" class="conditional-field">
               <div class="form-group" style="margin:0">
                 <label>Do you want us to maintain those new profiles? <span class="required">*</span></label>
@@ -258,30 +360,103 @@
           </div>
         </div>
 
-        <!-- 6. Social Media Package -->
+        <!-- 8. Social Media Package -->
         <div class="form-section">
           <div class="section-header">
-            <div class="section-number">6</div>
+            <div class="section-number">8</div>
             <h2>Social Media Package</h2>
           </div>
-          <div class="form-group" style="max-width:320px;">
-            <label for="smPackage">Select a package</label>
+          <div class="form-group" style="max-width:360px;">
+            <label for="smPackage">Select a maintenance package</label>
             <select id="smPackage" class="form-control" onchange="updatePricing()">
               <option value="">Choose package...</option>
-              <option value="1">Package 1 – Starter</option>
-              <option value="2">Package 2 – Growth</option>
-              <option value="3">Package 3 – Professional</option>
-              <option value="4">Package 4 – Business</option>
-              <option value="5">Package 5 – Enterprise</option>
+              <option value="1">Package 1 – Starter · LKR 3,500/mo</option>
+              <option value="2">Package 2 – Growth · LKR 5,000/mo</option>
+              <option value="3">Package 3 – Professional ⭐ · LKR 10,000/mo</option>
+              <option value="4">Package 4 – Business · LKR 20,000/mo</option>
+              <option value="5">Package 5 – Enterprise · LKR 50,000/mo</option>
             </select>
             <p class="form-hint" id="packageHint" style="margin-top:0.4rem;"></p>
           </div>
         </div>
 
-        <!-- 7. Dynamic Pricing -->
+        <!-- 9. Design and UI Enhancement -->
         <div class="form-section">
           <div class="section-header">
-            <div class="section-number">7</div>
+            <div class="section-number">9</div>
+            <h2>Design &amp; UI Enhancement</h2>
+          </div>
+          <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:1.25rem;">Choose a design package to elevate the look and feel of your website.</p>
+          <div class="design-packages">
+
+            <label class="design-pkg-card">
+              <input type="radio" name="designPackage" value="default" onchange="updatePricing()" checked />
+              <div class="dpkg-inner">
+                <div class="dpkg-top">
+                  <span class="dpkg-name">Default Design</span>
+                  <span class="dpkg-price free-tag">FREE</span>
+                </div>
+                <p class="dpkg-desc">Standard clean design included with every website.</p>
+              </div>
+            </label>
+
+            <label class="design-pkg-card">
+              <input type="radio" name="designPackage" value="customUI1" onchange="updatePricing()" />
+              <div class="dpkg-inner">
+                <span class="dpkg-badge recommended">⭐ Recommended</span>
+                <div class="dpkg-top">
+                  <span class="dpkg-name">Custom UI Design — Package 1</span>
+                  <span class="dpkg-price">LKR 10,000</span>
+                </div>
+                <p class="dpkg-desc">Tailored UI with custom colour palette, typography &amp; layout.</p>
+              </div>
+            </label>
+
+            <label class="design-pkg-card">
+              <input type="radio" name="designPackage" value="customUI2" onchange="updatePricing()" />
+              <div class="dpkg-inner">
+                <span class="dpkg-badge popular">🔥 Most Selected</span>
+                <div class="dpkg-top">
+                  <span class="dpkg-name">Custom UI Design — Package 2</span>
+                  <div class="dpkg-price-stack">
+                    <span class="dpkg-price-original">LKR 15,000</span>
+                    <span class="dpkg-price">LKR 12,000</span>
+                    <span class="dpkg-discount">20% OFF</span>
+                  </div>
+                </div>
+                <p class="dpkg-desc">Enhanced UI with advanced layouts, interactive components &amp; brand kit.</p>
+              </div>
+            </label>
+
+            <label class="design-pkg-card">
+              <input type="radio" name="designPackage" value="premiumAnim1" onchange="updatePricing()" />
+              <div class="dpkg-inner">
+                <div class="dpkg-top">
+                  <span class="dpkg-name">Premium Animations &amp; Effects — Package 1</span>
+                  <span class="dpkg-price">LKR 17,500</span>
+                </div>
+                <p class="dpkg-desc">Scroll animations, hover effects &amp; smooth page transitions.</p>
+              </div>
+            </label>
+
+            <label class="design-pkg-card">
+              <input type="radio" name="designPackage" value="premiumAnim2" onchange="updatePricing()" />
+              <div class="dpkg-inner">
+                <div class="dpkg-top">
+                  <span class="dpkg-name">Premium Animations / Effects — Package 2</span>
+                  <span class="dpkg-price">LKR 25,000</span>
+                </div>
+                <p class="dpkg-desc">Cinematic experience with particle effects, 3D elements &amp; custom micro-interactions.</p>
+              </div>
+            </label>
+
+          </div>
+        </div>
+
+        <!-- 10. Dynamic Pricing -->
+        <div class="form-section">
+          <div class="section-header">
+            <div class="section-number">10</div>
             <h2>Estimated Pricing</h2>
           </div>
           <div class="pricing-card">
@@ -300,10 +475,10 @@
           <p style="font-size:0.78rem; color:var(--text-secondary); margin-top:0.75rem;">* Pricing is indicative. Final quote provided after consultation.</p>
         </div>
 
-        <!-- 8. Contact Details -->
+        <!-- 11. Contact Details -->
         <div class="form-section">
           <div class="section-header">
-            <div class="section-number">8</div>
+            <div class="section-number">11</div>
             <h2>Contact Details</h2>
           </div>
           <div class="form-row">
