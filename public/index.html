@@ -273,8 +273,8 @@
               <label class="checkbox-option"><input type="checkbox" name="socialPlatform" value="Facebook" onchange="updatePricing()" /> 📘 Facebook</label>
               <label class="checkbox-option"><input type="checkbox" name="socialPlatform" value="Instagram" onchange="updatePricing()" /> 📸 Instagram</label>
               <label class="checkbox-option"><input type="checkbox" name="socialPlatform" value="TikTok" onchange="updatePricing()" /> 🎵 TikTok</label>
-              <label class="checkbox-option"><input type="checkbox" name="socialPlatform" value="LinkedIn" onchange="updatePricing()" /> 💼 LinkedIn <span class="platform-price-hint">(+LKR 2,500)</span></label>
-              <label class="checkbox-option"><input type="checkbox" name="socialPlatform" value="YouTube" onchange="updatePricing()" /> ▶️ YouTube <span class="platform-price-hint">(+LKR 2,500)</span></label>
+              <label class="checkbox-option"><input type="checkbox" name="socialPlatform" value="LinkedIn" onchange="updatePricing()" /> 💼 LinkedIn <span class="platform-price-hint" data-price="linkedinIntegration" data-pfx="+"></span></label>
+              <label class="checkbox-option"><input type="checkbox" name="socialPlatform" value="YouTube" onchange="updatePricing()" /> ▶️ YouTube <span class="platform-price-hint" data-price="youtubeIntegration" data-pfx="+"></span></label>
             </div>
           </div>
         </div>
@@ -314,12 +314,12 @@
               <p style="font-size:0.82rem; color:var(--text-secondary); margin-bottom:0.35rem; font-weight:600;">Select platforms to maintain <span style="font-weight:400;">(charged per platform / month):</span></p>
               <p style="font-size:0.78rem; color:var(--text-secondary); margin-bottom:0.75rem;">Facebook, Instagram, WhatsApp &amp; TikTok — standard rate. LinkedIn &amp; YouTube — premium rate.</p>
               <div class="checkbox-inline">
-                <label class="checkbox-option"><input type="checkbox" name="maintainPlatform" value="Facebook" onchange="updatePricing()" /> 📘 Facebook <span class="platform-price-hint">(LKR 2,000/mo)</span></label>
-                <label class="checkbox-option"><input type="checkbox" name="maintainPlatform" value="Instagram" onchange="updatePricing()" /> 📸 Instagram <span class="platform-price-hint">(LKR 2,000/mo)</span></label>
-                <label class="checkbox-option"><input type="checkbox" name="maintainPlatform" value="WhatsApp" onchange="updatePricing()" /> 💬 WhatsApp <span class="platform-price-hint">(LKR 2,000/mo)</span></label>
-                <label class="checkbox-option"><input type="checkbox" name="maintainPlatform" value="TikTok" onchange="updatePricing()" /> 🎵 TikTok <span class="platform-price-hint">(LKR 2,000/mo)</span></label>
-                <label class="checkbox-option"><input type="checkbox" name="maintainPlatform" value="LinkedIn" onchange="updatePricing()" /> 💼 LinkedIn <span class="platform-price-hint">(LKR 2,500/mo)</span></label>
-                <label class="checkbox-option"><input type="checkbox" name="maintainPlatform" value="YouTube" onchange="updatePricing()" /> ▶️ YouTube <span class="platform-price-hint">(LKR 2,500/mo)</span></label>
+                <label class="checkbox-option"><input type="checkbox" name="maintainPlatform" value="Facebook" onchange="updatePricing()" /> 📘 Facebook <span class="platform-price-hint" data-price="maintainStandard" data-sfx="/mo"></span></label>
+                <label class="checkbox-option"><input type="checkbox" name="maintainPlatform" value="Instagram" onchange="updatePricing()" /> 📸 Instagram <span class="platform-price-hint" data-price="maintainStandard" data-sfx="/mo"></span></label>
+                <label class="checkbox-option"><input type="checkbox" name="maintainPlatform" value="WhatsApp" onchange="updatePricing()" /> 💬 WhatsApp <span class="platform-price-hint" data-price="maintainStandard" data-sfx="/mo"></span></label>
+                <label class="checkbox-option"><input type="checkbox" name="maintainPlatform" value="TikTok" onchange="updatePricing()" /> 🎵 TikTok <span class="platform-price-hint" data-price="maintainStandard" data-sfx="/mo"></span></label>
+                <label class="checkbox-option"><input type="checkbox" name="maintainPlatform" value="LinkedIn" onchange="updatePricing()" /> 💼 LinkedIn <span class="platform-price-hint" data-price="maintainPremium" data-sfx="/mo"></span></label>
+                <label class="checkbox-option"><input type="checkbox" name="maintainPlatform" value="YouTube" onchange="updatePricing()" /> ▶️ YouTube <span class="platform-price-hint" data-price="maintainPremium" data-sfx="/mo"></span></label>
               </div>
             </div>
           </div>
@@ -340,12 +340,12 @@
             <div id="createPlatformsField" class="conditional-field">
               <p style="font-size:0.82rem; color:var(--text-secondary); margin-bottom:0.75rem; font-weight:600;">Select platforms to create <span style="font-weight:400;">(charged per profile):</span></p>
               <div class="checkbox-inline">
-                <label class="checkbox-option"><input type="checkbox" name="createPlatform" value="Facebook" onchange="updatePricing()" /> 📘 Facebook <span class="platform-price-hint">(LKR 2,000)</span></label>
-                <label class="checkbox-option"><input type="checkbox" name="createPlatform" value="Instagram" onchange="updatePricing()" /> 📸 Instagram <span class="platform-price-hint">(LKR 2,000)</span></label>
-                <label class="checkbox-option"><input type="checkbox" name="createPlatform" value="WhatsApp" onchange="updatePricing()" /> 💬 WhatsApp <span class="platform-price-hint">(LKR 2,000)</span></label>
-                <label class="checkbox-option"><input type="checkbox" name="createPlatform" value="TikTok" onchange="updatePricing()" /> 🎵 TikTok <span class="platform-price-hint">(LKR 2,000)</span></label>
-                <label class="checkbox-option"><input type="checkbox" name="createPlatform" value="LinkedIn" onchange="updatePricing()" /> 💼 LinkedIn <span class="platform-price-hint">(LKR 2,500)</span></label>
-                <label class="checkbox-option"><input type="checkbox" name="createPlatform" value="YouTube" onchange="updatePricing()" /> ▶️ YouTube <span class="platform-price-hint">(LKR 2,500)</span></label>
+                <label class="checkbox-option"><input type="checkbox" name="createPlatform" value="Facebook" onchange="updatePricing()" /> 📘 Facebook <span class="platform-price-hint" data-price="smCreateStandard"></span></label>
+                <label class="checkbox-option"><input type="checkbox" name="createPlatform" value="Instagram" onchange="updatePricing()" /> 📸 Instagram <span class="platform-price-hint" data-price="smCreateStandard"></span></label>
+                <label class="checkbox-option"><input type="checkbox" name="createPlatform" value="WhatsApp" onchange="updatePricing()" /> 💬 WhatsApp <span class="platform-price-hint" data-price="smCreateStandard"></span></label>
+                <label class="checkbox-option"><input type="checkbox" name="createPlatform" value="TikTok" onchange="updatePricing()" /> 🎵 TikTok <span class="platform-price-hint" data-price="smCreateStandard"></span></label>
+                <label class="checkbox-option"><input type="checkbox" name="createPlatform" value="LinkedIn" onchange="updatePricing()" /> 💼 LinkedIn <span class="platform-price-hint" data-price="smCreatePremium"></span></label>
+                <label class="checkbox-option"><input type="checkbox" name="createPlatform" value="YouTube" onchange="updatePricing()" /> ▶️ YouTube <span class="platform-price-hint" data-price="smCreatePremium"></span></label>
               </div>
             </div>
             <div id="wantMaintenanceField" class="conditional-field">
@@ -364,12 +364,12 @@
                 <p style="font-size:0.82rem; color:var(--text-secondary); margin-bottom:0.35rem; font-weight:600;">Select platforms to maintain <span style="font-weight:400;">(charged per platform / month):</span></p>
                 <p style="font-size:0.78rem; color:var(--text-secondary); margin-bottom:0.75rem;">Facebook, Instagram, WhatsApp &amp; TikTok — standard rate. LinkedIn &amp; YouTube — premium rate.</p>
                 <div class="checkbox-inline">
-                  <label class="checkbox-option"><input type="checkbox" name="maintainNewPlatform" value="Facebook" onchange="updatePricing()" /> 📘 Facebook <span class="platform-price-hint">(LKR 2,000/mo)</span></label>
-                  <label class="checkbox-option"><input type="checkbox" name="maintainNewPlatform" value="Instagram" onchange="updatePricing()" /> 📸 Instagram <span class="platform-price-hint">(LKR 2,000/mo)</span></label>
-                  <label class="checkbox-option"><input type="checkbox" name="maintainNewPlatform" value="WhatsApp" onchange="updatePricing()" /> 💬 WhatsApp <span class="platform-price-hint">(LKR 2,000/mo)</span></label>
-                  <label class="checkbox-option"><input type="checkbox" name="maintainNewPlatform" value="TikTok" onchange="updatePricing()" /> 🎵 TikTok <span class="platform-price-hint">(LKR 2,000/mo)</span></label>
-                  <label class="checkbox-option"><input type="checkbox" name="maintainNewPlatform" value="LinkedIn" onchange="updatePricing()" /> 💼 LinkedIn <span class="platform-price-hint">(LKR 2,500/mo)</span></label>
-                  <label class="checkbox-option"><input type="checkbox" name="maintainNewPlatform" value="YouTube" onchange="updatePricing()" /> ▶️ YouTube <span class="platform-price-hint">(LKR 2,500/mo)</span></label>
+                  <label class="checkbox-option"><input type="checkbox" name="maintainNewPlatform" value="Facebook" onchange="updatePricing()" /> 📘 Facebook <span class="platform-price-hint" data-price="maintainStandard" data-sfx="/mo"></span></label>
+                  <label class="checkbox-option"><input type="checkbox" name="maintainNewPlatform" value="Instagram" onchange="updatePricing()" /> 📸 Instagram <span class="platform-price-hint" data-price="maintainStandard" data-sfx="/mo"></span></label>
+                  <label class="checkbox-option"><input type="checkbox" name="maintainNewPlatform" value="WhatsApp" onchange="updatePricing()" /> 💬 WhatsApp <span class="platform-price-hint" data-price="maintainStandard" data-sfx="/mo"></span></label>
+                  <label class="checkbox-option"><input type="checkbox" name="maintainNewPlatform" value="TikTok" onchange="updatePricing()" /> 🎵 TikTok <span class="platform-price-hint" data-price="maintainStandard" data-sfx="/mo"></span></label>
+                  <label class="checkbox-option"><input type="checkbox" name="maintainNewPlatform" value="LinkedIn" onchange="updatePricing()" /> 💼 LinkedIn <span class="platform-price-hint" data-price="maintainPremium" data-sfx="/mo"></span></label>
+                  <label class="checkbox-option"><input type="checkbox" name="maintainNewPlatform" value="YouTube" onchange="updatePricing()" /> ▶️ YouTube <span class="platform-price-hint" data-price="maintainPremium" data-sfx="/mo"></span></label>
                 </div>
               </div>
             </div>

@@ -150,8 +150,19 @@ function formatLKR(n) {
   return 'LKR ' + Number(n).toLocaleString('en-US');
 }
 
+function updatePriceHints(pricing) {
+  document.querySelectorAll('.platform-price-hint[data-price]').forEach(el => {
+    const val = pricing[el.dataset.price];
+    if (val === undefined) return;
+    const pfx = el.dataset.pfx || '';
+    const sfx = el.dataset.sfx || '';
+    el.textContent = `(${pfx}${formatLKR(val)}${sfx})`;
+  });
+}
+
 async function updatePricing() {
   const pricing = await fetchPricing();
+  updatePriceHints(pricing);
   const items = [];
   let total = 0;
 
