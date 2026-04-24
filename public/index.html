@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DigiSolutions — Digital Services</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <header class="header">
+    <div class="header-inner">
+      <a href="index.html" class="logo">
+        <div class="logo-icon">⚡</div>
+        DigiSolutions
+      </a>
+      <div class="header-actions">
+        <button class="theme-toggle" id="themeToggle" title="Toggle dark mode">🌙</button>
+        <a href="admin.html" class="btn btn-outline">🔒 Admin</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="main">
+
+    <!-- ===== LANDING SECTION ===== -->
+    <section id="landingSection" class="page-section active">
+      <div class="hero">
+        <span class="hero-badge">✨ Digital Solutions</span>
+        <h1>Grow Your Business Digitally</h1>
+        <p>Transform your vision into a powerful digital presence. Choose what you need below to get started.</p>
+      </div>
+
+      <div class="services-grid">
+        <div class="service-card" onclick="showSection('websiteForm')">
+          <span class="service-badge">Available</span>
+          <div class="service-icon">🌐</div>
+          <h3>I want to create a website</h3>
+          <p>Get a professional, modern website tailored to your business. Dynamic pricing, social media integration, and more.</p>
+        </div>
+
+        <div class="service-card" onclick="showSection('businessSection')">
+          <span class="service-badge badge-beta">Beta</span>
+          <div class="service-icon">⚙️</div>
+          <h3>I want to improve business processes</h3>
+          <p>Streamline HR, accounting, marketing, and hiring workflows to boost efficiency across your organisation.</p>
+        </div>
+
+        <div class="service-card disabled" onclick="showComingSoon()">
+          <span class="service-badge badge-soon">Soon</span>
+          <div class="service-icon">💬</div>
+          <h3>I want free consultancy</h3>
+          <p>Book a free 30-minute session with our digital transformation consultants. Coming soon.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== WEBSITE REQUEST FORM ===== -->
+    <section id="websiteForm" class="page-section">
+      <button class="back-btn" onclick="showSection('landingSection')">← Back to Services</button>
+      <h2 style="font-size:1.4rem; margin-bottom:0.3rem;">Website Request Form</h2>
+      <p style="color:var(--text-secondary); font-size:0.875rem; margin-bottom:1.5rem;">Fill in the details below and we'll prepare a customised quote for you.</p>
+
+      <form id="websiteRequestForm" novalidate>
+
+        <!-- 1. Business Information -->
+        <div class="form-section">
+          <div class="section-header">
+            <div class="section-number">1</div>
+            <h2>Business Information</h2>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="businessType">Business Type <span class="required">*</span></label>
+              <select id="businessType" class="form-control" onchange="handleBusinessType()">
+                <option value="">Select business type...</option>
+                <option value="Retail">Retail</option>
+                <option value="Service">Service</option>
+                <option value="E-commerce">E-commerce</option>
+                <option value="Education">Education</option>
+                <option value="Other">Other</option>
+              </select>
+              <span class="error-msg" id="businessTypeError">Please select a business type.</span>
+            </div>
+            <div class="form-group">
+              <label for="clientCount">Number of Clients <span class="required">*</span></label>
+              <select id="clientCount" class="form-control">
+                <option value="">Select range...</option>
+                <option value="0–50">0 – 50</option>
+                <option value="50–100">50 – 100</option>
+                <option value="100–500">100 – 500</option>
+                <option value="500+">500+</option>
+              </select>
+              <span class="error-msg" id="clientCountError">Please select a client count range.</span>
+            </div>
+          </div>
+          <div id="otherBusinessField" class="conditional-field">
+            <div class="form-group" style="margin:0">
+              <label for="otherBusiness">Specify your business type</label>
+              <input type="text" id="otherBusiness" class="form-control" placeholder="e.g., Healthcare, Real estate, Photography..." />
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Marketing Scope -->
+        <div class="form-section">
+          <div class="section-header">
+            <div class="section-number">2</div>
+            <h2>Marketing Scope</h2>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="marketingScope">Marketing Scope <span class="required">*</span></label>
+              <select id="marketingScope" class="form-control">
+                <option value="">Select scope...</option>
+                <option value="Local">Local</option>
+                <option value="National">National</option>
+                <option value="International">International</option>
+              </select>
+              <span class="error-msg" id="marketingScopeError">Please select a marketing scope.</span>
+            </div>
+            <div class="form-group">
+              <label for="marketingCustom">Additional Details</label>
+              <input type="text" id="marketingCustom" class="form-control" placeholder="Target regions, demographics, language..." />
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. Website Requirements -->
+        <div class="form-section">
+          <div class="section-header">
+            <div class="section-number">3</div>
+            <h2>Website Requirements</h2>
+          </div>
+          <div class="form-group">
+            <label for="websiteRequirement">Describe your requirements <span class="required">*</span></label>
+            <textarea id="websiteRequirement" class="form-control" rows="4"
+              placeholder="Tell us about your website goals, target audience, key features, design style, special functionality..."></textarea>
+            <span class="error-msg" id="websiteRequirementError">Please describe your requirements (at least 10 characters).</span>
+          </div>
+          <div class="form-group">
+            <label for="exampleWebsite">Example websites you like <span style="font-weight:400; color:var(--text-secondary);">(optional)</span></label>
+            <input type="text" id="exampleWebsite" class="form-control" placeholder="https://example.com, https://another-site.com" />
+            <p class="form-hint">Separate multiple URLs with commas</p>
+          </div>
+          <div class="form-group" style="max-width:220px;">
+            <label for="numPages">Number of Pages <span class="required">*</span></label>
+            <select id="numPages" class="form-control" onchange="updatePricing()">
+              <option value="">Select...</option>
+              <option value="1">1 page</option>
+              <option value="2">2 pages</option>
+              <option value="3">3 pages</option>
+              <option value="4">4 pages</option>
+              <option value="5">5+ pages</option>
+            </select>
+            <span class="error-msg" id="numPagesError">Please select the number of pages.</span>
+          </div>
+        </div>
+
+        <!-- 4. Social Media Integration -->
+        <div class="form-section">
+          <div class="section-header">
+            <div class="section-number">4</div>
+            <h2>Social Media Integration on Website</h2>
+          </div>
+          <div class="form-group">
+            <label>Integrate social media feeds/links into your website? <span class="required">*</span></label>
+            <div class="radio-inline">
+              <label class="radio-option">
+                <input type="radio" name="socialIntegration" value="yes" onchange="handleSocialIntegration()" /> Yes
+              </label>
+              <label class="radio-option">
+                <input type="radio" name="socialIntegration" value="no" onchange="handleSocialIntegration()" /> No
+              </label>
+            </div>
+          </div>
+          <div id="socialPlatformsField" class="conditional-field">
+            <p style="font-size:0.82rem; color:var(--text-secondary); margin-bottom:0.75rem; font-weight:600;">Select platforms to integrate:</p>
+            <div class="checkbox-inline">
+              <label class="checkbox-option"><input type="checkbox" name="socialPlatform" value="Facebook" onchange="updatePricing()" /> 📘 Facebook</label>
+              <label class="checkbox-option"><input type="checkbox" name="socialPlatform" value="Instagram" onchange="updatePricing()" /> 📸 Instagram</label>
+              <label class="checkbox-option"><input type="checkbox" name="socialPlatform" value="LinkedIn" onchange="updatePricing()" /> 💼 LinkedIn</label>
+              <label class="checkbox-option"><input type="checkbox" name="socialPlatform" value="TikTok" onchange="updatePricing()" /> 🎵 TikTok</label>
+              <label class="checkbox-option"><input type="checkbox" name="socialPlatform" value="YouTube" onchange="updatePricing()" /> ▶️ YouTube</label>
+            </div>
+          </div>
+        </div>
+
+        <!-- 5. Existing Social Media -->
+        <div class="form-section">
+          <div class="section-header">
+            <div class="section-number">5</div>
+            <h2>Existing Social Media</h2>
+          </div>
+          <div class="form-group">
+            <label>Do you have existing social media profiles? <span class="required">*</span></label>
+            <div class="radio-inline">
+              <label class="radio-option">
+                <input type="radio" name="hasExistingSocial" value="yes" onchange="handleExistingSocial()" /> Yes
+              </label>
+              <label class="radio-option">
+                <input type="radio" name="hasExistingSocial" value="no" onchange="handleExistingSocial()" /> No
+              </label>
+            </div>
+          </div>
+
+          <!-- Branch: YES — existing profiles -->
+          <div id="existingSocialYes" class="conditional-field">
+            <div class="form-group">
+              <label>Do you want us to maintain your existing social media? <span class="required">*</span></label>
+              <div class="radio-inline">
+                <label class="radio-option">
+                  <input type="radio" name="maintainExisting" value="yes" onchange="handleMaintainExisting(); updatePricing();" /> Yes
+                </label>
+                <label class="radio-option">
+                  <input type="radio" name="maintainExisting" value="no" onchange="handleMaintainExisting(); updatePricing();" /> No
+                </label>
+              </div>
+            </div>
+            <div id="maintainPlatformsField" class="conditional-field">
+              <p style="font-size:0.82rem; color:var(--text-secondary); margin-bottom:0.75rem; font-weight:600;">Select platforms to maintain:</p>
+              <div class="checkbox-inline">
+                <label class="checkbox-option"><input type="checkbox" name="maintainPlatform" value="Facebook" onchange="updatePricing()" /> 📘 Facebook</label>
+                <label class="checkbox-option"><input type="checkbox" name="maintainPlatform" value="Instagram" onchange="updatePricing()" /> 📸 Instagram</label>
+                <label class="checkbox-option"><input type="checkbox" name="maintainPlatform" value="LinkedIn" onchange="updatePricing()" /> 💼 LinkedIn</label>
+                <label class="checkbox-option"><input type="checkbox" name="maintainPlatform" value="TikTok" onchange="updatePricing()" /> 🎵 TikTok</label>
+                <label class="checkbox-option"><input type="checkbox" name="maintainPlatform" value="YouTube" onchange="updatePricing()" /> ▶️ YouTube</label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Branch: NO — no existing profiles -->
+          <div id="existingSocialNo" class="conditional-field">
+            <div class="form-group">
+              <label>Would you like us to create professional social media profiles for you? <span class="required">*</span></label>
+              <div class="radio-inline">
+                <label class="radio-option">
+                  <input type="radio" name="createProfiles" value="yes" onchange="handleCreateProfiles(); updatePricing();" /> Yes
+                </label>
+                <label class="radio-option">
+                  <input type="radio" name="createProfiles" value="no" onchange="handleCreateProfiles(); updatePricing();" /> No
+                </label>
+              </div>
+            </div>
+            <div id="wantMaintenanceField" class="conditional-field">
+              <div class="form-group" style="margin:0">
+                <label>Do you want us to maintain those new profiles? <span class="required">*</span></label>
+                <div class="radio-inline">
+                  <label class="radio-option">
+                    <input type="radio" name="wantMaintenance" value="yes" onchange="updatePricing()" /> Yes
+                  </label>
+                  <label class="radio-option">
+                    <input type="radio" name="wantMaintenance" value="no" onchange="updatePricing()" /> No
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 6. Social Media Package -->
+        <div class="form-section">
+          <div class="section-header">
+            <div class="section-number">6</div>
+            <h2>Social Media Package</h2>
+          </div>
+          <div class="form-group" style="max-width:320px;">
+            <label for="smPackage">Select a package</label>
+            <select id="smPackage" class="form-control" onchange="updatePricing()">
+              <option value="">Choose package...</option>
+              <option value="1">Package 1 – Starter</option>
+              <option value="2">Package 2 – Growth</option>
+              <option value="3">Package 3 – Professional</option>
+              <option value="4">Package 4 – Business</option>
+              <option value="5">Package 5 – Enterprise</option>
+            </select>
+            <p class="form-hint" id="packageHint" style="margin-top:0.4rem;"></p>
+          </div>
+        </div>
+
+        <!-- 7. Dynamic Pricing -->
+        <div class="form-section">
+          <div class="section-header">
+            <div class="section-number">7</div>
+            <h2>Estimated Pricing</h2>
+          </div>
+          <div class="pricing-card">
+            <h3>💰 Price Breakdown</h3>
+            <div class="pricing-items" id="pricingItems">
+              <div class="pricing-item">
+                <span>Select options above to see pricing</span>
+                <span>—</span>
+              </div>
+            </div>
+            <div class="pricing-total">
+              <span>Total Estimate</span>
+              <span class="amount" id="totalPrice">LKR 0</span>
+            </div>
+          </div>
+          <p style="font-size:0.78rem; color:var(--text-secondary); margin-top:0.75rem;">* Pricing is indicative. Final quote provided after consultation.</p>
+        </div>
+
+        <!-- 8. Contact Details -->
+        <div class="form-section">
+          <div class="section-header">
+            <div class="section-number">8</div>
+            <h2>Contact Details</h2>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="contactName">Full Name <span class="required">*</span></label>
+              <input type="text" id="contactName" class="form-control" placeholder="Rajitha Perera" />
+              <span class="error-msg" id="contactNameError">Please enter your full name.</span>
+            </div>
+            <div class="form-group">
+              <label for="contactEmail">Email Address <span class="required">*</span></label>
+              <input type="email" id="contactEmail" class="form-control" placeholder="you@example.com" />
+              <span class="error-msg" id="contactEmailError">Please enter a valid email address.</span>
+            </div>
+            <div class="form-group">
+              <label for="contactPhone">Phone Number <span class="required">*</span></label>
+              <input type="tel" id="contactPhone" class="form-control" placeholder="+94 71 234 5678" />
+              <span class="error-msg" id="contactPhoneError">Please enter your phone number.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="submit-section">
+          <button type="submit" class="btn-submit" id="submitBtn">Submit Request</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- ===== BUSINESS PROCESSES SECTION ===== -->
+    <section id="businessSection" class="page-section">
+      <button class="back-btn" onclick="showSection('landingSection')">← Back to Services</button>
+      <h2 style="font-size:1.4rem; margin-bottom:0.3rem;">Business Process Improvement</h2>
+      <p style="color:var(--text-secondary); font-size:0.875rem; margin-bottom:1.5rem;">Tell us which areas you'd like to improve and we'll get back to you within 1 hour.</p>
+
+      <form id="businessProcessForm" novalidate>
+        <div class="form-section">
+          <div class="section-header">
+            <div class="section-number">1</div>
+            <h2>Process Areas</h2>
+          </div>
+          <div class="form-group">
+            <label>Which areas need improvement? <span style="font-weight:400;color:var(--text-secondary);">(Select all that apply)</span></label>
+            <div class="checkbox-group">
+              <label class="checkbox-option"><input type="checkbox" name="processArea" value="HR" /> 👥 Human Resources (HR)</label>
+              <label class="checkbox-option"><input type="checkbox" name="processArea" value="Hiring" /> 🎯 People Hiring &amp; Recruitment</label>
+              <label class="checkbox-option"><input type="checkbox" name="processArea" value="Accounting" /> 📊 Accounting &amp; Finance</label>
+              <label class="checkbox-option"><input type="checkbox" name="processArea" value="Marketing" /> 📣 Marketing &amp; Campaigns</label>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Business Scope</label>
+            <div class="radio-inline">
+              <label class="radio-option"><input type="radio" name="businessScope" value="National" /> 🇱🇰 National</label>
+              <label class="radio-option"><input type="radio" name="businessScope" value="International" /> 🌍 International</label>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="processDetails">Describe your current challenges</label>
+            <textarea id="processDetails" class="form-control" rows="4"
+              placeholder="What's not working well? What outcome are you hoping for?"></textarea>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <div class="section-header">
+            <div class="section-number">2</div>
+            <h2>Contact Details</h2>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="bpName">Full Name <span class="required">*</span></label>
+              <input type="text" id="bpName" class="form-control" placeholder="Your name" />
+              <span class="error-msg" id="bpNameError">Please enter your name.</span>
+            </div>
+            <div class="form-group">
+              <label for="bpEmail">Email Address <span class="required">*</span></label>
+              <input type="email" id="bpEmail" class="form-control" placeholder="you@example.com" />
+              <span class="error-msg" id="bpEmailError">Please enter a valid email.</span>
+            </div>
+            <div class="form-group">
+              <label for="bpPhone">Phone Number</label>
+              <input type="tel" id="bpPhone" class="form-control" placeholder="+94 ..." />
+            </div>
+          </div>
+        </div>
+
+        <div class="submit-section">
+          <button type="submit" class="btn-submit" id="bpSubmitBtn">Submit Inquiry</button>
+        </div>
+      </form>
+    </section>
+
+  </main>
+
+  <!-- Success Modal -->
+  <div class="modal-overlay" id="successModal">
+    <div class="modal">
+      <div class="modal-icon">✅</div>
+      <h2>Request Submitted!</h2>
+      <p id="successModalMsg">Your request has been submitted. You will be contacted within 1 hour.</p>
+      <button class="btn-submit" style="margin-top:1.5rem; padding:0.65rem 2rem; border-radius:8px;" onclick="closeModal()">
+        Back to Home
+      </button>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast">
+    <span class="toast-icon" id="toastIcon">✅</span>
+    <p id="toastMsg"></p>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
