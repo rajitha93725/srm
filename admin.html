@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard — DigiSolutions</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <header class="admin-header">
+    <div class="admin-header-inner">
+      <a href="index.html" class="logo">
+        <div class="logo-icon">⚡</div>
+        DigiSolutions
+        <span class="admin-subtitle">/ Admin</span>
+      </a>
+      <div class="header-actions">
+        <button class="theme-toggle" id="themeToggle" title="Toggle dark mode">🌙</button>
+        <a href="index.html" class="btn btn-outline">← Customer View</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="admin-main">
+
+    <h1 style="font-size:1.4rem; margin-bottom:0.2rem;">Dashboard</h1>
+    <p style="color:var(--text-secondary); font-size:0.875rem; margin-bottom:1.5rem;">Manage pricing and review customer submissions.</p>
+
+    <!-- Stats Row -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">Total Requests</div>
+        <div class="stat-value" id="statTotal">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Est. Revenue</div>
+        <div class="stat-value small" id="statRevenue">LKR 0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">With Social Media</div>
+        <div class="stat-value" id="statSocial">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Avg. Pages</div>
+        <div class="stat-value" id="statAvgPages">0</div>
+      </div>
+    </div>
+
+    <div class="admin-layout">
+
+      <!-- LEFT: Pricing Configuration -->
+      <div>
+        <p class="sidebar-heading">Pricing Configuration</p>
+        <div class="pricing-settings">
+
+          <!-- Base Website -->
+          <div class="price-card">
+            <div class="price-card-header">
+              <div class="price-card-icon">🌐</div>
+              <h3>Base Website (1 Page)</h3>
+            </div>
+            <p class="price-link-label">
+              <span class="link-icon">🔗</span>
+              Linked to: Customer form → Number of Pages = 1
+            </p>
+            <div class="price-input-group">
+              <span class="currency">LKR</span>
+              <input type="number" class="price-input" id="priceBase" value="15000" min="0" onchange="savePricing()" />
+            </div>
+          </div>
+
+          <!-- Per Additional Page -->
+          <div class="price-card">
+            <div class="price-card-header">
+              <div class="price-card-icon">📄</div>
+              <h3>Price per Additional Page</h3>
+            </div>
+            <p class="price-link-label">
+              <span class="link-icon">🔗</span>
+              Linked to: Each page beyond the first
+            </p>
+            <div class="price-input-group">
+              <span class="currency">LKR</span>
+              <input type="number" class="price-input" id="pricePerPage" value="5000" min="0" onchange="savePricing()" />
+            </div>
+          </div>
+
+          <!-- Social Media Creation -->
+          <div class="price-card">
+            <div class="price-card-header">
+              <div class="price-card-icon">📱</div>
+              <h3>Social Media Profile Creation</h3>
+            </div>
+            <p class="price-link-label">
+              <span class="link-icon">🔗</span>
+              Linked to: "Create professional profiles" = Yes
+            </p>
+            <div class="price-input-group">
+              <span class="currency">LKR</span>
+              <input type="number" class="price-input" id="priceSMCreation" value="10000" min="0" onchange="savePricing()" />
+            </div>
+          </div>
+
+          <!-- Packages -->
+          <div class="price-card">
+            <div class="price-card-header">
+              <div class="price-card-icon">📦</div>
+              <h3>Social Media Packages</h3>
+            </div>
+            <p class="price-link-label">
+              <span class="link-icon">🔗</span>
+              Linked to: "Social Media Package" dropdown (monthly)
+            </p>
+            <div class="package-row">
+              <div class="package-item">
+                <label>Package 1 – Starter</label>
+                <div class="price-input-group">
+                  <span class="currency">LKR</span>
+                  <input type="number" class="price-input" id="pricePackage1" value="5000" min="0" onchange="savePricing()" />
+                </div>
+              </div>
+              <div class="package-item">
+                <label>Package 2 – Growth</label>
+                <div class="price-input-group">
+                  <span class="currency">LKR</span>
+                  <input type="number" class="price-input" id="pricePackage2" value="10000" min="0" onchange="savePricing()" />
+                </div>
+              </div>
+              <div class="package-item">
+                <label>Package 3 – Professional</label>
+                <div class="price-input-group">
+                  <span class="currency">LKR</span>
+                  <input type="number" class="price-input" id="pricePackage3" value="15000" min="0" onchange="savePricing()" />
+                </div>
+              </div>
+              <div class="package-item">
+                <label>Package 4 – Business</label>
+                <div class="price-input-group">
+                  <span class="currency">LKR</span>
+                  <input type="number" class="price-input" id="pricePackage4" value="20000" min="0" onchange="savePricing()" />
+                </div>
+              </div>
+              <div class="package-item">
+                <label>Package 5 – Enterprise</label>
+                <div class="price-input-group">
+                  <span class="currency">LKR</span>
+                  <input type="number" class="price-input" id="pricePackage5" value="25000" min="0" onchange="savePricing()" />
+                </div>
+              </div>
+            </div>
+            <button class="save-btn" onclick="savePricing(); showToast('Pricing saved successfully!', '✅')">
+              💾 Save All Pricing
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- RIGHT: Requests Table -->
+      <div>
+        <div class="table-container">
+          <div class="table-header">
+            <h2>Customer Requests</h2>
+            <div class="table-actions">
+              <select id="perPageSelect" class="form-control"
+                style="width:auto; padding:0.4rem 0.7rem; font-size:0.82rem;"
+                onchange="currentPage=1; renderTable()">
+                <option value="5">5 / page</option>
+                <option value="10" selected>10 / page</option>
+              </select>
+              <button class="btn btn-outline" onclick="exportJSON()" style="font-size:0.82rem;">⬇ Export JSON</button>
+              <button class="btn btn-danger" onclick="clearRequests()" style="font-size:0.82rem;">🗑 Clear All</button>
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Name</th>
+                  <th>Type</th>
+                  <th>Business</th>
+                  <th>Pages</th>
+                  <th>Social Platforms</th>
+                  <th>Package</th>
+                  <th>Total Price</th>
+                  <th>Email</th>
+                  <th>Phone</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody id="requestsTableBody"></tbody>
+            </table>
+          </div>
+
+          <div id="emptyState" class="empty-state" style="display:none;">
+            <div class="empty-icon">📋</div>
+            <p>No requests submitted yet.<br>Customer submissions will appear here.</p>
+          </div>
+
+          <div class="pagination" id="paginationControls" style="display:none;">
+            <div class="pagination-info" id="paginationInfo"></div>
+            <div class="pagination-controls" id="paginationBtns"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Toast -->
+  <div class="toast" id="toast">
+    <span class="toast-icon" id="toastIcon">✅</span>
+    <p id="toastMsg"></p>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
