@@ -8,6 +8,29 @@
 </head>
 <body>
 
+  <!-- Admin Login Overlay -->
+  <div id="adminLoginOverlay" class="admin-login-overlay">
+    <div class="admin-login-card">
+      <div class="login-logo">
+        <div class="logo-icon">⚡</div>
+        <h2>Admin Login</h2>
+        <p class="login-subtitle">DigiSolutions Admin Dashboard</p>
+      </div>
+      <form id="adminLoginForm" novalidate>
+        <div class="form-group">
+          <label for="adminUsername">Username</label>
+          <input type="text" id="adminUsername" class="form-control" placeholder="Username" autocomplete="username" />
+        </div>
+        <div class="form-group">
+          <label for="adminPassword">Password</label>
+          <input type="password" id="adminPassword" class="form-control" placeholder="••••••••" autocomplete="current-password" />
+        </div>
+        <p class="login-error" id="adminLoginError"></p>
+        <button type="submit" class="save-btn" id="adminLoginBtn" style="margin-top:1rem;">Login to Dashboard</button>
+      </form>
+    </div>
+  </div>
+
   <header class="admin-header">
     <div class="admin-header-inner">
       <a href="index.html" class="logo">
@@ -18,6 +41,7 @@
       <div class="header-actions">
         <button class="theme-toggle" id="themeToggle" title="Toggle dark mode">🌙</button>
         <a href="index.html" class="btn btn-outline">← Customer View</a>
+        <button class="btn btn-outline" onclick="adminLogout()" style="font-size:0.82rem;">🔒 Logout</button>
       </div>
     </div>
   </header>
@@ -263,54 +287,100 @@
         </div>
       </div>
 
-      <!-- RIGHT: Requests Table -->
+      <!-- RIGHT: Tabbed panel (Requests + Users) -->
       <div>
-        <div class="table-container">
-          <div class="table-header">
-            <h2>Customer Requests</h2>
-            <div class="table-actions">
-              <select id="perPageSelect" class="form-control"
-                style="width:auto; padding:0.4rem 0.7rem; font-size:0.82rem;"
-                onchange="currentPage=1; renderTable()">
-                <option value="5">5 / page</option>
-                <option value="10" selected>10 / page</option>
-              </select>
-              <button class="btn btn-outline" onclick="exportJSON()" style="font-size:0.82rem;">⬇ Export JSON</button>
-              <button class="btn btn-danger" onclick="clearRequests()" style="font-size:0.82rem;">🗑 Clear All</button>
+        <!-- Tab Bar -->
+        <div class="admin-tabs-bar">
+          <button class="admin-tab-btn active" id="tabBtnRequests" onclick="switchAdminTab('Requests', this)">📋 Customer Requests</button>
+          <button class="admin-tab-btn" id="tabBtnUsers" onclick="switchAdminTab('Users', this)">👥 Registered Users</button>
+        </div>
+
+        <!-- Requests Tab -->
+        <div id="tabRequests" class="admin-tab-panel active">
+          <div class="table-container">
+            <div class="table-header">
+              <h2>Customer Requests</h2>
+              <div class="table-actions">
+                <select id="requestFilterSelect" class="form-control"
+                  style="width:auto; padding:0.4rem 0.7rem; font-size:0.82rem;"
+                  onchange="currentPage=1; renderTable()">
+                  <option value="all">All</option>
+                  <option value="registered">Registered</option>
+                  <option value="guest">Guest</option>
+                </select>
+                <select id="perPageSelect" class="form-control"
+                  style="width:auto; padding:0.4rem 0.7rem; font-size:0.82rem;"
+                  onchange="currentPage=1; renderTable()">
+                  <option value="5">5 / page</option>
+                  <option value="10" selected>10 / page</option>
+                </select>
+                <button class="btn btn-outline" onclick="exportJSON()" style="font-size:0.82rem;">⬇ Export JSON</button>
+                <button class="btn btn-danger" onclick="clearRequests()" style="font-size:0.82rem;">🗑 Clear All</button>
+              </div>
+            </div>
+
+            <div class="table-responsive">
+              <table>
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th>Business</th>
+                    <th>Pages</th>
+                    <th>Social Platforms</th>
+                    <th>Package</th>
+                    <th>Total Price</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Date</th>
+                  </tr>
+                </thead>
+                <tbody id="requestsTableBody"></tbody>
+              </table>
+            </div>
+
+            <div id="emptyState" class="empty-state" style="display:none;">
+              <div class="empty-icon">📋</div>
+              <p>No requests submitted yet.<br>Customer submissions will appear here.</p>
+            </div>
+
+            <div class="pagination" id="paginationControls" style="display:none;">
+              <div class="pagination-info" id="paginationInfo"></div>
+              <div class="pagination-controls" id="paginationBtns"></div>
             </div>
           </div>
+        </div>
 
-          <div class="table-responsive">
-            <table>
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>Name</th>
-                  <th>Type</th>
-                  <th>Business</th>
-                  <th>Pages</th>
-                  <th>Social Platforms</th>
-                  <th>Package</th>
-                  <th>Total Price</th>
-                  <th>Email</th>
-                  <th>Phone</th>
-                  <th>Date</th>
-                </tr>
-              </thead>
-              <tbody id="requestsTableBody"></tbody>
-            </table>
-          </div>
-
-          <div id="emptyState" class="empty-state" style="display:none;">
-            <div class="empty-icon">📋</div>
-            <p>No requests submitted yet.<br>Customer submissions will appear here.</p>
-          </div>
-
-          <div class="pagination" id="paginationControls" style="display:none;">
-            <div class="pagination-info" id="paginationInfo"></div>
-            <div class="pagination-controls" id="paginationBtns"></div>
+        <!-- Users Tab -->
+        <div id="tabUsers" class="admin-tab-panel">
+          <div class="table-container">
+            <div class="table-header">
+              <h2>Registered Users</h2>
+              <div class="table-actions">
+                <button class="btn btn-danger" onclick="clearUsers()" style="font-size:0.82rem;">🗑 Clear All</button>
+              </div>
+            </div>
+            <div class="table-responsive">
+              <table>
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Full Name</th>
+                    <th>Login (Email / Phone)</th>
+                    <th>Registered At</th>
+                  </tr>
+                </thead>
+                <tbody id="usersTableBody"></tbody>
+              </table>
+            </div>
+            <div id="usersEmptyState" class="empty-state" style="display:none;">
+              <div class="empty-icon">👥</div>
+              <p>No registered users yet.</p>
+            </div>
           </div>
         </div>
+
       </div>
 
     </div>

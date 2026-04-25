@@ -2,7 +2,14 @@
   "permissions": {
     "allow": [
       "Bash(npm install *)",
-      "Bash(node -e \"const express=require\\('express'\\); console.log\\('Express OK, version:', require\\('./node_modules/express/package.json'\\).version\\)\")"
+      "Bash(node -e \"const express=require\\('express'\\); console.log\\('Express OK, version:', require\\('./node_modules/express/package.json'\\).version\\)\")",
+      "Bash(python3 -c ' *)",
+      "Bash(node -e \" const readline = require\\('readline'\\); const lines = require\\('fs'\\).readFileSync\\('/dev/stdin','utf8'\\).trim\\(\\).split\\('\\\\n'\\); lines.slice\\(-20\\).forEach\\(line => { try { const obj = JSON.parse\\(line\\); const role = obj.role || ''; let content = obj.content || ''; if \\(Array.isArray\\(content\\)\\) { content.forEach\\(c => { if \\(c && c.type === 'text'\\) console.log\\(role.toUpperCase\\(\\) + ':', c.text.substring\\(0,400\\)\\); }\\); } else if \\(typeof content === 'string'\\) { console.log\\(role.toUpperCase\\(\\) + ':', content.substring\\(0,400\\)\\); } } catch\\(e\\) {} }\\); \")",
+      "Bash(node -e ' *)",
+      "Bash(node server.js)",
+      "Bash(curl -s http://localhost:3000/api/pricing)",
+      "Bash(node -e \"const d=require\\('fs'\\).readFileSync\\('/dev/stdin','utf8'\\); console.log\\(JSON.parse\\(d\\).base ? 'Server OK' : 'bad response'\\)\")",
+      "Bash(node -c server.js)"
     ]
   }
 }

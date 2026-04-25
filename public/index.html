@@ -587,6 +587,59 @@
 
   </main>
 
+  <!-- Register Choice Modal -->
+  <div class="modal-overlay register-choice-modal" id="registerChoiceModal">
+    <div class="modal" style="max-width:500px; text-align:left;">
+
+      <!-- Step 1: Choice -->
+      <div id="regStepChoice">
+        <div class="modal-icon" style="background:var(--accent-light);">🎉</div>
+        <h2 style="font-size:1.15rem; margin-bottom:0.5rem;">Almost there!</h2>
+        <p style="color:var(--text-secondary); font-size:0.88rem;">
+          Create a free account and get a <strong>5% discount</strong> on your total, or continue as a guest.
+        </p>
+        <div class="register-options">
+          <div class="reg-opt-card featured" onclick="showRegisterForm()">
+            <div class="reg-opt-icon">🌟</div>
+            <div class="reg-opt-title">Register &amp; Save</div>
+            <div class="reg-opt-desc">Create an account and get 5% off your estimate.</div>
+            <span class="discount-tag">5% OFF</span>
+          </div>
+          <div class="reg-opt-card" onclick="submitWithoutRegister()">
+            <div class="reg-opt-icon">➔</div>
+            <div class="reg-opt-title">Continue as Guest</div>
+            <div class="reg-opt-desc">Submit without registering. No discount applied.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2: Registration Form -->
+      <div id="regStepForm" class="reg-form-step">
+        <button class="reg-back-btn" onclick="showRegChoiceStep()">← Back</button>
+        <h2 style="font-size:1.1rem; margin-bottom:0.3rem;">Create Your Account</h2>
+        <p style="color:var(--text-secondary); font-size:0.85rem; margin-bottom:1.25rem;">Quick registration — just a few details.</p>
+        <div class="form-group">
+          <label for="regFullName">Full Name <span class="required">*</span></label>
+          <input type="text" id="regFullName" class="form-control" placeholder="Your full name" />
+        </div>
+        <div class="form-group">
+          <label for="regLogin">Email or Phone Number <span class="required">*</span></label>
+          <input type="text" id="regLogin" class="form-control" placeholder="email@example.com or +94 71 234 5678" />
+        </div>
+        <div class="form-group">
+          <label for="regPassword">Password <span class="required">*</span></label>
+          <input type="password" id="regPassword" class="form-control" placeholder="Min. 6 characters" />
+        </div>
+        <p class="login-error" id="regError"></p>
+        <div style="display:flex; gap:0.75rem; margin-top:1.25rem; justify-content:flex-end; flex-wrap:wrap;">
+          <button class="btn btn-outline" onclick="submitWithoutRegister()">Skip — no discount</button>
+          <button class="btn-submit" id="regSubmitBtn" onclick="submitWithRegister()" style="padding:0.65rem 1.75rem; border-radius:100px;">Register &amp; Submit</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
   <!-- Success Modal -->
   <div class="modal-overlay" id="successModal">
     <div class="modal">

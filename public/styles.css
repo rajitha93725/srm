@@ -790,3 +790,86 @@ tr:hover td { background: var(--bg-secondary); }
 ::-webkit-scrollbar-track { background: var(--bg-secondary); }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--text-secondary); }
+
+/* ===== Admin Login Overlay ===== */
+.admin-login-overlay {
+  position: fixed; inset: 0;
+  background: var(--bg-secondary);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 2000;
+}
+.admin-login-card {
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  padding: 2.5rem;
+  width: 100%; max-width: 380px;
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--border);
+}
+.login-logo { text-align: center; margin-bottom: 1.75rem; }
+.login-logo .logo-icon { width: 52px; height: 52px; font-size: 1.4rem; margin: 0 auto 0.75rem; }
+.login-logo h2 { font-size: 1.1rem; margin-bottom: 0.3rem; }
+.login-subtitle { color: var(--text-secondary); font-size: 0.85rem; margin-top: 0.2rem; }
+.login-error { color: var(--danger); font-size: 0.8rem; margin-top: 0.5rem; text-align: center; display: none; }
+
+/* ===== Admin Tabs ===== */
+.admin-tabs-bar {
+  display: flex;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-bottom: 2px solid var(--border);
+  border-radius: var(--radius) var(--radius) 0 0;
+  padding: 0 1rem;
+}
+.admin-tab-btn {
+  padding: 0.8rem 1rem; font-size: 0.85rem; font-weight: 600;
+  border: none; background: none; cursor: pointer;
+  color: var(--text-secondary); position: relative;
+  transition: var(--transition); font-family: inherit;
+}
+.admin-tab-btn::after {
+  content: ''; position: absolute; bottom: -2px; left: 0; right: 0; height: 2px;
+  background: var(--accent); transform: scaleX(0); transition: transform 0.25s ease;
+}
+.admin-tab-btn:hover { color: var(--accent); }
+.admin-tab-btn.active { color: var(--accent); }
+.admin-tab-btn.active::after { transform: scaleX(1); }
+.admin-tab-panel { display: none; }
+.admin-tab-panel.active { display: block; }
+.admin-tab-panel .table-container {
+  border-top: none;
+  border-radius: 0 0 var(--radius) var(--radius);
+}
+
+/* ===== Register Choice Modal ===== */
+.register-choice-modal .modal { max-width: 500px; text-align: left; }
+.register-options {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;
+  margin: 1.25rem 0 0.5rem;
+}
+@media (max-width: 500px) { .register-options { grid-template-columns: 1fr; } }
+.reg-opt-card {
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.1rem; cursor: pointer;
+  transition: var(--transition); text-align: center;
+  background: var(--bg-secondary);
+}
+.reg-opt-card:hover { border-color: var(--accent); background: var(--accent-light); }
+.reg-opt-card.featured { border-color: var(--accent); background: var(--accent-light); }
+.reg-opt-icon { font-size: 1.6rem; margin-bottom: 0.45rem; }
+.reg-opt-title { font-size: 0.88rem; font-weight: 700; margin-bottom: 0.3rem; }
+.reg-opt-desc { font-size: 0.78rem; color: var(--text-secondary); line-height: 1.5; }
+.discount-tag {
+  display: inline-flex; align-items: center;
+  background: var(--success); color: white;
+  font-size: 0.7rem; font-weight: 700;
+  padding: 0.15rem 0.5rem; border-radius: 100px; margin-top: 0.35rem;
+}
+.reg-form-step { display: none; }
+.reg-back-btn {
+  background: none; border: none; color: var(--text-secondary);
+  font-size: 0.82rem; cursor: pointer; padding: 0; font-family: inherit;
+  margin-bottom: 1rem; display: flex; align-items: center; gap: 0.3rem;
+}
+.reg-back-btn:hover { color: var(--accent); }

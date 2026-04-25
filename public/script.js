@@ -1,5 +1,5 @@
 /* ================================================================
-   VisitSL / DigiSolutions — script.js
+   DigiSolutions — script.js
    All data operations use the Express REST API (/api/*)
    Theme preference is kept in localStorage (client-only).
    ================================================================ */
@@ -329,7 +329,7 @@ async function collectWebsiteData() {
   const wantMaint      = document.querySelector('input[name="wantMaintenance"]:checked')?.value  || '';
   const pkgVal         = document.getElementById('smPackage').value;
   const designPkg      = document.querySelector('input[name="designPackage"]:checked')?.value || 'default';
-  const createPlatforms     = [...document.querySelectorAll('input[name="createPlatform"]:checked')].map(c => c.value);
+  const createPlatforms      = [...document.querySelectorAll('input[name="createPlatform"]:checked')].map(c => c.value);
   const maintainNewPlatforms = [...document.querySelectorAll('input[name="maintainNewPlatform"]:checked')].map(c => c.value);
 
   let total = 0;
@@ -401,8 +401,10 @@ async function collectWebsiteData() {
 }
 
 // ----------------------------------------------------------------
-// SUBMIT — WEBSITE FORM
+// SUBMIT — WEBSITE FORM (shows register choice modal)
 // ----------------------------------------------------------------
+let _pendingSubmitData = null;
+
 async function handleWebsiteSubmit(e) {
   e.preventDefault();
   if (!validateWebsiteForm()) {
@@ -413,18 +415,107 @@ async function handleWebsiteSubmit(e) {
 
   const btn = document.getElementById('submitBtn');
   btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span> Submitting...';
+  btn.innerHTML = '<span class="spinner"></span> Processing...';
 
   try {
-    const data = await collectWebsiteData();
+    _pendingSubmitData = await collectWebsiteData();
+    showRegChoiceStep();
+    document.getElementById('registerChoiceModal')?.classList.add('show');
+  } catch (err) {
+    showToast('Something went wrong. Please try again.', '❌');
+    console.error(err);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Submit Request';
+  }
+}
+
+// ----------------------------------------------------------------
+// REGISTRATION FLOW
+// ----------------------------------------------------------------
+function showRegChoiceStep() {
+  const choice = document.getElementById('regStepChoice');
+  const form   = document.getElementById('regStepForm');
+  const errEl  = document.getElementById('regError');
+  if (choice) choice.style.display = '';
+  if (form)   form.style.display   = 'none';
+  if (errEl)  errEl.style.display  = 'none';
+}
+
+function showRegisterForm() {
+  document.getElementById('regStepChoice')?.style.setProperty('display', 'none');
+  const formStep = document.getElementById('regStepForm');
+  if (formStep) formStep.style.display = 'block';
+}
+
+async function submitWithRegister() {
+  const fullName = document.getElementById('regFullName')?.value.trim() || '';
+  const login    = document.getElementById('regLogin')?.value.trim()    || '';
+  const password = document.getElementById('regPassword')?.value        || '';
+  const errEl    = document.getElementById('regError');
+
+  if (!fullName || !login || password.length < 6) {
+    if (errEl) { errEl.textContent = 'Please fill all fields. Password must be at least 6 characters.'; errEl.style.display = 'block'; }
+    return;
+  }
+  if (errEl) errEl.style.display = 'none';
+
+  const btn = document.getElementById('regSubmitBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Registering...';
+
+  try {
+    let userId = null;
+    try {
+      const reg = await apiPost('/api/users', { fullName, login, password });
+      userId = reg.id;
+    } catch (regErr) {
+      if (!regErr.message.includes('409')) throw regErr;
+      showToast('Login already registered — submitting without extra discount.', 'ℹ️');
+    }
+
+    const hasDiscount = userId != null;
+    const data = {
+      ..._pendingSubmitData,
+      registeredUser: hasDiscount,
+      userId,
+      totalPrice: hasDiscount ? Math.round(_pendingSubmitData.totalPrice * 0.95) : _pendingSubmitData.totalPrice
+    };
+
     await apiPost('/api/requests', data);
+    document.getElementById('registerChoiceModal')?.classList.remove('show');
+    _pendingSubmitData = null;
+
+    const msg = hasDiscount
+      ? `Registered! 5% discount applied — Total: ${formatLKR(data.totalPrice)}. We'll contact you within 1 hour.`
+      : 'Your request has been submitted. You will be contacted within 1 hour.';
+    showSuccessModal(msg);
+  } catch (err) {
+    if (errEl) { errEl.textContent = 'Submission failed. Please try again.'; errEl.style.display = 'block'; }
+    showToast('Submission failed. Please try again.', '❌');
+    console.error(err);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Register & Submit';
+  }
+}
+
+async function submitWithoutRegister() {
+  document.getElementById('registerChoiceModal')?.classList.remove('show');
+
+  const btn = document.getElementById('submitBtn');
+  if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Submitting...'; }
+
+  try {
+    await apiPost('/api/requests', { ..._pendingSubmitData, registeredUser: false });
+    _pendingSubmitData = null;
     showSuccessModal('Your request has been submitted. You will be contacted within 1 hour.');
   } catch (err) {
     showToast('Submission failed. Please try again.', '❌');
     console.error(err);
   } finally {
-    btn.disabled = false;
-    btn.textContent = 'Submit Request';
+    if (btn) { btn.disabled = false; btn.textContent = 'Submit Request'; }
+    _pendingSubmitData = null;
   }
 }
 
@@ -449,6 +540,7 @@ async function handleBusinessSubmit(e) {
       businessScope: document.querySelector('input[name="businessScope"]:checked')?.value || '',
       details:       document.getElementById('processDetails')?.value || '',
       numPages: '', socialPlatforms: [], smPackage: '', totalPrice: 0,
+      registeredUser: false,
       contactName:  document.getElementById('bpName').value.trim(),
       contactEmail: document.getElementById('bpEmail').value.trim(),
       contactPhone: document.getElementById('bpPhone')?.value.trim() || ''
@@ -483,6 +575,12 @@ function closeModal() {
     document.querySelectorAll('.error-msg.show').forEach(f => f.classList.remove('show'));
     updatePricing();
   }
+  // Reset register form fields
+  ['regFullName', 'regLogin', 'regPassword'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  _pendingSubmitData = null;
 }
 
 // ----------------------------------------------------------------
@@ -497,6 +595,69 @@ function showToast(message, icon) {
   toast.classList.add('show');
   clearTimeout(_toastTimer);
   _toastTimer = setTimeout(() => toast.classList.remove('show'), 3200);
+}
+
+// ----------------------------------------------------------------
+// ADMIN AUTH
+// ----------------------------------------------------------------
+function checkAdminAuth() {
+  const overlay = document.getElementById('adminLoginOverlay');
+  if (!overlay) return;
+  if (sessionStorage.getItem('ds_admin') === '1') {
+    overlay.style.display = 'none';
+  } else {
+    overlay.style.display = 'flex';
+  }
+}
+
+async function handleAdminLogin(e) {
+  e.preventDefault();
+  const username = document.getElementById('adminUsername').value.trim();
+  const password = document.getElementById('adminPassword').value;
+  const btn = document.getElementById('adminLoginBtn');
+  const errEl = document.getElementById('adminLoginError');
+  errEl.style.display = 'none';
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Logging in...';
+  try {
+    const result = await apiPost('/api/auth', { username, password });
+    if (result.success) {
+      sessionStorage.setItem('ds_admin', '1');
+      document.getElementById('adminLoginOverlay').style.display = 'none';
+      loadAdminPricing();
+      renderTable();
+    }
+  } catch {
+    errEl.textContent = 'Invalid credentials. Please try again.';
+    errEl.style.display = 'block';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Login to Dashboard';
+  }
+}
+
+function adminLogout() {
+  sessionStorage.removeItem('ds_admin');
+  const overlay = document.getElementById('adminLoginOverlay');
+  if (overlay) overlay.style.display = 'flex';
+  const u = document.getElementById('adminUsername');
+  const p = document.getElementById('adminPassword');
+  const e = document.getElementById('adminLoginError');
+  if (u) u.value = '';
+  if (p) p.value = '';
+  if (e) e.style.display = 'none';
+}
+
+// ----------------------------------------------------------------
+// ADMIN TABS
+// ----------------------------------------------------------------
+function switchAdminTab(tabId, btn) {
+  document.querySelectorAll('.admin-tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.admin-tab-panel').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  const panel = document.getElementById('tab' + tabId);
+  if (panel) panel.classList.add('active');
+  if (tabId === 'Users') renderUsersTable();
 }
 
 // ----------------------------------------------------------------
@@ -566,7 +727,7 @@ async function savePricing() {
 }
 
 // ----------------------------------------------------------------
-// ADMIN — TABLE & PAGINATION
+// ADMIN — REQUESTS TABLE & PAGINATION
 // ----------------------------------------------------------------
 let currentPage = 1;
 
@@ -574,8 +735,13 @@ async function renderTable() {
   let requests = [];
   try { requests = await apiGet('/api/requests'); } catch { requests = []; }
 
+  const filter = document.getElementById('requestFilterSelect')?.value || 'all';
+  let filtered = requests;
+  if (filter === 'registered') filtered = requests.filter(r => r.registeredUser);
+  else if (filter === 'guest')  filtered = requests.filter(r => !r.registeredUser);
+
   const perPage    = parseInt(document.getElementById('perPageSelect')?.value) || 10;
-  const totalPages = Math.max(1, Math.ceil(requests.length / perPage));
+  const totalPages = Math.max(1, Math.ceil(filtered.length / perPage));
   if (currentPage > totalPages) currentPage = totalPages;
 
   updateStats(requests);
@@ -585,7 +751,7 @@ async function renderTable() {
   const pagination = document.getElementById('paginationControls');
   if (!tbody) return;
 
-  if (requests.length === 0) {
+  if (filtered.length === 0) {
     tbody.innerHTML = '';
     if (empty)      empty.style.display = 'block';
     if (pagination) pagination.style.display = 'none';
@@ -595,17 +761,20 @@ async function renderTable() {
   if (empty)      empty.style.display = 'none';
   if (pagination) pagination.style.display = 'flex';
 
-  const reversed  = [...requests].reverse();
+  const reversed  = [...filtered].reverse();
   const start     = (currentPage - 1) * perPage;
   const pageItems = reversed.slice(start, start + perPage);
   const pkgNames  = { '1':'Starter','2':'Growth','3':'Professional','4':'Business','5':'Enterprise' };
 
   tbody.innerHTML = pageItems.map((req, i) => {
-    const rowNum    = requests.length - start - i;
+    const rowNum    = filtered.length - start - i;
     const date      = new Date(req.timestamp).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' });
     const typeBadge = req.type === 'business'
       ? '<span class="badge badge-purple">Business</span>'
       : '<span class="badge badge-blue">Website</span>';
+    const userBadge = req.registeredUser
+      ? ' <span class="badge badge-orange" style="font-size:0.65rem;">Reg.</span>'
+      : '';
     const platforms = req.socialPlatforms?.length ? req.socialPlatforms.join(', ') : '—';
     const pkg       = req.smPackage ? `Pkg ${req.smPackage} · ${pkgNames[req.smPackage] || ''}` : '—';
     const price     = req.totalPrice > 0
@@ -614,7 +783,7 @@ async function renderTable() {
 
     return `<tr>
       <td style="color:var(--text-secondary)">${rowNum}</td>
-      <td><strong>${esc(req.contactName || '—')}</strong></td>
+      <td><strong>${esc(req.contactName || '—')}</strong>${userBadge}</td>
       <td>${typeBadge}</td>
       <td style="max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"
           title="${esc(req.businessType || req.processAreas?.join(', ') || '')}">
@@ -630,7 +799,7 @@ async function renderTable() {
     </tr>`;
   }).join('');
 
-  renderPagination(requests.length, perPage, totalPages, start);
+  renderPagination(filtered.length, perPage, totalPages, start);
 }
 
 function renderPagination(total, perPage, totalPages, start) {
@@ -669,6 +838,35 @@ function updateStats(requests) {
 }
 
 // ----------------------------------------------------------------
+// ADMIN — USERS TABLE
+// ----------------------------------------------------------------
+async function renderUsersTable() {
+  let users = [];
+  try { users = await apiGet('/api/users'); } catch { users = []; }
+
+  const tbody = document.getElementById('usersTableBody');
+  const empty = document.getElementById('usersEmptyState');
+  if (!tbody) return;
+
+  if (users.length === 0) {
+    tbody.innerHTML = '';
+    if (empty) empty.style.display = 'block';
+    return;
+  }
+  if (empty) empty.style.display = 'none';
+
+  tbody.innerHTML = users.map((u, i) => {
+    const date = new Date(u.registeredAt).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' });
+    return `<tr>
+      <td style="color:var(--text-secondary)">${i + 1}</td>
+      <td><strong>${esc(u.fullName || '—')}</strong></td>
+      <td style="font-size:0.82rem">${esc(u.login || '—')}</td>
+      <td style="font-size:0.78rem;color:var(--text-secondary)">${date}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ----------------------------------------------------------------
 // ADMIN — EXPORT & CLEAR
 // ----------------------------------------------------------------
 async function exportJSON() {
@@ -680,7 +878,7 @@ async function exportJSON() {
   const url  = URL.createObjectURL(blob);
   const a    = document.createElement('a');
   a.href = url;
-  a.download = `visitsl-requests-${new Date().toISOString().slice(0, 10)}.json`;
+  a.download = `digisolutions-requests-${new Date().toISOString().slice(0, 10)}.json`;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
@@ -700,6 +898,17 @@ async function clearRequests() {
   }
 }
 
+async function clearUsers() {
+  if (!confirm('Delete ALL registered users? This cannot be undone.')) return;
+  try {
+    await apiDelete('/api/users');
+    renderUsersTable();
+    showToast('All users cleared.', '🗑️');
+  } catch {
+    showToast('Failed to clear users.', '❌');
+  }
+}
+
 // ----------------------------------------------------------------
 // UTILITY
 // ----------------------------------------------------------------
@@ -715,11 +924,15 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('themeToggle')?.addEventListener('click', toggleTheme);
   document.getElementById('websiteRequestForm')?.addEventListener('submit', handleWebsiteSubmit);
   document.getElementById('businessProcessForm')?.addEventListener('submit', handleBusinessSubmit);
+  document.getElementById('adminLoginForm')?.addEventListener('submit', handleAdminLogin);
 
   if (document.getElementById('pricingItems')) updatePricing();   // customer page
 
   if (document.getElementById('requestsTableBody')) {             // admin page
-    loadAdminPricing();
-    renderTable();
+    checkAdminAuth();
+    if (sessionStorage.getItem('ds_admin') === '1') {
+      loadAdminPricing();
+      renderTable();
+    }
   }
 });
