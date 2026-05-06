@@ -169,12 +169,26 @@ h2{font-size:1rem;font-weight:600;margin-bottom:14px;color:#f1f5f9}
 
 <header>
   <div class="header-titles">
-    <div style="display:flex;align-items:center;gap:10px;">
-  <span style="font-size:1.3rem;">🏆</span>
-  <span style="font-size:1.3rem;">🎱</span>
-  <h1 style="margin:0;font-size:1.5rem;font-weight:800;">
+    <div style="display:flex;align-items:center;gap:12px;">
+  <svg width="44" height="44" viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0">
+    <!-- pool table felt -->
+    <rect x="1" y="1" width="42" height="42" rx="6" fill="#14532d" stroke="#166534" stroke-width="1.5"/>
+    <!-- cue stick -->
+    <line x1="5" y1="8" x2="30" y2="33" stroke="#d4a855" stroke-width="3" stroke-linecap="round"/>
+    <line x1="5" y1="8" x2="7" y2="10" stroke="#f0d090" stroke-width="3" stroke-linecap="round"/>
+    <!-- 8-ball (main) -->
+    <circle cx="34" cy="28" r="7" fill="#1e1e1e"/>
+    <circle cx="34" cy="28" r="3.8" fill="white"/>
+    <text x="34" y="30" text-anchor="middle" font-size="4" font-weight="bold" fill="#1e1e1e" font-family="sans-serif">8</text>
+    <!-- red ball -->
+    <circle cx="24" cy="34" r="4.5" fill="#ef4444" stroke="#166534" stroke-width=".5"/>
+    <!-- yellow ball -->
+    <circle cx="34" cy="14" r="4.5" fill="#eab308" stroke="#166534" stroke-width=".5"/>
+    <!-- white cue ball -->
+    <circle cx="13" cy="30" r="4" fill="#f8fafc" stroke="#166534" stroke-width=".5"/>
+  </svg>
+  <h1 style="margin:0;font-size:1.5rem;font-weight:800;background:linear-gradient(90deg,#f8fafc,#94a3b8);-webkit-background-clip:text;-webkit-text-fill-color:transparent">
     Gapstars Pool Tournament — 2026
-    <span style="font-size:1rem; font-weight:700; color:#94a3b8; margin-left:10px;"> · Men’s Doubles</span>
   </h1>
 </div>
     <p>hosted by stargazers &nbsp; &nbsp;·&nbsp; 12 groups &nbsp;·&nbsp; 4 houses</p>
@@ -320,41 +334,20 @@ function getGroup(gId){
 }
 
 // ── Scoring: per SUB-MATCH ────────────────────────────────────────────────────
-// Each sub-match independently: winner +1.0, loser +(loser_score/winner_score × 0.7)
-// Max per sub-match = 1.7 (winner 1.0 + loser near-equal score → 0.7)
+// Each sub-match: winner +1.0, loser +(loser_score/winner_score × 0.7). Max 1.7 per sub-match.
 function calcMatchup(sc){
   if(!sc||!sc.t1||!sc.t1.length) return null;
-
   let t1pts=0,t2pts=0,t1w=0,t2w=0,t1b=0,t2b=0;
-
   sc.t1.forEach((s1,i)=>{
-    const s2=Number(sc.t2[i])||0; 
-    s1=Number(s1)||0;
-
-    t1b+=s1; 
-    t2b+=s2;
-
+    const s2=Number(sc.t2[i])||0; s1=Number(s1)||0;
+    t1b+=s1; t2b+=s2;
     if(s1>0||s2>0){
-      if(s1>s2) t1w++;
-      else if(s2>s1) t2w++;
-
-      // 🔥 KEY CHANGE: Direct addition
-      t1pts += s1;
-      t2pts += s2;
+      if(s1>s2){t1pts+=1;t2pts+=s1>0?Math.round(s2/s1*700)/1000:0;t1w++;}
+      else if(s2>s1){t2pts+=1;t1pts+=s2>0?Math.round(s1/s2*700)/1000:0;t2w++;}
     }
   });
-
-  const winner = t1w>t2w ? 0 : t2w>t1w ? 1 : null;
-
-  return {
-    t1pts: Math.round(t1pts*10)/10,
-    t2pts: Math.round(t2pts*10)/10,
-    t1w,
-    t2w,
-    winner,
-    t1b,
-    t2b
-  };
+  const winner=t1w>t2w?0:t2w>t1w?1:null;
+  return{t1pts:Math.round(t1pts*1000)/1000,t2pts:Math.round(t2pts*1000)/1000,t1w,t2w,winner,t1b,t2b};
 }
 
 // ── Group standings ───────────────────────────────────────────────────────────
@@ -405,18 +398,25 @@ function getKOWinner(id){const m=STATE.knockout[id];return m&&m.winner!=null?m.w
 function renderGroups(){
   document.getElementById('groups-container').innerHTML=BASE_GROUPS.map(bg=>{
     const grp=getGroup(bg.id), st=getGroupStandings(bg.id);
-    const pairsHtml=grp.pairs.map((p,pi)=>`
-      <div class="pair-row">
-        <span class="h-label" style="color:${hc(p.h)}">${hn(p.h)}</span>
-        <span class="pair-name" style="color:${hc(p.h)}">${p.n}</span>
-        <button class="edit-btn" onclick="openNameEdit(${bg.id},${pi})">✏</button>
-      </div>`).join('');
     const standHtml=st.map((p,rank)=>`
       <div class="standing-row rank-${rank+1}">
         <div class="rank-circle">${rank+1}</div>
-        <span style="flex:1;color:${hc(p.h)};font-weight:600;font-size:.75rem">${p.n}</span>
-        <span style="font-size:.65rem;color:${hc(p.h)};opacity:.65">${hn(p.h)}</span>
-        <span style="font-weight:700;color:${rank===0?'#fbbf24':'#64748b'};font-size:.78rem;min-width:38px;text-align:right">${p.pts.toFixed(1)}</span>
+        <span style="flex:1;color:${hc(p.h)};font-weight:600;font-size:.75rem;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.n}</span>
+        <span style="display:inline-flex;align-items:center;gap:3px;font-size:.63rem;color:${hc(p.h)};opacity:.9;flex-shrink:0;margin:0 4px">
+          <svg width="12" height="12" viewBox="0 0 12 12" style="flex-shrink:0;filter:drop-shadow(0 0 3px ${hc(p.h)}88)">
+            <defs>
+              <radialGradient id="sd_${bg.id}_${rank}" cx="36%" cy="30%" r="65%">
+                <stop offset="0%" stop-color="#fff" stop-opacity="0.9"/>
+                <stop offset="45%" stop-color="${hc(p.h)}"/>
+                <stop offset="100%" stop-color="${hc(p.h)}" stop-opacity="0.8"/>
+              </radialGradient>
+            </defs>
+            <circle cx="6" cy="6" r="5.2" fill="url(#sd_${bg.id}_${rank})"/>
+            <ellipse cx="4.1" cy="3.6" rx="1.5" ry="0.9" fill="white" opacity="0.55" transform="rotate(-20,4.1,3.6)"/>
+          </svg>${hn(p.h)}
+        </span>
+        <span style="font-weight:700;color:${rank===0?'#fbbf24':'#94a3b8'};font-size:.76rem;flex-shrink:0">${p.pts.toFixed(2)}</span>
+        <button class="edit-btn" style="margin-left:4px;flex-shrink:0" onclick="openNameEdit(${bg.id},${p.idx})">✏</button>
       </div>`).join('');
     const matchHtml=GROUP_MATCHES.map((m,mi)=>{
       const p1=grp.pairs[m[0]],p2=grp.pairs[m[1]], key=`g${bg.id}_m${mi}`;
@@ -437,8 +437,7 @@ function renderGroups(){
     return`<div class="group-card">
       <div class="group-header"><span>Group ${bg.id}</span><span style="font-size:.68rem;color:#64748b">3 pairs</span></div>
       <div class="group-body">
-        ${pairsHtml}
-        <div class="group-standings" style="margin-top:8px">${standHtml}</div>
+        <div class="group-standings">${standHtml}</div>
         <div class="matches-section"><div class="sec-label">Matches</div>${matchHtml}</div>
       </div>
     </div>`;
@@ -460,7 +459,7 @@ function renderBestLosers(){
       <td><span style="color:${hc(p.h)};font-weight:600">${p.n}</span></td>
       <td><span style="font-size:.72rem;color:${hc(p.h)}">${hn(p.h)}</span></td>
       <td style="color:#94a3b8;font-size:.78rem">Group ${p.gId} · ${p.groupRank===2?'2nd':'3rd'}</td>
-      <td style="font-weight:700;color:${isAdv?'#fbbf24':'#64748b'}">${p.pts.toFixed(1)}</td>
+      <td style="font-weight:700;color:${isAdv?'#fbbf24':'#64748b'}">${p.pts.toFixed(2)}</td>
       <td style="font-size:.72rem;color:#475569">${p.mwon} matchup wins</td>
       ${isAdv?`<td><span class="bl-badge" style="background:rgba(251,191,36,.12);color:#fbbf24;border:1px solid rgba(251,191,36,.3)">→ Bracket</span></td>`:'<td></td>'}
     </tr>`;
@@ -723,19 +722,18 @@ function livePreview(pfx,p1,p2){
   const sumEl=document.getElementById(`${pfx}sum`);
   if(!sumEl||!played) return;
   // per-sub-match: winner +1.0, loser +loser/winner×0.7
-  let p1pts = 0, p2pts = 0;
-
+  let p1pts=0,p2pts=0;
   t1.forEach((s1,i)=>{
-    const s2 = t2[i];
-    p1pts += s1;
-    p2pts += s2;
+    const s2=t2[i];
+    if(s1>s2){p1pts+=1;p2pts+=s1>0?s2/s1*0.7:0;}
+    else if(s2>s1){p2pts+=1;p1pts+=s2>0?s1/s2*0.7:0;}
   });
   
   const wlabel=t1w>t2w?`<span style="color:${hc(lp1.h)}">${lp1.n}</span> wins (${t1w}-${t2w})`:
                t2w>t1w?`<span style="color:${hc(lp2.h)}">${lp2.n}</span> wins (${t2w}-${t1w})`:'Tied';
   sumEl.innerHTML=`
-    <div class="sum-row"><span style="color:${hc(lp1.h)};font-weight:600">${lp1.n}</span><span style="font-weight:700;color:${hc(lp1.h)}">${p1pts.toFixed(1)} pts</span></div>
-    <div class="sum-row"><span style="color:${hc(lp2.h)};font-weight:600">${lp2.n}</span><span style="font-weight:700;color:${hc(lp2.h)}">${p2pts.toFixed(1)} pts</span></div>
+    <div class="sum-row"><span style="color:${hc(lp1.h)};font-weight:600">${lp1.n}</span><span style="font-weight:700;color:${hc(lp1.h)}">${p1pts.toFixed(2)} pts</span></div>
+    <div class="sum-row"><span style="color:${hc(lp2.h)};font-weight:600">${lp2.n}</span><span style="font-weight:700;color:${hc(lp2.h)}">${p2pts.toFixed(2)} pts</span></div>
     <div class="sum-winner">Overall: ${wlabel}</div>`;
 }
 
