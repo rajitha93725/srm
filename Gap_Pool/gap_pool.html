@@ -169,8 +169,15 @@ h2{font-size:1rem;font-weight:600;margin-bottom:14px;color:#f1f5f9}
 
 <header>
   <div class="header-titles">
-    <h1>🏸 Gapstars Pool Tournament — 2026</h1>
-    <p>hosted by stargazers &nbsp;·&nbsp; mens doubles &nbsp;·&nbsp; 12 groups &nbsp;·&nbsp; 4 houses</p>
+    <div style="display:flex;align-items:center;gap:10px;">
+  <span style="font-size:1.3rem;">🏆</span>
+  <span style="font-size:1.3rem;">🎱</span>
+  <h1 style="margin:0;font-size:1.5rem;font-weight:800;">
+    Gapstars Pool Tournament — 2026
+    <span style="font-size:1rem; font-weight:700; color:#94a3b8; margin-left:10px;"> · Men’s Doubles</span>
+  </h1>
+</div>
+    <p>hosted by stargazers &nbsp; &nbsp;·&nbsp; 12 groups &nbsp;·&nbsp; 4 houses</p>
   </div>
   <div class="house-pills">
     <span class="hpill hpill-orion">Orion</span>
@@ -223,7 +230,7 @@ h2{font-size:1rem;font-weight:600;margin-bottom:14px;color:#f1f5f9}
 <div class="modal-bg" id="modal">
   <div class="modal">
     <div class="modal-title" id="modal-title">Match Score Entry</div>
-    <div class="modal-sub">Best of 3 · Winner earns 1.0 + ball-share bonus · Max 1.7 pts per matchup · Decimals allowed</div>
+    <div class="modal-sub">Best of 3 · Points are sum of scores · Decimals allowed</div>
     <div id="modal-content"></div>
     <div class="btn-row">
       <button class="btn btn-danger" onclick="clearMatch()">Clear</button>
@@ -317,25 +324,37 @@ function getGroup(gId){
 // Max per sub-match = 1.7 (winner 1.0 + loser near-equal score → 0.7)
 function calcMatchup(sc){
   if(!sc||!sc.t1||!sc.t1.length) return null;
+
   let t1pts=0,t2pts=0,t1w=0,t2w=0,t1b=0,t2b=0;
+
   sc.t1.forEach((s1,i)=>{
-    const s2=Number(sc.t2[i])||0; s1=Number(s1)||0;
-    t1b+=s1; t2b+=s2;
+    const s2=Number(sc.t2[i])||0; 
+    s1=Number(s1)||0;
+
+    t1b+=s1; 
+    t2b+=s2;
+
     if(s1>0||s2>0){
-      if(s1>s2){
-        t1pts+=1;
-        t2pts+=s1>0?Math.round(s2/s1*700)/1000:0;
-        t1w++;
-      } else if(s2>s1){
-        t2pts+=1;
-        t1pts+=s2>0?Math.round(s1/s2*700)/1000:0;
-        t2w++;
-      }
+      if(s1>s2) t1w++;
+      else if(s2>s1) t2w++;
+
+      // 🔥 KEY CHANGE: Direct addition
+      t1pts += s1;
+      t2pts += s2;
     }
   });
-  const winner=t1w>t2w?0:t2w>t1w?1:null;
-  return{t1pts:Math.round(t1pts*1000)/1000, t2pts:Math.round(t2pts*1000)/1000,
-         t1w,t2w,winner,t1b,t2b};
+
+  const winner = t1w>t2w ? 0 : t2w>t1w ? 1 : null;
+
+  return {
+    t1pts: Math.round(t1pts*10)/10,
+    t2pts: Math.round(t2pts*10)/10,
+    t1w,
+    t2w,
+    winner,
+    t1b,
+    t2b
+  };
 }
 
 // ── Group standings ───────────────────────────────────────────────────────────
@@ -397,7 +416,7 @@ function renderGroups(){
         <div class="rank-circle">${rank+1}</div>
         <span style="flex:1;color:${hc(p.h)};font-weight:600;font-size:.75rem">${p.n}</span>
         <span style="font-size:.65rem;color:${hc(p.h)};opacity:.65">${hn(p.h)}</span>
-        <span style="font-weight:700;color:${rank===0?'#fbbf24':'#64748b'};font-size:.78rem;min-width:38px;text-align:right">${p.pts.toFixed(2)}</span>
+        <span style="font-weight:700;color:${rank===0?'#fbbf24':'#64748b'};font-size:.78rem;min-width:38px;text-align:right">${p.pts.toFixed(1)}</span>
       </div>`).join('');
     const matchHtml=GROUP_MATCHES.map((m,mi)=>{
       const p1=grp.pairs[m[0]],p2=grp.pairs[m[1]], key=`g${bg.id}_m${mi}`;
@@ -441,7 +460,7 @@ function renderBestLosers(){
       <td><span style="color:${hc(p.h)};font-weight:600">${p.n}</span></td>
       <td><span style="font-size:.72rem;color:${hc(p.h)}">${hn(p.h)}</span></td>
       <td style="color:#94a3b8;font-size:.78rem">Group ${p.gId} · ${p.groupRank===2?'2nd':'3rd'}</td>
-      <td style="font-weight:700;color:${isAdv?'#fbbf24':'#64748b'}">${p.pts.toFixed(2)}</td>
+      <td style="font-weight:700;color:${isAdv?'#fbbf24':'#64748b'}">${p.pts.toFixed(1)}</td>
       <td style="font-size:.72rem;color:#475569">${p.mwon} matchup wins</td>
       ${isAdv?`<td><span class="bl-badge" style="background:rgba(251,191,36,.12);color:#fbbf24;border:1px solid rgba(251,191,36,.3)">→ Bracket</span></td>`:'<td></td>'}
     </tr>`;
@@ -704,17 +723,19 @@ function livePreview(pfx,p1,p2){
   const sumEl=document.getElementById(`${pfx}sum`);
   if(!sumEl||!played) return;
   // per-sub-match: winner +1.0, loser +loser/winner×0.7
-  let p1pts=0,p2pts=0;
+  let p1pts = 0, p2pts = 0;
+
   t1.forEach((s1,i)=>{
-    const s2=t2[i];
-    if(s1>s2){p1pts+=1;p2pts+=s1>0?s2/s1*0.7:0;}
-    else if(s2>s1){p2pts+=1;p1pts+=s2>0?s1/s2*0.7:0;}
+    const s2 = t2[i];
+    p1pts += s1;
+    p2pts += s2;
   });
+  
   const wlabel=t1w>t2w?`<span style="color:${hc(lp1.h)}">${lp1.n}</span> wins (${t1w}-${t2w})`:
                t2w>t1w?`<span style="color:${hc(lp2.h)}">${lp2.n}</span> wins (${t2w}-${t1w})`:'Tied';
   sumEl.innerHTML=`
-    <div class="sum-row"><span style="color:${hc(lp1.h)};font-weight:600">${lp1.n}</span><span style="font-weight:700;color:${hc(lp1.h)}">${p1pts.toFixed(2)} pts</span></div>
-    <div class="sum-row"><span style="color:${hc(lp2.h)};font-weight:600">${lp2.n}</span><span style="font-weight:700;color:${hc(lp2.h)}">${p2pts.toFixed(2)} pts</span></div>
+    <div class="sum-row"><span style="color:${hc(lp1.h)};font-weight:600">${lp1.n}</span><span style="font-weight:700;color:${hc(lp1.h)}">${p1pts.toFixed(1)} pts</span></div>
+    <div class="sum-row"><span style="color:${hc(lp2.h)};font-weight:600">${lp2.n}</span><span style="font-weight:700;color:${hc(lp2.h)}">${p2pts.toFixed(1)} pts</span></div>
     <div class="sum-winner">Overall: ${wlabel}</div>`;
 }
 
