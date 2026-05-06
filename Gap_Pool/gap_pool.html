@@ -130,6 +130,39 @@ h2{font-size:1rem;font-weight:600;margin-bottom:14px;color:#f1f5f9}
 .house-card .detail{font-size:.7rem;opacity:.75;margin-top:2px}
 .final-section{background:#1e293b;border:1px solid #f59e0b;border-radius:12px;padding:16px;margin-top:16px;text-align:center}
 .final-section h3{color:#f59e0b;margin-bottom:12px;font-size:.95rem}
+
+/* House standings breakdown */
+.hs-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:24px}
+.hs-card{border-radius:12px;padding:18px;text-align:center;position:relative}
+.hs-card.orion{background:linear-gradient(135deg,#1e3a8a,#1d4ed8);border:1px solid var(--orion)}
+.hs-card.aquilla{background:linear-gradient(135deg,#4c1d95,#7c3aed);border:1px solid var(--aquilla)}
+.hs-card.cygnus{background:linear-gradient(135deg,#7f1d1d,#991b1b);border:1px solid var(--cygnus)}
+.hs-card.draco{background:linear-gradient(135deg,#14532d,#166534);border:1px solid var(--draco)}
+.hs-card h4{font-size:.95rem;font-weight:700;margin-bottom:2px}
+.hs-card .sc{font-size:2.4rem;font-weight:900;line-height:1.1}
+.hs-card .sc-sub{font-size:.7rem;opacity:.75;margin-top:4px}
+.hs-card .bonus-tag{font-size:.68rem;background:rgba(251,191,36,.2);color:#fbbf24;border:1px solid rgba(251,191,36,.4);border-radius:10px;padding:2px 8px;display:inline-block;margin-top:6px}
+.hbk-wrap{display:grid;grid-template-columns:repeat(auto-fill,minmax(480px,1fr));gap:14px;margin-bottom:20px}
+.hbk-card{background:#1e293b;border:1px solid #334155;border-radius:10px;overflow:hidden}
+.hbk-head{padding:10px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #334155}
+.hbk-head h3{font-size:.9rem;font-weight:700}
+.hbk-pts{font-size:1.1rem;font-weight:800}
+.hbk-table{width:100%;border-collapse:collapse;font-size:.77rem}
+.hbk-table th{padding:6px 10px;text-align:left;background:#0f172a;color:#64748b;font-size:.68rem;font-weight:600;white-space:nowrap}
+.hbk-table td{padding:6px 10px;border-bottom:1px solid #1e293b;vertical-align:middle}
+.hbk-table tr:last-child td{border-bottom:none}
+.stage-pill{display:inline-block;padding:2px 7px;border-radius:8px;font-size:.66rem;font-weight:700;white-space:nowrap}
+.s5{background:rgba(100,116,139,.15);color:#94a3b8}
+.s10{background:rgba(100,116,139,.25);color:#cbd5e1}
+.s15{background:rgba(59,130,246,.15);color:#60a5fa}
+.s25{background:rgba(168,85,247,.15);color:#c084fc}
+.s50{background:rgba(251,146,60,.15);color:#fb923c}
+.s75{background:rgba(251,191,36,.15);color:#fbbf24}
+.s100{background:rgba(251,191,36,.25);color:#fcd34d}
+.s200{background:rgba(34,197,94,.2);color:#4ade80}
+.hbk-foot{padding:9px 14px;background:#0f172a;display:flex;gap:16px;align-items:center;flex-wrap:wrap;border-top:1px solid #334155}
+.hbk-foot-item{font-size:.75rem;color:#94a3b8}
+.hbk-foot-item strong{color:#e2e8f0}
 </style>
 </head>
 <body>
@@ -182,7 +215,7 @@ h2{font-size:1rem;font-weight:600;margin-bottom:14px;color:#f1f5f9}
 <div id="tab-standings" class="section">
   <h2>House Standings</h2>
   <div class="house-summary" id="house-summary"></div>
-  <h2>Group Overview</h2>
+  <h2>House Breakdown</h2>
   <div id="standings-overview"></div>
 </div>
 
@@ -310,9 +343,10 @@ function getGroupStandings(gId){
   const grp=getGroup(gId), pts=[0,0,0], mwon=[0,0,0];
   GROUP_MATCHES.forEach((m,mi)=>{
     const res=calcMatchup(STATE.groupScores[`g${gId}_m${mi}`]);
-    if(res&&res.winner!==null){
+    if(res){
       pts[m[0]]+=res.t1pts; pts[m[1]]+=res.t2pts;
-      if(res.winner===0) mwon[m[0]]++; else mwon[m[1]]++;
+      if(res.winner===0) mwon[m[0]]++;
+      else if(res.winner===1) mwon[m[1]]++;
     }
   });
   return grp.pairs.map((p,i)=>({...p,pts:pts[i],mwon:mwon[i],idx:i,gId}))
@@ -363,7 +397,7 @@ function renderGroups(){
         <div class="rank-circle">${rank+1}</div>
         <span style="flex:1;color:${hc(p.h)};font-weight:600;font-size:.75rem">${p.n}</span>
         <span style="font-size:.65rem;color:${hc(p.h)};opacity:.65">${hn(p.h)}</span>
-        <span style="font-weight:700;color:${rank===0?'#fbbf24':'#64748b'};font-size:.78rem;min-width:38px;text-align:right">${p.pts.toFixed(3)}</span>
+        <span style="font-weight:700;color:${rank===0?'#fbbf24':'#64748b'};font-size:.78rem;min-width:38px;text-align:right">${p.pts.toFixed(2)}</span>
       </div>`).join('');
     const matchHtml=GROUP_MATCHES.map((m,mi)=>{
       const p1=grp.pairs[m[0]],p2=grp.pairs[m[1]], key=`g${bg.id}_m${mi}`;
@@ -407,7 +441,7 @@ function renderBestLosers(){
       <td><span style="color:${hc(p.h)};font-weight:600">${p.n}</span></td>
       <td><span style="font-size:.72rem;color:${hc(p.h)}">${hn(p.h)}</span></td>
       <td style="color:#94a3b8;font-size:.78rem">Group ${p.gId} · ${p.groupRank===2?'2nd':'3rd'}</td>
-      <td style="font-weight:700;color:${isAdv?'#fbbf24':'#64748b'}">${p.pts.toFixed(3)}</td>
+      <td style="font-weight:700;color:${isAdv?'#fbbf24':'#64748b'}">${p.pts.toFixed(2)}</td>
       <td style="font-size:.72rem;color:#475569">${p.mwon} matchup wins</td>
       ${isAdv?`<td><span class="bl-badge" style="background:rgba(251,191,36,.12);color:#fbbf24;border:1px solid rgba(251,191,36,.3)">→ Bracket</span></td>`:'<td></td>'}
     </tr>`;
@@ -468,33 +502,143 @@ function renderBracket(){
     </div>`;
 }
 
+// ── House Standings Helpers ───────────────────────────────────────────────────
+function isGroupComplete(gId){
+  return GROUP_MATCHES.every((_,mi)=>{const r=calcMatchup(STATE.groupScores[`g${gId}_m${mi}`]);return r&&r.winner!==null;});
+}
+function countHouseCompletedPairs(house){
+  let n=0;
+  BASE_GROUPS.forEach(bg=>{
+    if(!isGroupComplete(bg.id))return;
+    for(let pi=0;pi<3;pi++){if(getPair(bg.id,pi).h===house)n++;}
+  });
+  return n;
+}
+
+function getKnockoutPoints(pairName){
+  const ko=STATE.knockout;
+  function inM(id){const m=ko[id];return m&&((m.t1&&m.t1.name===pairName)||(m.t2&&m.t2.name===pairName));}
+  function wonM(id){const m=ko[id];if(!m||m.winner==null)return false;return(m.winner===0&&m.t1&&m.t1.name===pairName)||(m.winner===1&&m.t2&&m.t2.name===pairName);}
+  function lostM(id){const m=ko[id];if(!m||m.winner==null)return false;return(m.winner===1&&m.t1&&m.t1.name===pairName)||(m.winner===0&&m.t2&&m.t2.name===pairName);}
+
+  if(wonM('final'))  return{pts:200,stage:'Champion'};
+  if(lostM('final')) return{pts:100,stage:'Finalist'};
+  if(inM('final'))   return{pts:100,stage:'Finalist'};
+
+  if(wonM('third'))  return{pts:75, stage:'3rd Place'};
+  if(lostM('third')) return{pts:50, stage:'4th Place'};
+  if(inM('third'))   return{pts:50, stage:'4th Place'};
+
+  for(const id of['sf1','sf2']){
+    if(wonM(id))  return{pts:100,stage:'Finalist'};
+    if(lostM(id)) return{pts:50, stage:'4th Place'};
+    if(inM(id))   return{pts:50, stage:'Semifinals'};
+  }
+  for(const id of['qf1','qf2','qf3','qf4']){
+    if(wonM(id))  return{pts:50, stage:'Semifinals'};
+    if(lostM(id)) return{pts:25, stage:'QF Loser'};
+    if(inM(id))   return{pts:25, stage:'Quarterfinals'};
+  }
+  for(const m of R16){
+    if(wonM(m.id))  return{pts:25, stage:'Quarterfinals'};
+    if(lostM(m.id)) return{pts:15, stage:'R16 Loser'};
+    if(inM(m.id))   return{pts:15, stage:'R16'};
+  }
+  // Pair qualified for bracket but match slot not yet opened in UI
+  for(const bg of BASE_GROUPS){const w=getGroupWinner(bg.id);if(w&&w.n===pairName)return{pts:15,stage:'R16'};}
+  const blTop4=getBestLosers().slice(0,4).map(p=>p.n);
+  if(blTop4.includes(pairName))return{pts:15,stage:'R16'};
+  return null;
+}
+
+function getGroupPairPoints(pairName){
+  const blTop4=getBestLosers().slice(0,4).map(p=>p.n);
+  for(const bg of BASE_GROUPS){
+    const st=getGroupStandings(bg.id);
+    for(let rank=0;rank<st.length;rank++){
+      if(st[rank].n!==pairName)continue;
+      const anyPlayed=GROUP_MATCHES.some((_,mi)=>calcMatchup(STATE.groupScores[`g${bg.id}_m${mi}`])!==null);
+      if(!anyPlayed)return{pts:0,stage:'Not Started'};
+      if(rank===0)return{pts:15,stage:'Group 1st'};
+      if(blTop4.includes(pairName))return{pts:15,stage:'Best Loser'};
+      if(rank===1)return{pts:10,stage:'Group 2nd'};
+      return{pts:5,stage:'Group 3rd'};
+    }
+  }
+  return{pts:0,stage:'No Data'};
+}
+
+function getPairTotalPoints(pairName){
+  const ko=getKnockoutPoints(pairName);
+  return ko||getGroupPairPoints(pairName);
+}
+
 // ── Render Standings ──────────────────────────────────────────────────────────
 function renderStandings(){
-  const hp={orion:0,aquilla:0,cygnus:0,draco:0};
-  BASE_GROUPS.forEach(bg=>getGroupStandings(bg.id).forEach(p=>{if(hp[p.h]!=null)hp[p.h]+=p.pts;}));
-  const sorted=Object.entries(hp).sort((a,b)=>b[1]-a[1]);
-  document.getElementById('house-summary').innerHTML=sorted.map(([h,pts],rank)=>`
-    <div class="house-card ${h}">
-      <h4>${['🥇','🥈','🥉','4️⃣'][rank]} ${HOUSES[h].name}</h4>
-      <div class="score">${pts.toFixed(2)}</div>
-      <div class="detail">Total Group Points</div>
+  const STAGE_CLS={'Champion':'s200','Finalist':'s100','3rd Place':'s75','4th Place':'s50',
+    'Semifinals':'s50','Quarterfinals':'s25','QF Loser':'s25','R16 Loser':'s15','R16':'s15',
+    'Best Loser':'s15','Group 1st':'s15','Group 2nd':'s10','Group 3rd':'s5',
+    'Not Started':'s5','No Data':'s5'};
+
+  const hd={};
+  Object.keys(HOUSES).forEach(h=>{hd[h]={pairs:[],total:0,bonus:0,completed:0};});
+
+  BASE_GROUPS.forEach(bg=>{
+    const gc=isGroupComplete(bg.id);
+    for(let pi=0;pi<3;pi++){
+      const p=getPair(bg.id,pi);
+      const res=getPairTotalPoints(p.n);
+      hd[p.h].pairs.push({name:p.n,gId:bg.id,groupComplete:gc,res});
+    }
+  });
+
+  Object.keys(HOUSES).forEach(h=>{
+    hd[h].completed=countHouseCompletedPairs(h);
+    hd[h].bonus=hd[h].completed>=7?100:0;
+    hd[h].total=hd[h].pairs.reduce((s,p)=>s+p.res.pts,0)+hd[h].bonus;
+  });
+
+  const sorted=Object.entries(hd).sort((a,b)=>b[1].total-a[1].total);
+  const rankEmoji=['🥇','🥈','🥉','4️⃣'];
+
+  document.getElementById('house-summary').innerHTML=sorted.map(([h,d],rank)=>`
+    <div class="hs-card ${h}">
+      <h4>${rankEmoji[rank]} ${HOUSES[h].name}</h4>
+      <div class="sc">${d.total}</div>
+      <div class="sc-sub">${d.completed}/9 pairs completed</div>
+      ${d.bonus?'<div class="bonus-tag">+100 Participation Bonus</div>':''}
     </div>`).join('');
-  document.getElementById('standings-overview').innerHTML=`<div style="overflow-x:auto">
-    <table style="width:100%;border-collapse:collapse;font-size:.78rem">
-      <thead><tr style="background:#1e3050">
-        <th style="padding:8px 12px;text-align:left;color:#64748b">Group</th>
-        <th style="padding:8px;text-align:left;color:#64748b">1st — Winner</th>
-        <th style="padding:8px;text-align:left;color:#64748b">2nd</th>
-        <th style="padding:8px;text-align:left;color:#64748b">3rd</th>
-      </tr></thead>
-      <tbody>${BASE_GROUPS.map(bg=>{
-        const s=getGroupStandings(bg.id);
-        return`<tr style="border-bottom:1px solid #1e293b">
-          <td style="padding:7px 12px;font-weight:700;color:#94a3b8">G${bg.id}</td>
-          ${s.map((p,i)=>`<td style="padding:7px 8px"><span style="color:${hc(p.h)};font-weight:600">${p.n}</span><span style="color:#475569;font-size:.7rem;margin-left:5px">(${p.pts.toFixed(3)})</span></td>`).join('')}
-        </tr>`;
-      }).join('')}</tbody>
-    </table></div>`;
+
+  document.getElementById('standings-overview').innerHTML=`<div class="hbk-wrap">${
+    sorted.map(([h,d])=>{
+      const pairTotal=d.pairs.reduce((s,p)=>s+p.res.pts,0);
+      const rows=d.pairs.slice().sort((a,b)=>b.res.pts-a.res.pts).map(p=>`
+        <tr>
+          <td style="color:${hc(h)};font-weight:600">${p.name}</td>
+          <td style="color:#64748b;font-size:.72rem">G${p.gId}</td>
+          <td><span class="stage-pill ${STAGE_CLS[p.res.stage]||'s5'}">${p.res.stage}</span></td>
+          <td style="font-weight:700;color:${hc(h)};text-align:right">${p.res.pts}</td>
+        </tr>`).join('');
+      return`<div class="hbk-card">
+        <div class="hbk-head" style="border-left:3px solid ${hc(h)}">
+          <h3 style="color:${hc(h)}">${HOUSES[h].name}</h3>
+          <span class="hbk-pts" style="color:${hc(h)}">${d.total} pts</span>
+        </div>
+        <table class="hbk-table">
+          <thead><tr>
+            <th>Pair</th><th>Group</th><th>Stage</th><th style="text-align:right">Pts</th>
+          </tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+        <div class="hbk-foot">
+          <span class="hbk-foot-item">Pairs: <strong>${d.pairs.length}</strong></span>
+          <span class="hbk-foot-item">Completed: <strong>${d.completed}/9</strong></span>
+          <span class="hbk-foot-item">Achievement: <strong>${pairTotal}</strong></span>
+          ${d.bonus?`<span class="hbk-foot-item" style="color:#fbbf24">Participation Bonus: <strong>+100</strong></span>`:''}
+        </div>
+      </div>`;
+    }).join('')
+  }</div>`;
 }
 
 // ── Score Modal ───────────────────────────────────────────────────────────────
@@ -569,8 +713,8 @@ function livePreview(pfx,p1,p2){
   const wlabel=t1w>t2w?`<span style="color:${hc(lp1.h)}">${lp1.n}</span> wins (${t1w}-${t2w})`:
                t2w>t1w?`<span style="color:${hc(lp2.h)}">${lp2.n}</span> wins (${t2w}-${t1w})`:'Tied';
   sumEl.innerHTML=`
-    <div class="sum-row"><span style="color:${hc(lp1.h)};font-weight:600">${lp1.n}</span><span style="font-weight:700;color:${hc(lp1.h)}">${p1pts.toFixed(3)} pts</span></div>
-    <div class="sum-row"><span style="color:${hc(lp2.h)};font-weight:600">${lp2.n}</span><span style="font-weight:700;color:${hc(lp2.h)}">${p2pts.toFixed(3)} pts</span></div>
+    <div class="sum-row"><span style="color:${hc(lp1.h)};font-weight:600">${lp1.n}</span><span style="font-weight:700;color:${hc(lp1.h)}">${p1pts.toFixed(2)} pts</span></div>
+    <div class="sum-row"><span style="color:${hc(lp2.h)};font-weight:600">${lp2.n}</span><span style="font-weight:700;color:${hc(lp2.h)}">${p2pts.toFixed(2)} pts</span></div>
     <div class="sum-winner">Overall: ${wlabel}</div>`;
 }
 
