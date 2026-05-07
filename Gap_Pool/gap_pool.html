@@ -33,7 +33,10 @@ h2{font-size:1rem;font-weight:600;margin-bottom:14px;color:#f1f5f9}
 
 /* Groups */
 .groups-wrap{overflow-x:auto}
-.groups-grid{display:grid;grid-template-columns:repeat(6,minmax(200px,1fr));gap:10px;min-width:1200px}
+.groups-grid{display:grid;grid-template-columns:repeat(6,minmax(200px,1fr));gap:10px}
+@media(max-width:1300px){.groups-grid{grid-template-columns:repeat(4,minmax(200px,1fr))}}
+@media(max-width:880px){.groups-grid{grid-template-columns:repeat(2,minmax(200px,1fr))}}
+@media(max-width:480px){.groups-grid{grid-template-columns:1fr}}
 .group-card{background:#1e293b;border:1px solid #334155;border-radius:10px;overflow:hidden}
 .group-header{background:#1e3050;padding:8px 12px;display:flex;align-items:center;justify-content:space-between}
 .group-header span{font-size:.82rem;font-weight:700;color:#e2e8f0}
@@ -290,8 +293,41 @@ h2{font-size:1rem;font-weight:600;margin-bottom:14px;color:#f1f5f9}
   </div>
 </div>
 
+<!-- Password modal -->
+<div class="modal-bg" id="pwd-modal">
+  <div class="modal" style="width:300px;text-align:center">
+    <div style="font-size:2rem;margin-bottom:6px">🔒</div>
+    <div class="modal-title">Password Required</div>
+    <div class="modal-sub">This action is protected</div>
+    <input class="ne-input" id="pwd-input" type="password" placeholder="Enter password" autocomplete="off"
+      onkeydown="if(event.key==='Enter')submitPwd()" style="margin-top:4px;text-align:center;letter-spacing:3px">
+    <div id="pwd-error" style="display:none;color:#ef4444;font-size:.72rem;margin-top:8px">Incorrect password. Try again.</div>
+    <div class="btn-row" style="margin-top:16px">
+      <button class="btn btn-secondary" onclick="closePwdModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="submitPwd()">Unlock</button>
+    </div>
+  </div>
+</div>
+
 <script>
 // ── Constants ─────────────────────────────────────────────────────────────────
+// Password: to recover forgotten password open browser console and type: atob(PWD_HASH)
+const PWD_HASH='c3RAOTA=';
+let _pwdCb=null;
+function requirePwd(cb){
+  _pwdCb=cb;
+  document.getElementById('pwd-input').value='';
+  document.getElementById('pwd-error').style.display='none';
+  document.getElementById('pwd-modal').classList.add('open');
+  setTimeout(()=>document.getElementById('pwd-input').focus(),80);
+}
+function closePwdModal(){document.getElementById('pwd-modal').classList.remove('open');_pwdCb=null;}
+function submitPwd(){
+  const v=document.getElementById('pwd-input').value;
+  if(btoa(v)===PWD_HASH){const cb=_pwdCb;closePwdModal();if(cb)cb();}
+  else{document.getElementById('pwd-error').style.display='block';document.getElementById('pwd-input').value='';document.getElementById('pwd-input').focus();}
+}
+
 const HOUSES={
   orion:  {name:'Orion',   tc:'#60a5fa'},
   aquilla:{name:'Aquilla', tc:'#a78bfa'},
@@ -797,15 +833,19 @@ function saveMatch(){
     if(v1!==''&&v2!==''){t1.push(parseFloat(v1)||0);t2.push(parseFloat(v2)||0);}
   }
   if(!t1.length){alert('Enter at least Match 1 scores.');return;}
-  const res=calcMatchup({t1,t2});
-  const sc={t1,t2,winner:res?res.winner:null,score:res?`${res.t1w}-${res.t2w}`:''};
-  if(currentModal.type==='group') STATE.groupScores[currentModal.key]=sc;
-  save();closeModal();renderAll();
+  requirePwd(()=>{
+    const res=calcMatchup({t1,t2});
+    const sc={t1,t2,winner:res?res.winner:null,score:res?`${res.t1w}-${res.t2w}`:''};
+    if(currentModal.type==='group') STATE.groupScores[currentModal.key]=sc;
+    save();closeModal();renderAll();
+  });
 }
 function clearMatch(){
   if(!currentModal||!confirm('Clear this match?')) return;
-  if(currentModal.type==='group') delete STATE.groupScores[currentModal.key];
-  save();closeModal();renderAll();
+  requirePwd(()=>{
+    if(currentModal.type==='group') delete STATE.groupScores[currentModal.key];
+    save();closeModal();renderAll();
+  });
 }
 
 // ── Name Edit Modal ───────────────────────────────────────────────────────────
@@ -833,9 +873,11 @@ function saveNameEdit(){
   const n=document.getElementById('ne-name').value.trim();
   const h=document.getElementById('ne-house').value;
   if(!n){alert('Name cannot be empty.');return;}
-  const key=`g${nameEditState.gId}_p${nameEditState.pIdx}`;
-  STATE.customNames[key]={n,h};
-  save();closeNameModal();renderAll();
+  requirePwd(()=>{
+    const key=`g${nameEditState.gId}_p${nameEditState.pIdx}`;
+    STATE.customNames[key]={n,h};
+    save();closeNameModal();renderAll();
+  });
 }
 
 // ── Knockout Modal ────────────────────────────────────────────────────────────
@@ -860,15 +902,19 @@ function saveKO(){
     if(v1!==''&&v2!==''){t1.push(parseFloat(v1)||0);t2.push(parseFloat(v2)||0);}
   }
   if(!t1.length){alert('Enter at least Match 1 scores.');return;}
-  const res=calcMatchup({t1,t2});
-  STATE.knockout[koState.id]={t1:koState.t1,t2:koState.t2,winner:res?res.winner:null,
-    score:res?`${res.t1w}-${res.t2w}`:''};
-  save();closeKOModal();renderAll();
+  requirePwd(()=>{
+    const res=calcMatchup({t1,t2});
+    STATE.knockout[koState.id]={t1:koState.t1,t2:koState.t2,winner:res?res.winner:null,
+      score:res?`${res.t1w}-${res.t2w}`:''};
+    save();closeKOModal();renderAll();
+  });
 }
 function clearKO(){
   if(!koState||!confirm('Clear this knockout match?')) return;
-  delete STATE.knockout[koState.id];
-  save();closeKOModal();renderAll();
+  requirePwd(()=>{
+    delete STATE.knockout[koState.id];
+    save();closeKOModal();renderAll();
+  });
 }
 
 // ── Export / Import ───────────────────────────────────────────────────────────
@@ -898,6 +944,7 @@ function showTab(n){
 document.getElementById('modal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeModal();});
 document.getElementById('name-modal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeNameModal();});
 document.getElementById('ko-modal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeKOModal();});
+document.getElementById('pwd-modal').addEventListener('click',e=>{if(e.target===e.currentTarget)closePwdModal();});
 
 function renderAll(){renderGroups();renderBestLosers();renderBracket();renderStandings();}
 renderAll();
