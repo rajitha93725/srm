@@ -60,6 +60,16 @@ h2{font-size:1rem;font-weight:600;margin-bottom:14px;color:#f1f5f9}
 .score-txt.done{color:#4ade80}
 .score-btn{padding:2px 9px;background:#3b82f6;color:#fff;border:none;border-radius:5px;cursor:pointer;font-size:.7rem;font-weight:500}
 .score-btn:hover{background:#2563eb}
+.match-deadline{display:inline-flex;align-items:center;gap:4px}
+.deadline-lbl{font-size:.68rem;color:#64748b;flex-shrink:0}
+.deadline-val-wrap{position:relative;display:inline-flex;align-items:center}
+.deadline-val{font-size:.72rem;font-weight:600;color:#7dd3fc;padding:2px 9px;background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.3);border-radius:6px;cursor:pointer;white-space:nowrap;transition:.15s}
+.deadline-val:hover{background:rgba(56,189,248,.16);border-color:#38bdf8;color:#e0f2fe}
+.deadline-inp-overlay{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;border:none;padding:0}
+.deadline-inp-overlay::-webkit-calendar-picker-indicator{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer}
+.deadline-time-sel{font-size:.72rem;font-weight:600;color:#7dd3fc;padding:2px 6px;background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.3);border-radius:6px;cursor:pointer;outline:none;font-family:inherit;-webkit-appearance:none;appearance:none;text-align:center;min-width:72px}
+.deadline-time-sel:hover,.deadline-time-sel:focus{background:rgba(56,189,248,.16);border-color:#38bdf8;color:#e0f2fe}
+.deadline-time-sel option{background:#1e293b;color:#e2e8f0}
 
 /* Best losers */
 .bl-table{width:100%;border-collapse:collapse;font-size:.82rem}
@@ -319,8 +329,10 @@ const R16=[
 ];
 
 // ── State ─────────────────────────────────────────────────────────────────────
-let STATE=JSON.parse(localStorage.getItem('gapstars_2026')||'null')||{groupScores:{},knockout:{},customNames:{}};
+let STATE=JSON.parse(localStorage.getItem('gapstars_2026')||'null')||{groupScores:{},knockout:{},customNames:{},matchDates:{},matchTimes:{}};
 if(!STATE.customNames) STATE.customNames={};
+if(!STATE.matchDates) STATE.matchDates={};
+if(!STATE.matchTimes) STATE.matchTimes={};
 function save(){localStorage.setItem('gapstars_2026',JSON.stringify(STATE));}
 
 // ── Pair data (with name overrides) ──────────────────────────────────────────
@@ -391,6 +403,40 @@ function getKnockoutTeam(lbl){
 }
 function getKOWinner(id){const m=STATE.knockout[id];return m&&m.winner!=null?m.winner===0?m.t1:m.t2:null;}
 
+// ── Match Dates ───────────────────────────────────────────────────────────────
+function setMatchDate(key,val){
+  if(!STATE.matchDates)STATE.matchDates={};
+  if(val)STATE.matchDates[key]=val;
+  else delete STATE.matchDates[key];
+  save();renderGroups();
+}
+function fmtMatchDate(val){
+  if(!val)return null;
+  const d=new Date(val+'T00:00:00');
+  return d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+}
+function setMatchTime(key,val){
+  if(!STATE.matchTimes)STATE.matchTimes={};
+  if(val)STATE.matchTimes[key]=val;
+  else delete STATE.matchTimes[key];
+  save();renderGroups();
+}
+function fmtMatchTime(val){
+  if(!val)return null;
+  const [h,m]=val.split(':').map(Number);
+  const ampm=h<12?'AM':'PM', h12=h===0?12:h>12?h-12:h;
+  return`${h12}:${String(m).padStart(2,'0')} ${ampm}`;
+}
+function genTimeOpts(selected){
+  let o='<option value="">Time</option>';
+  for(let h=0;h<24;h++)for(const m of[0,30]){
+    const val=`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
+    const ampm=h<12?'AM':'PM', h12=h===0?12:h>12?h-12:h;
+    o+=`<option value="${val}"${selected===val?' selected':''}>${h12}:${String(m).padStart(2,'0')} ${ampm}</option>`;
+  }
+  return o;
+}
+
 // ── Render Groups ─────────────────────────────────────────────────────────────
 function renderGroups(){
   document.getElementById('groups-container').innerHTML=BASE_GROUPS.map(bg=>{
@@ -421,6 +467,8 @@ function renderGroups(){
       const summary=done
         ?`${res.t1pts.toFixed(1)} - ${res.t2pts.toFixed(1)} <span style="font-size:.62rem;padding:1px 6px;border-radius:8px;background:rgba(34,197,94,.15);color:#4ade80;font-weight:700;margin-left:4px">Played</span>`
         :'<span style="font-size:.62rem;padding:1px 6px;border-radius:8px;background:rgba(100,116,139,.15);color:#64748b;font-weight:700">Not played</span>';
+      const dateVal=(STATE.matchDates&&STATE.matchDates[key])||'';
+      const dateDisp=fmtMatchDate(dateVal)||'—';
       return`<div class="match-row">
         <div class="match-names">
           <span style="color:${hc(p1.h)};font-weight:600">${p1.n}</span>
@@ -429,6 +477,13 @@ function renderGroups(){
         </div>
         <div class="match-meta">
           <span class="score-txt ${done?'done':''}">${summary}</span>
+          <span class="match-deadline">
+            <span class="deadline-lbl">On or before</span>
+            <span class="deadline-val-wrap">
+              <span class="deadline-val">${dateDisp}</span>
+              <input type="date" class="deadline-inp-overlay" value="${dateVal}" onchange="setMatchDate('${key}',this.value)">
+            </span>
+          </span>
           <button class="score-btn" onclick="openScoreModal(${bg.id},${mi},${m[0]},${m[1]})">Score</button>
         </div>
       </div>`;
