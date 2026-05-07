@@ -468,6 +468,7 @@ function renderGroups(){
         ?`${res.t1pts.toFixed(1)} - ${res.t2pts.toFixed(1)} <span style="font-size:.62rem;padding:1px 6px;border-radius:8px;background:rgba(34,197,94,.15);color:#4ade80;font-weight:700;margin-left:4px">Played</span>`
         :'<span style="font-size:.62rem;padding:1px 6px;border-radius:8px;background:rgba(100,116,139,.15);color:#64748b;font-weight:700">Not played</span>';
       const dateVal=(STATE.matchDates&&STATE.matchDates[key])||'';
+      const timeVal=(STATE.matchTimes&&STATE.matchTimes[key])||'';
       const dateDisp=fmtMatchDate(dateVal)||'—';
       return`<div class="match-row">
         <div class="match-names">
@@ -483,6 +484,7 @@ function renderGroups(){
               <span class="deadline-val">${dateDisp}</span>
               <input type="date" class="deadline-inp-overlay" value="${dateVal}" onchange="setMatchDate('${key}',this.value)">
             </span>
+            <select class="deadline-time-sel" onchange="setMatchTime('${key}',this.value)">${genTimeOpts(timeVal)}</select>
           </span>
           <button class="score-btn" onclick="openScoreModal(${bg.id},${mi},${m[0]},${m[1]})">Score</button>
         </div>
