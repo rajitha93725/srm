@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stargazers Jackpot</title>
+<style>
+/* ── Reset ──────────────────────────────────────────────────────── */
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --gold:#ffd700;--gold2:#e8a800;--goldglow:rgba(255,215,0,.55);
+  --nblue:#00d4ff;--npurp:#bf5fff;--nred:#ff3355;--ngreen:#00ff88;
+  --bg:#06000e;--surf:#110020;--surf2:#1b0035;
+}
+body{font-family:'Segoe UI',sans-serif;background:var(--bg);color:#ddd;min-height:100vh;overflow-x:hidden;user-select:none}
+
+/* ── Background blobs ───────────────────────────────────────────── */
+.blob{position:fixed;border-radius:50%;filter:blur(90px);opacity:.1;pointer-events:none;z-index:0}
+
+/* ── Particles ──────────────────────────────────────────────────── */
+#ptc{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.pt{position:absolute;border-radius:50%;opacity:0;animation:pf linear infinite}
+@keyframes pf{
+  0%{transform:translateY(105vh) scale(0);opacity:0}
+  8%{opacity:.65}85%{opacity:.25}
+  100%{transform:translateY(-5vh) scale(1.3);opacity:0}
+}
+
+/* ── Header ─────────────────────────────────────────────────────── */
+header{position:relative;z-index:10;padding:16px 24px 12px;
+  background:linear-gradient(180deg,rgba(12,0,34,.98),rgba(6,0,18,.88));
+  border-bottom:2px solid rgba(191,95,255,.3);
+  box-shadow:0 4px 50px rgba(191,95,255,.12)}
+.logo-row{display:flex;align-items:center;justify-content:center;gap:18px;flex-wrap:wrap;margin-bottom:10px}
+.wiz-svg{width:70px;height:76px;filter:drop-shadow(0 0 14px var(--gold));flex-shrink:0}
+.title-block{text-align:center}
+.gtitle{font-size:clamp(1.5rem,3.8vw,2.7rem);font-weight:900;letter-spacing:3px;text-transform:uppercase;
+  background:linear-gradient(90deg,var(--gold),var(--nblue),var(--npurp),var(--gold));
+  background-size:300%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  animation:tsh 5s linear infinite}
+@keyframes tsh{to{background-position:300%}}
+.gsub{font-size:.72rem;color:rgba(191,95,255,.65);letter-spacing:3px;text-transform:uppercase;margin-top:3px}
+
+/* Score bar */
+.sc-bar{display:flex;gap:24px;justify-content:center;flex-wrap:wrap;margin-top:12px}
+.sc-item{text-align:center}
+.sc-lbl{font-size:.56rem;letter-spacing:2px;color:#553368;text-transform:uppercase;margin-bottom:2px}
+.sc-val{font-size:1.65rem;font-weight:800;color:var(--gold);text-shadow:0 0 12px var(--goldglow)}
+.sc-unit{font-size:.62rem;color:#444}
+
+/* ── Phase banner ───────────────────────────────────────────────── */
+#phase{position:relative;z-index:10;padding:8px 16px;text-align:center;
+  font-size:.76rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+  background:rgba(0,0,0,.45);border-bottom:1px solid rgba(191,95,255,.18);transition:color .4s}
+
+/* ── Game area ──────────────────────────────────────────────────── */
+#ga{position:relative;z-index:5;max-width:1100px;margin:0 auto;padding:20px 24px}
+
+/* ── Tray ───────────────────────────────────────────────────────── */
+.t-lbl{font-size:.6rem;letter-spacing:2px;color:#4a2860;text-transform:uppercase;margin-bottom:7px}
+#tray{min-height:76px;display:flex;flex-wrap:wrap;gap:9px;padding:11px;
+  background:rgba(255,255,255,.02);border:1.5px dashed rgba(191,95,255,.22);
+  border-radius:12px;transition:border-color .2s,background .2s;margin-bottom:22px}
+#tray.dov{border-color:var(--nblue);background:rgba(0,212,255,.045)}
+
+/* ── Gold Blocks ────────────────────────────────────────────────── */
+.blk{width:60px;height:60px;border-radius:10px;cursor:grab;flex-shrink:0;
+  background:linear-gradient(135deg,#a07000,#ffd700,#d4a200,#ffcc00);
+  border:2px solid rgba(255,240,110,.65);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  font-weight:900;color:#2a1000;
+  box-shadow:0 0 13px rgba(255,215,0,.42),0 4px 10px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,160,.45);
+  transition:transform .14s,box-shadow .14s;position:relative}
+.blk:hover{transform:translateY(-4px) scale(1.08);
+  box-shadow:0 0 22px rgba(255,215,0,.72),0 8px 18px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,160,.45)}
+.blk:active{cursor:grabbing}
+.blk.dragging{opacity:.3;transform:scale(.9)}
+.blk.locked{cursor:default;filter:brightness(.72);pointer-events:none}
+.blk .bn{font-size:1.3rem;line-height:1}
+.blk .bl{font-size:.48rem;letter-spacing:1px;opacity:.62}
+
+/* ── Buckets ────────────────────────────────────────────────────── */
+.bkts{display:flex;gap:16px;justify-content:center;margin-bottom:20px}
+.bw{flex:1;max-width:310px;display:flex;flex-direction:column;align-items:center;perspective:400px}
+.bw-lbl{font-size:.72rem;letter-spacing:3px;font-weight:700;text-transform:uppercase;margin-bottom:6px}
+.bkt{width:100%;min-height:190px;border-radius:12px 12px 0 0;
+  background:linear-gradient(180deg,#140620 0%,#0b0016 100%);
+  border:2px solid rgba(191,95,255,.32);border-bottom:none;
+  padding:10px;display:flex;flex-wrap:wrap;gap:7px;align-content:flex-end;
+  position:relative;transition:border-color .25s,box-shadow .25s,background .3s}
+.bkt.dov{border-color:var(--nblue);box-shadow:0 0 18px rgba(0,212,255,.22),inset 0 0 14px rgba(0,212,255,.04)}
+.bkt.bkt-ok{border-color:var(--ngreen);background:linear-gradient(180deg,#001410,#00090a);
+  animation:bpulse 1.4s ease-in-out infinite}
+@keyframes bpulse{0%,100%{box-shadow:0 0 28px rgba(0,255,136,.35)}50%{box-shadow:0 0 52px rgba(0,255,136,.65),0 0 90px rgba(0,255,136,.18)}}
+.bkt.bkt-bad{border-color:var(--nred);box-shadow:0 0 20px rgba(255,51,85,.3);
+  background:linear-gradient(180deg,#1e000a,#0e0005)}
+.bkt-cnt{position:absolute;top:7px;right:9px;font-size:.58rem;color:rgba(255,255,255,.2);font-weight:700}
+.bkt-sum{width:100%;text-align:center;padding:4px 0 2px;font-size:.68rem;font-weight:700;
+  letter-spacing:1px;min-height:18px;transition:color .3s}
+
+/* Trap door — hinged at top, swings open */
+.door{width:100%;height:26px;
+  background:linear-gradient(180deg,#221040 0%,#160828 55%,#0e0518 100%);
+  border:2px solid rgba(191,95,255,.32);border-top:none;border-radius:0 0 10px 10px;
+  position:relative;overflow:hidden;transform-origin:top center;
+  transition:transform .6s cubic-bezier(.4,0,.2,1),border-color .3s,background .3s}
+.door::before{content:'';position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  width:36%;height:2px;background:rgba(191,95,255,.22);border-radius:2px}
+.door.d-bad{border-color:var(--nred);background:linear-gradient(180deg,#2a000e,#150008)}
+.door.d-open{transform:rotateX(90deg)}
+
+/* ── Buttons ────────────────────────────────────────────────────── */
+.act-row{display:flex;justify-content:center;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+.btn-fa{padding:14px 50px;font-size:1rem;font-weight:800;letter-spacing:2px;text-transform:uppercase;
+  background:linear-gradient(135deg,#b08000,var(--gold),#d09800);color:#180600;
+  border:2px solid rgba(255,235,90,.55);border-radius:12px;cursor:pointer;
+  box-shadow:0 0 20px rgba(255,215,0,.42),0 4px 12px rgba(0,0,0,.4);
+  animation:fablink 2.8s ease-in-out infinite;transition:transform .14s}
+@keyframes fablink{0%,100%{box-shadow:0 0 20px rgba(255,215,0,.42)}50%{box-shadow:0 0 36px rgba(255,215,0,.72)}}
+.btn-fa:hover{transform:scale(1.04)}
+.btn-fa:disabled{opacity:.28;animation:none;cursor:default;transform:none}
+
+/* ── Result banner ───────────────────────────────────────────────── */
+#res-banner{display:none;text-align:center;padding:14px 10px;
+  font-size:clamp(1rem,2.4vw,1.45rem);font-weight:900;letter-spacing:2px;
+  animation:rpop .45s cubic-bezier(.34,1.56,.64,1)}
+@keyframes rpop{from{transform:scale(.5);opacity:0}to{transform:scale(1);opacity:1}}
+
+/* ── Host panel ──────────────────────────────────────────────────── */
+hr.hd{border:none;border-top:1px solid rgba(191,95,255,.14)}
+#hp{position:relative;z-index:10;padding:11px 24px;background:rgba(4,0,12,.94);border-top:1px solid rgba(191,95,255,.18)}
+.hp-ttl{font-size:.56rem;letter-spacing:3px;color:#442255;text-transform:uppercase;margin-bottom:8px;text-align:center}
+.hp-row{display:flex;align-items:center;justify-content:center;gap:9px;flex-wrap:wrap}
+.hp-sep{width:1px;height:20px;background:rgba(191,95,255,.18);margin:0 3px}
+.hp-lbl{font-size:.58rem;color:#442255;letter-spacing:1px;text-transform:uppercase}
+
+.btn-hc{padding:5px 13px;border-radius:8px;cursor:pointer;font-size:.68rem;font-weight:600;
+  letter-spacing:.5px;text-transform:uppercase;border:1px solid;transition:all .2s}
+.btn-rst{background:rgba(70,25,110,.22);color:rgba(191,95,255,.75);border-color:rgba(191,95,255,.28)}
+.btn-rst:hover{background:rgba(90,35,140,.4)}
+.btn-ulk{background:rgba(0,70,120,.18);color:rgba(0,212,255,.75);border-color:rgba(0,212,255,.28)}
+.btn-ulk:hover{background:rgba(0,90,150,.35)}
+
+.btn-rv{padding:6px 17px;border-radius:8px;cursor:pointer;font-weight:800;font-size:.78rem;
+  letter-spacing:1px;text-transform:uppercase;border:2px solid;transition:all .2s}
+.btn-rv:hover:not(:disabled){transform:scale(1.06);filter:brightness(1.22)}
+.btn-rv:disabled{opacity:.22;cursor:default;transform:none}
+.rva{background:rgba(0,180,255,.08);color:#00d4ff;border-color:rgba(0,212,255,.38)}
+.rvb{background:rgba(191,95,255,.08);color:#bf5fff;border-color:rgba(191,95,255,.38)}
+.rvc{background:rgba(255,155,0,.08);color:#ffa828;border-color:rgba(255,155,0,.38)}
+
+/* ── Modal ───────────────────────────────────────────────────────── */
+.mbg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.87);z-index:300;align-items:center;justify-content:center}
+.mbg.open{display:flex}
+.mbox{background:linear-gradient(135deg,#100020,#090016);border:2px solid var(--gold);border-radius:18px;
+  padding:28px 32px;width:360px;max-width:92vw;text-align:center;
+  box-shadow:0 0 58px rgba(255,215,0,.22),0 18px 48px rgba(0,0,0,.6);
+  animation:mpop .28s cubic-bezier(.34,1.56,.64,1)}
+@keyframes mpop{from{transform:scale(.6);opacity:0}to{transform:scale(1);opacity:1}}
+.m-ico{font-size:2.3rem;margin-bottom:8px}
+.m-ttl{font-size:1.1rem;font-weight:800;color:var(--gold);margin-bottom:6px}
+.m-body{font-size:.8rem;color:#888;margin-bottom:20px;line-height:1.65}
+.m-btns{display:flex;gap:10px;justify-content:center}
+.btn-mc{background:linear-gradient(135deg,#a07800,var(--gold));color:#180500;padding:9px 24px;
+  border-radius:8px;border:none;cursor:pointer;font-weight:700;font-size:.8rem}
+.btn-mc:hover{filter:brightness(1.1)}
+.btn-mx{background:rgba(255,255,255,.06);color:#888;padding:9px 24px;border-radius:8px;
+  border:1px solid rgba(255,255,255,.12);cursor:pointer;font-size:.8rem}
+.btn-mx:hover{background:rgba(255,255,255,.1)}
+
+/* ── Responsive ──────────────────────────────────────────────────── */
+@media(max-width:660px){
+  .bkts{flex-direction:column;align-items:center}
+  .bw{max-width:100%;width:100%}
+  #ga{padding:14px 12px}
+  .logo-row{gap:10px}
+  .wiz-svg{width:52px;height:56px}
+}
+</style>
+</head>
+<body>
+
+<!-- Background glow blobs -->
+<div class="blob" style="width:480px;height:480px;background:#2800aa;top:-80px;left:-100px"></div>
+<div class="blob" style="width:360px;height:360px;background:#006688;bottom:-60px;right:-80px"></div>
+<div class="blob" style="width:280px;height:280px;background:#550022;top:45%;left:45%;transform:translate(-50%,-50%)"></div>
+<div id="ptc"></div>
+
+<!-- ═══════════════ HEADER ═══════════════════════════════════════ -->
+<header>
+  <div class="logo-row">
+
+    <!-- Left Dumbledore Wizard SVG -->
+    <svg class="wiz-svg" viewBox="0 0 72 80" xmlns="http://www.w3.org/2000/svg">
+      <!-- Stars -->
+      <polygon points="10,7 11.1,10.3 14.5,10.3 11.8,12.3 12.9,15.6 10,13.6 7.1,15.6 8.2,12.3 5.5,10.3 8.9,10.3" fill="#ffd700" opacity=".8"/>
+      <polygon points="62,10 62.9,12.8 65.8,12.8 63.5,14.4 64.4,17.2 62,15.6 59.6,17.2 60.5,14.4 58.2,12.8 61.1,12.8" fill="#ffd700" opacity=".55"/>
+      <circle cx="37" cy="3" r="1.8" fill="#00d4ff" opacity=".7"/>
+      <circle cx="22" cy="15" r="1.1" fill="#bf5fff" opacity=".55"/>
+      <!-- Hat brim -->
+      <ellipse cx="36" cy="44" rx="21" ry="5.5" fill="#16072a"/>
+      <ellipse cx="36" cy="44" rx="21" ry="5.5" fill="none" stroke="#8833dd" stroke-width="1.5"/>
+      <!-- Hat body -->
+      <path d="M18,44 L25,14 Q36,3 47,14 L54,44 Z" fill="#16072a"/>
+      <path d="M18,44 L25,14 Q36,3 47,14 L54,44 Z" fill="none" stroke="#8833dd" stroke-width="1.5"/>
+      <!-- Hat band -->
+      <rect x="21" y="36" width="30" height="6" rx="2" fill="#5511aa" opacity=".7"/>
+      <!-- Star on hat -->
+      <polygon points="36,34 36.9,36.8 39.9,36.8 37.5,38.4 38.4,41.2 36,39.6 33.6,41.2 34.5,38.4 32.1,36.8 35.1,36.8" fill="#ffd700"/>
+      <!-- Face -->
+      <ellipse cx="36" cy="52" rx="11" ry="10.5" fill="#f0c46a"/>
+      <ellipse cx="36" cy="52" rx="11" ry="10.5" fill="none" stroke="#c09030" stroke-width=".8"/>
+      <!-- Half-moon glasses frames -->
+      <path d="M27,51 Q31.5,47.5 35,51" fill="rgba(200,200,255,.07)" stroke="#7a5010" stroke-width="1.3"/>
+      <path d="M37,51 Q40.5,47.5 45,51" fill="rgba(200,200,255,.07)" stroke="#7a5010" stroke-width="1.3"/>
+      <line x1="35" y1="50" x2="37" y2="50" stroke="#7a5010" stroke-width="1"/>
+      <line x1="27" y1="51" x2="24.5" y2="51.5" stroke="#7a5010" stroke-width="1"/>
+      <line x1="45" y1="51" x2="47.5" y2="51.5" stroke="#7a5010" stroke-width="1"/>
+      <!-- Eyes -->
+      <ellipse cx="31" cy="50" rx="2" ry="1.8" fill="#3366cc"/>
+      <ellipse cx="41" cy="50" rx="2" ry="1.8" fill="#3366cc"/>
+      <ellipse cx="31" cy="50" rx=".9" ry=".9" fill="#112"/>
+      <ellipse cx="41" cy="50" rx=".9" ry=".9" fill="#112"/>
+      <!-- Bushy eyebrows -->
+      <path d="M28,46.5 Q31.5,44.8 35,46.5" stroke="#ccc" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+      <path d="M37,46.5 Q40.5,44.8 44,46.5" stroke="#ccc" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+      <!-- Nose -->
+      <path d="M36,51.5 Q34.2,55 35.3,55.6 Q36,56 36.7,55.6 Q37.8,55 36,51.5" fill="#c8922a" opacity=".75"/>
+      <!-- Mustache -->
+      <path d="M32.5,57 Q36,59 39.5,57" stroke="#ddd" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+      <!-- Long beard -->
+      <path d="M27,57.5 Q25,65 29,71 Q36,77 43,71 Q47,65 45,57.5 Q41.5,60.5 36,61 Q30.5,60.5 27,57.5Z" fill="#ddd"/>
+      <path d="M30,59.5 Q29,65 31,69" stroke="#bbb" stroke-width=".9" fill="none"/>
+      <path d="M36,61 Q36,66.5 36,71" stroke="#bbb" stroke-width=".9" fill="none"/>
+      <path d="M42,59.5 Q43,65 41,69" stroke="#bbb" stroke-width=".9" fill="none"/>
+      <!-- Robe collar hint -->
+      <path d="M26,58 Q20,64 22,72 L36,78 L50,72 Q52,64 46,58" fill="#220a44" opacity=".5"/>
+      <!-- Wand -->
+      <line x1="46" y1="62" x2="65" y2="45" stroke="#c8a028" stroke-width="2.8" stroke-linecap="round"/>
+      <circle cx="46" cy="62" r="3" fill="#f0c840" opacity=".9"/>
+      <circle cx="65" cy="45" r="5.5" fill="#ffd700" opacity=".45"/>
+      <circle cx="65" cy="45" r="9" fill="#ffd700" opacity=".12"/>
+    </svg>
+
+    <div class="title-block">
+      <div class="gtitle">Stargazers Jackpot</div>
+      <div class="gsub">Money Drop Edition &nbsp;·&nbsp; Hosted by Stargazers</div>
+    </div>
+
+    <!-- Right wizard (mirrored) -->
+    <svg class="wiz-svg" viewBox="0 0 72 80" xmlns="http://www.w3.org/2000/svg" style="transform:scaleX(-1)">
+      <polygon points="10,7 11.1,10.3 14.5,10.3 11.8,12.3 12.9,15.6 10,13.6 7.1,15.6 8.2,12.3 5.5,10.3 8.9,10.3" fill="#ffd700" opacity=".8"/>
+      <polygon points="62,10 62.9,12.8 65.8,12.8 63.5,14.4 64.4,17.2 62,15.6 59.6,17.2 60.5,14.4 58.2,12.8 61.1,12.8" fill="#ffd700" opacity=".55"/>
+      <circle cx="37" cy="3" r="1.8" fill="#00d4ff" opacity=".7"/>
+      <circle cx="22" cy="15" r="1.1" fill="#bf5fff" opacity=".55"/>
+      <ellipse cx="36" cy="44" rx="21" ry="5.5" fill="#16072a"/>
+      <ellipse cx="36" cy="44" rx="21" ry="5.5" fill="none" stroke="#8833dd" stroke-width="1.5"/>
+      <path d="M18,44 L25,14 Q36,3 47,14 L54,44 Z" fill="#16072a"/>
+      <path d="M18,44 L25,14 Q36,3 47,14 L54,44 Z" fill="none" stroke="#8833dd" stroke-width="1.5"/>
+      <rect x="21" y="36" width="30" height="6" rx="2" fill="#5511aa" opacity=".7"/>
+      <polygon points="36,34 36.9,36.8 39.9,36.8 37.5,38.4 38.4,41.2 36,39.6 33.6,41.2 34.5,38.4 32.1,36.8 35.1,36.8" fill="#ffd700"/>
+      <ellipse cx="36" cy="52" rx="11" ry="10.5" fill="#f0c46a"/>
+      <ellipse cx="36" cy="52" rx="11" ry="10.5" fill="none" stroke="#c09030" stroke-width=".8"/>
+      <path d="M27,51 Q31.5,47.5 35,51" fill="rgba(200,200,255,.07)" stroke="#7a5010" stroke-width="1.3"/>
+      <path d="M37,51 Q40.5,47.5 45,51" fill="rgba(200,200,255,.07)" stroke="#7a5010" stroke-width="1.3"/>
+      <line x1="35" y1="50" x2="37" y2="50" stroke="#7a5010" stroke-width="1"/>
+      <line x1="27" y1="51" x2="24.5" y2="51.5" stroke="#7a5010" stroke-width="1"/>
+      <line x1="45" y1="51" x2="47.5" y2="51.5" stroke="#7a5010" stroke-width="1"/>
+      <ellipse cx="31" cy="50" rx="2" ry="1.8" fill="#3366cc"/>
+      <ellipse cx="41" cy="50" rx="2" ry="1.8" fill="#3366cc"/>
+      <ellipse cx="31" cy="50" rx=".9" ry=".9" fill="#112"/>
+      <ellipse cx="41" cy="50" rx=".9" ry=".9" fill="#112"/>
+      <path d="M28,46.5 Q31.5,44.8 35,46.5" stroke="#ccc" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+      <path d="M37,46.5 Q40.5,44.8 44,46.5" stroke="#ccc" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+      <path d="M36,51.5 Q34.2,55 35.3,55.6 Q36,56 36.7,55.6 Q37.8,55 36,51.5" fill="#c8922a" opacity=".75"/>
+      <path d="M32.5,57 Q36,59 39.5,57" stroke="#ddd" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+      <path d="M27,57.5 Q25,65 29,71 Q36,77 43,71 Q47,65 45,57.5 Q41.5,60.5 36,61 Q30.5,60.5 27,57.5Z" fill="#ddd"/>
+      <path d="M30,59.5 Q29,65 31,69" stroke="#bbb" stroke-width=".9" fill="none"/>
+      <path d="M36,61 Q36,66.5 36,71" stroke="#bbb" stroke-width=".9" fill="none"/>
+      <path d="M42,59.5 Q43,65 41,69" stroke="#bbb" stroke-width=".9" fill="none"/>
+      <path d="M26,58 Q20,64 22,72 L36,78 L50,72 Q52,64 46,58" fill="#220a44" opacity=".5"/>
+      <line x1="46" y1="62" x2="65" y2="45" stroke="#c8a028" stroke-width="2.8" stroke-linecap="round"/>
+      <circle cx="46" cy="62" r="3" fill="#f0c840" opacity=".9"/>
+      <circle cx="65" cy="45" r="5.5" fill="#ffd700" opacity=".45"/>
+      <circle cx="65" cy="45" r="9" fill="#ffd700" opacity=".12"/>
+    </svg>
+  </div>
+
+  <!-- Score bar -->
+  <div class="sc-bar">
+    <div class="sc-item">
+      <div class="sc-lbl">Blocks Remaining</div>
+      <div class="sc-val" id="sv-blk">10</div>
+      <div class="sc-unit">blocks</div>
+    </div>
+    <div class="sc-item">
+      <div class="sc-lbl">Points Available</div>
+      <div class="sc-val" id="sv-pts">100</div>
+      <div class="sc-unit">pts</div>
+    </div>
+    <div class="sc-item">
+      <div class="sc-lbl">In Tray</div>
+      <div class="sc-val" id="sv-tray">10</div>
+      <div class="sc-unit">unplaced</div>
+    </div>
+    <div class="sc-item">
+      <div class="sc-lbl">Round</div>
+      <div class="sc-val" id="sv-round">1</div>
+      <div class="sc-unit">round</div>
+    </div>
+  </div>
+</header>
+
+<!-- Phase banner -->
+<div id="phase" style="color:var(--nblue)">🎯 Drag blocks to the buckets — then lock your final answer!</div>
+
+<!-- ═══════════════ GAME AREA ═════════════════════════════════ -->
+<div id="ga">
+  <div class="t-lbl">Available Blocks — drag to a bucket below</div>
+  <div id="tray"></div>
+  <div class="bkts" id="bkts"></div>
+  <div id="res-banner"></div>
+  <div class="act-row">
+    <button class="btn-fa" id="btn-fa" onclick="confirmFinal()">🔒 Final Answer</button>
+  </div>
+</div>
+
+<hr class="hd">
+
+<!-- ═══════════════ HOST PANEL ════════════════════════════════ -->
+<div id="hp">
+  <div class="hp-ttl">🎬 Host Control Panel</div>
+  <div class="hp-row">
+    <span class="hp-lbl">Controls</span>
+    <button class="btn-hc btn-rst" onclick="resetRound()">↺ Reset Round</button>
+    <button class="btn-hc btn-ulk" onclick="unlockDragging()">🔓 Unlock Dragging</button>
+    <div class="hp-sep"></div>
+    <span class="hp-lbl">Correct Bucket:</span>
+    <button class="btn-rv rva" id="hb0" onclick="revealCorrect(0)" disabled>Bucket A</button>
+    <button class="btn-rv rvb" id="hb1" onclick="revealCorrect(1)" disabled>Bucket B</button>
+    <button class="btn-rv rvc" id="hb2" onclick="revealCorrect(2)" disabled>Bucket C</button>
+  </div>
+</div>
+
+<!-- ═══════════════ CONFIRMATION MODAL ═══════════════════════ -->
+<div class="mbg" id="modal">
+  <div class="mbox">
+    <div class="m-ico">🔒</div>
+    <div class="m-ttl">Lock Your Answer?</div>
+    <div class="m-body">Are you sure you want to lock your answer?<br>Blocks cannot be moved after confirming.</div>
+    <div class="m-btns">
+      <button class="btn-mx" onclick="closeModal()">Cancel</button>
+      <button class="btn-mc" onclick="lockAnswer()">Confirm!</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════════════════════════════
+//  STARGAZERS JACKPOT — Game Engine
+// ════════════════════════════════════════════════════════════════
+
+const LABELS = ['A','B','C'];
+const COLORS = ['#00d4ff','#bf5fff','#ffa828'];
+const N      = 10; // total blocks
+
+// ── State ─────────────────────────────────────────────────────
+let S = {
+  round  : 1,
+  blocks : [],            // { id, loc: 'tray'|0|1|2 }
+  phase  : 'placing',     // 'placing' | 'locked' | 'revealed'
+  dragId : null,
+};
+
+// ── Init ──────────────────────────────────────────────────────
+function init(keepBlocks) {
+  if (!keepBlocks) {
+    S.blocks = Array.from({length:N}, (_,i) => ({id:i, loc:'tray'}));
+    S.round  = 1;
+  } else {
+    // Next round: surviving blocks go back to tray
+    S.blocks = S.blocks.map(b => ({...b, loc:'tray'}));
+    S.round++;
+  }
+  S.phase  = 'placing';
+  S.dragId = null;
+  document.getElementById('res-banner').style.display = 'none';
+  renderAll();
+  spawnParticles();
+}
+
+// ── Render all ────────────────────────────────────────────────
+function renderAll() {
+  renderTray();
+  renderBuckets();
+  updateUI();
+}
+
+// ── Tray ──────────────────────────────────────────────────────
+function renderTray() {
+  const el = document.getElementById('tray');
+  el.innerHTML = '';
+  S.blocks.filter(b => b.loc === 'tray').forEach(b => el.appendChild(mkBlock(b)));
+  el.ondragover  = e => { if (S.phase!=='placing') return; e.preventDefault(); el.classList.add('dov'); };
+  el.ondragleave = () => el.classList.remove('dov');
+  el.ondrop      = e => {
+    e.preventDefault(); el.classList.remove('dov');
+    if (S.phase==='placing' && S.dragId!==null) moveBlock(S.dragId,'tray');
+  };
+}
+
+// ── Buckets ───────────────────────────────────────────────────
+function renderBuckets() {
+  const row = document.getElementById('bkts');
+  row.innerHTML = '';
+  LABELS.forEach((lbl, i) => {
+    const inside = S.blocks.filter(b => b.loc === i);
+    const pts    = inside.length * 10;
+
+    const wrap = el('div','bw');
+
+    const topLbl = el('div','bw-lbl', `Bucket ${lbl}`);
+    topLbl.style.color = COLORS[i];
+    wrap.appendChild(topLbl);
+
+    const bkt = el('div','bkt');
+    bkt.id = `bkt${i}`;
+
+    // Block count badge
+    const badge = el('div','bkt-cnt', inside.length ? `${inside.length}×` : '');
+    bkt.appendChild(badge);
+
+    // Blocks stacked inside bucket
+    inside.forEach(b => bkt.appendChild(mkBlock(b)));
+
+    // Drag-over bucket events
+    bkt.ondragover  = e => { if (S.phase!=='placing') return; e.preventDefault(); bkt.classList.add('dov'); };
+    bkt.ondragleave = () => bkt.classList.remove('dov');
+    bkt.ondrop      = e => {
+      e.preventDefault(); bkt.classList.remove('dov');
+      if (S.phase==='placing' && S.dragId!==null) moveBlock(S.dragId, i);
+    };
+
+    // Points sum below bucket
+    const sum = el('div','bkt-sum', inside.length ? `${pts} pts` : '');
+    sum.style.color = COLORS[i];
+
+    // Trap door (metallic flap at bottom)
+    const door = el('div','door');
+    door.id = `door${i}`;
+
+    wrap.appendChild(bkt);
+    wrap.appendChild(sum);
+    wrap.appendChild(door);
+    row.appendChild(wrap);
+  });
+}
+
+// ── Block element factory ─────────────────────────────────────
+function mkBlock(b) {
+  const e = el('div','blk');
+  e.id        = `blk${b.id}`;
+  e.draggable = S.phase === 'placing';
+  e.innerHTML = `<span class="bn">10</span><span class="bl">PTS</span>`;
+  if (S.phase !== 'placing') e.classList.add('locked');
+
+  e.ondragstart = () => {
+    if (S.phase !== 'placing') return;
+    S.dragId = b.id;
+    setTimeout(() => e.classList.add('dragging'), 0);
+    // sound placeholder: playSound('drag_start')
+  };
+  e.ondragend = () => { e.classList.remove('dragging'); S.dragId = null; };
+  return e;
+}
+
+function moveBlock(id, loc) {
+  const b = S.blocks.find(x => x.id === id);
+  if (b) b.loc = loc;
+  renderAll();
+  // sound placeholder: playSound('block_place')
+}
+
+// ── Update scores / UI state ──────────────────────────────────
+function updateUI() {
+  const tray = S.blocks.filter(b => b.loc === 'tray').length;
+  document.getElementById('sv-blk').textContent   = S.blocks.length;
+  document.getElementById('sv-pts').textContent   = S.blocks.length * 10;
+  document.getElementById('sv-tray').textContent  = tray;
+  document.getElementById('sv-round').textContent = S.round;
+
+  const locked = S.phase === 'locked';
+  [0,1,2].forEach(i => document.getElementById(`hb${i}`).disabled = !locked);
+
+  const ph  = document.getElementById('phase');
+  const btn = document.getElementById('btn-fa');
+  if (S.phase === 'placing') {
+    ph.textContent = '🎯 Drag blocks to the buckets — then lock your final answer!';
+    ph.style.color = '#00d4ff';
+    btn.disabled   = false;
+  } else if (S.phase === 'locked') {
+    ph.textContent = '🔒 Answer locked! Host — select the correct bucket below';
+    ph.style.color = '#ffd700';
+    btn.disabled   = true;
+  } else {
+    btn.disabled = true;
+  }
+}
+
+// ── Final Answer flow ─────────────────────────────────────────
+function confirmFinal() { document.getElementById('modal').classList.add('open'); }
+function closeModal()   { document.getElementById('modal').classList.remove('open'); }
+function lockAnswer() {
+  closeModal();
+  S.phase = 'locked';
+  renderAll();
+  // sound placeholder: playSound('lock_click')
+}
+
+// ── Host: reveal correct bucket ───────────────────────────────
+function revealCorrect(ci) {
+  if (S.phase !== 'locked') return;
+  S.phase = 'revealed';
+  [0,1,2].forEach(i => document.getElementById(`hb${i}`).disabled = true);
+
+  // Correct bucket: glow green
+  document.getElementById(`bkt${ci}`).classList.add('bkt-ok');
+  // sound placeholder: playSound('correct_reveal')
+
+  // Wrong buckets: red flash → door opens → blocks fall
+  [0,1,2].filter(i => i !== ci).forEach((wi, seq) => {
+    setTimeout(() => {
+      document.getElementById(`bkt${wi}`).classList.add('bkt-bad');
+      const doorEl = document.getElementById(`door${wi}`);
+      doorEl.classList.add('d-bad');
+      // sound placeholder: playSound('wrong_buzz')
+
+      setTimeout(() => {
+        doorEl.classList.add('d-open');
+        // sound placeholder: playSound('door_creak')
+        dropBlocks(wi);
+      }, 580);
+    }, seq * 650);
+  });
+
+  // Show result after all animations settle
+  const kept = S.blocks.filter(b => b.loc === ci).length;
+  setTimeout(() => showResult(kept), 3000);
+}
+
+// Animate blocks falling from a wrong bucket
+function dropBlocks(bucketIdx) {
+  S.blocks.filter(b => b.loc === bucketIdx).forEach((b, i) => {
+    setTimeout(() => {
+      const orig = document.getElementById(`blk${b.id}`);
+      if (!orig) return;
+      const r = orig.getBoundingClientRect();
+
+      // Create fixed-position clone to animate freely
+      const clone = orig.cloneNode(true);
+      clone.style.cssText = [
+        `position:fixed`,`left:${r.left}px`,`top:${r.top}px`,
+        `width:${r.width}px`,`height:${r.height}px`,
+        `margin:0`,`z-index:500`,`pointer-events:none`,`transition:none`,
+      ].join(';');
+      document.body.appendChild(clone);
+      orig.style.visibility = 'hidden';
+
+      // Trigger gravity fall on next frame
+      requestAnimationFrame(() => {
+        const dy  = window.innerHeight - r.top + 80;
+        const rot = (Math.random() - 0.5) * 90;
+        clone.style.transition = 'transform .9s ease-in, opacity .85s ease-in';
+        clone.style.transform  = `translateY(${dy}px) rotate(${rot}deg)`;
+        clone.style.opacity    = '0';
+        // sound placeholder: playSound('block_clatter')
+
+        setTimeout(() => {
+          clone.remove();
+          S.blocks = S.blocks.filter(x => x.id !== b.id);
+          updateUI();
+        }, 950);
+      });
+    }, i * 110);
+  });
+}
+
+// ── Show result banner ────────────────────────────────────────
+function showResult(kept) {
+  const pts    = kept * 10;
+  const banner = document.getElementById('res-banner');
+  const ph     = document.getElementById('phase');
+
+  if (kept === 0) {
+    banner.innerHTML = `<span style="color:#ff3355">💀 All blocks lost — 0 points remaining!</span>`;
+    ph.textContent   = '💀 No blocks survived · Use Reset Round to start fresh';
+    ph.style.color   = '#ff3355';
+    // sound placeholder: playSound('lose_jingle')
+  } else {
+    banner.innerHTML = `<span style="color:#00ff88">🎉 ${kept} block${kept>1?'s':''} survived!&nbsp;&nbsp;<span style="color:#ffd700">${pts} pts kept!</span></span>`;
+    ph.textContent   = `✅ ${kept} block(s) survived → ${pts} pts · Press Reset Round to continue`;
+    ph.style.color   = '#00ff88';
+    // sound placeholder: playSound('win_fanfare')
+  }
+  banner.style.display = 'block';
+}
+
+// ── Host controls ─────────────────────────────────────────────
+function resetRound() {
+  // Surviving blocks go back to tray, advance round
+  S.blocks = S.blocks.map(b => ({...b, loc:'tray'}));
+  S.round++;
+  S.phase  = 'placing';
+  S.dragId = null;
+  document.getElementById('res-banner').style.display = 'none';
+  renderAll();
+  // sound placeholder: playSound('round_start')
+}
+
+function unlockDragging() {
+  // If already revealed, collect all remaining blocks to tray
+  if (S.phase === 'revealed') S.blocks = S.blocks.map(b => ({...b, loc:'tray'}));
+  S.phase  = 'placing';
+  S.dragId = null;
+  document.getElementById('res-banner').style.display = 'none';
+  renderAll();
+}
+
+// ── Particles ─────────────────────────────────────────────────
+function spawnParticles() {
+  const c    = document.getElementById('ptc');
+  c.innerHTML = '';
+  const cols = ['#ffd700','#bf5fff','#00d4ff','#ff6699','#66ffaa','#ff9900'];
+  for (let i = 0; i < 46; i++) {
+    const p  = document.createElement('div');
+    p.className = 'pt';
+    const s = Math.random() * 5 + 2;
+    p.style.cssText = [
+      `left:${Math.random()*100}%`,
+      `width:${s}px`,`height:${s}px`,
+      `background:${cols[Math.floor(Math.random()*cols.length)]}`,
+      `animation-duration:${Math.random()*13+8}s`,
+      `animation-delay:${Math.random()*11}s`,
+      `box-shadow:0 0 ${s*2}px currentColor`,
+    ].join(';');
+    c.appendChild(p);
+  }
+}
+
+// ── Utility ────────────────────────────────────────────────────
+function el(tag, cls='', text='') {
+  const e = document.createElement(tag);
+  if (cls)  e.className   = cls;
+  if (text) e.textContent = text;
+  return e;
+}
+
+// ── Start ──────────────────────────────────────────────────────
+init(false);
+</script>
+</body>
+</html>
