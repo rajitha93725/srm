@@ -33,10 +33,9 @@ h2{font-size:1rem;font-weight:600;margin-bottom:14px;color:#f1f5f9}
 
 /* Groups */
 .groups-wrap{overflow-x:auto}
-.groups-grid{display:grid;grid-template-columns:repeat(6,minmax(200px,1fr));gap:10px}
-@media(max-width:1300px){.groups-grid{grid-template-columns:repeat(4,minmax(200px,1fr))}}
-@media(max-width:880px){.groups-grid{grid-template-columns:repeat(2,minmax(200px,1fr))}}
-@media(max-width:480px){.groups-grid{grid-template-columns:1fr}}
+.groups-grid{display:grid;grid-template-columns:repeat(4,minmax(230px,1fr));gap:12px}
+@media(max-width:1100px){.groups-grid{grid-template-columns:repeat(2,minmax(230px,1fr))}}
+@media(max-width:560px){.groups-grid{grid-template-columns:1fr}}
 .group-card{background:#1e293b;border:1px solid #334155;border-radius:10px;overflow:hidden}
 .group-header{background:#1e3050;padding:8px 12px;display:flex;align-items:center;justify-content:space-between}
 .group-header span{font-size:.82rem;font-weight:700;color:#e2e8f0}
@@ -58,13 +57,13 @@ h2{font-size:1rem;font-weight:600;margin-bottom:14px;color:#f1f5f9}
 .match-row{margin-bottom:7px;background:#0f172a;border:1px solid #334155;border-radius:7px;padding:7px 9px}
 .match-names{font-size:.75rem;margin-bottom:4px;line-height:1.4}
 .match-names .vs{color:#475569;margin:0 4px}
-.match-meta{display:flex;align-items:center;justify-content:space-between;gap:6px}
-.score-txt{font-size:.68rem;color:#64748b}
+.match-meta{display:flex;align-items:center;gap:5px;flex-wrap:nowrap;margin-top:5px}
+.score-txt{font-size:.65rem;color:#64748b;flex-shrink:0}
 .score-txt.done{color:#4ade80}
-.score-btn{padding:2px 9px;background:#3b82f6;color:#fff;border:none;border-radius:5px;cursor:pointer;font-size:.7rem;font-weight:500}
+.score-btn{padding:4px 10px;background:#3b82f6;color:#fff;border:none;border-radius:5px;cursor:pointer;font-size:.72rem;font-weight:600;flex-shrink:0;margin-left:auto}
 .score-btn:hover{background:#2563eb}
 .match-deadline{display:inline-flex;align-items:center;gap:4px}
-.deadline-lbl{font-size:.68rem;color:#64748b;flex-shrink:0}
+.deadline-lbl{font-size:.6rem;color:#64748b;flex-shrink:0;line-height:1.25;white-space:normal;max-width:36px;word-break:break-word}
 .deadline-val-wrap{position:relative;display:inline-flex;align-items:center}
 .deadline-val{font-size:.72rem;font-weight:600;color:#7dd3fc;padding:2px 9px;background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.3);border-radius:6px;cursor:pointer;white-space:nowrap;transition:.15s}
 .deadline-val:hover{background:rgba(56,189,248,.16);border-color:#38bdf8;color:#e0f2fe}
@@ -511,17 +510,15 @@ function renderGroups(){
           <span style="color:${hc(p1.h)};font-weight:600">${p1.n}</span>
           <span class="vs">vs</span>
           <span style="color:${hc(p2.h)};font-weight:600">${p2.n}</span>
+          <span class="score-txt ${done?'done':''}" style="margin-left:auto">${summary}</span>
         </div>
         <div class="match-meta">
-          <span class="score-txt ${done?'done':''}">${summary}</span>
-          <span class="match-deadline">
-            <span class="deadline-lbl">On or before</span>
-            <span class="deadline-val-wrap">
-              <span class="deadline-val">${dateDisp}</span>
-              <input type="date" class="deadline-inp-overlay" value="${dateVal}" onchange="setMatchDate('${key}',this.value)">
-            </span>
-            <select class="deadline-time-sel" onchange="setMatchTime('${key}',this.value)">${genTimeOpts(timeVal)}</select>
+          <span class="deadline-lbl">On or<br>before</span>
+          <span class="deadline-val-wrap">
+            <span class="deadline-val">${dateDisp}</span>
+            <input type="date" class="deadline-inp-overlay" value="${dateVal}" onchange="setMatchDate('${key}',this.value)">
           </span>
+          <select class="deadline-time-sel" onchange="setMatchTime('${key}',this.value)">${genTimeOpts(timeVal)}</select>
           <button class="score-btn" onclick="openScoreModal(${bg.id},${mi},${m[0]},${m[1]})">Score</button>
         </div>
       </div>`;
