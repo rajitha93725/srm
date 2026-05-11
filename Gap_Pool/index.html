@@ -8,10 +8,22 @@
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Segoe UI',sans-serif;background:#06010f;color:#e2e8f0;min-height:100vh;overflow-x:hidden}
 
-/* ── Floating particles ─────────────────────────────────────── */
+/* ── Floating rocket particles ──────────────────────────────── */
 #ptc{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
-.pt{position:absolute;border-radius:50%;opacity:0;animation:pf linear infinite}
-@keyframes pf{0%{transform:translateY(105vh) scale(0);opacity:0}8%{opacity:.45}85%{opacity:.12}100%{transform:translateY(-5vh) scale(1.2);opacity:0}}
+.pt{position:absolute;opacity:0;animation:pf linear infinite;font-style:normal;line-height:1;user-select:none}
+@keyframes pf{
+  /* Travel: bottom → top in first 38% of cycle, then hide and wait */
+  0%    {transform:translateY(112vh) rotate(-45deg) scale(.55);opacity:0}
+  5%    {opacity:.95}
+  34%   {transform:translateY(-12vh) rotate(-45deg) scale(1.05);opacity:0}
+  34.1% {transform:translateY(112vh) rotate(-45deg) scale(.55);opacity:0}
+  100%  {transform:translateY(112vh) rotate(-45deg) scale(.55);opacity:0}
+}
+
+/* ── Gapstars wordmark ──────────────────────────────────────── */
+.gs-wordmark{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:10px}
+.gs-name{font-size:clamp(1rem,3vw,1.5rem);font-weight:900;letter-spacing:6px;text-transform:uppercase;
+  color:#ff7a00;text-shadow:0 0 22px rgba(255,122,0,.6),0 0 44px rgba(255,80,0,.2)}
 
 /* ── Ambient blobs ──────────────────────────────────────────── */
 .blob{position:fixed;border-radius:50%;filter:blur(120px);opacity:.07;pointer-events:none;z-index:0}
@@ -116,12 +128,17 @@ footer{position:relative;z-index:5;text-align:center;padding:16px;
 <div class="blob" style="width:520px;height:520px;background:#2a00bb;top:-140px;left:-130px"></div>
 <div class="blob" style="width:400px;height:400px;background:#004f80;bottom:-80px;right:-100px"></div>
 <div class="blob" style="width:280px;height:280px;background:#5a0030;top:48%;left:50%;transform:translate(-50%,-50%)"></div>
+<div class="blob" style="width:320px;height:320px;background:#cc4400;top:-60px;left:50%;transform:translateX(-50%);opacity:.06"></div>
 <div id="ptc"></div>
 
 <!-- ═══════ HEADER ══════════════════════════════════════════════ -->
 <header>
-  <span class="crown">🏆</span>
-  <div class="main-title">Gapstars Grand Table Clash</div>
+  <div class="gs-wordmark">
+    <span style="font-size:2.2rem;filter:drop-shadow(0 0 10px rgba(255,215,0,.7))">🏆</span>
+    <span class="gs-name">Gapstars</span>
+    <span style="font-size:2.2rem;filter:drop-shadow(0 0 10px rgba(255,215,0,.7))">🏆</span>
+  </div>
+  <div class="main-title">Grand Table Clash</div>
   <div class="sub-row">
     <span class="sub-pill">
       <!-- mini pool ball -->
@@ -375,18 +392,32 @@ footer{position:relative;z-index:5;text-align:center;padding:16px;
 <footer>Hosted by Stargazers &nbsp;·&nbsp; Gapstars Grand Table Clash 2026</footer>
 
 <script>
-// Floating particles
+// Rockets launch in waves — quiet gaps between bursts
 (function(){
-  const c=document.getElementById('ptc');
-  const cols=['#ffd700','#bf5fff','#00d4ff','#ff6699','#f59e0b','#66ffaa'];
-  for(let i=0;i<36;i++){
-    const p=document.createElement('div');p.className='pt';
-    const s=Math.random()*4+2;
-    p.style.cssText=`left:${Math.random()*100}%;width:${s}px;height:${s}px;`+
-      `background:${cols[i%cols.length]};animation-duration:${Math.random()*14+10}s;`+
-      `animation-delay:${Math.random()*13}s;opacity:0`;
-    c.appendChild(p);
-  }
+  const c = document.getElementById('ptc');
+  const CYCLE = 24; // seconds per full cycle (travel ~8.2s, then hidden ~15.8s)
+  // 3 waves per cycle — spaced to keep clear quiet gaps between bursts
+  const waves = [
+    { base: 0,    count: 5 },   // launch burst at t=0s
+    { base: 9,    count: 4 },   // launch burst at t=9s
+    { base: 17,   count: 4 },   // launch burst at t=17s
+    // next cycle starts at t=24s → ~7s quiet after last wave
+  ];
+  waves.forEach(wave => {
+    for(let j = 0; j < wave.count; j++){
+      const p = document.createElement('span'); p.className = 'pt';
+      const sz = Math.random() * 14 + 16; // 16–30px
+      p.textContent = '🚀';
+      p.style.cssText =
+        `left:${Math.random()*88+5}%;`+
+        `font-size:${sz}px;`+
+        `animation-duration:${CYCLE}s;`+
+        `animation-delay:${wave.base + j * 0.28}s;`+
+        `filter:drop-shadow(0 0 ${Math.round(sz*.38)}px rgba(255,110,0,.85));`+
+        `opacity:0`;
+      c.appendChild(p);
+    }
+  });
 })();
 </script>
 </body>
