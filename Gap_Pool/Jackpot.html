@@ -5,321 +5,397 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Stargazers Jackpot</title>
 <style>
-/* ── Reset ──────────────────────────────────────────────────────── */
+/* ── Reset & Vars ─────────────────────────────────────────────── */
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --gold:#ffd700;--gold2:#e8a800;--goldglow:rgba(255,215,0,.55);
-  --nblue:#00d4ff;--npurp:#bf5fff;--nred:#ff3355;--ngreen:#00ff88;
-  --bg:#06000e;--surf:#110020;--surf2:#1b0035;
+  --gold:#ffd700;--goldg:rgba(255,215,0,.55);
+  --nb:#00d4ff;--np:#bf5fff;--nr:#ff3355;--ng:#00ff88;
+  --bg:#05000c;
 }
-body{font-family:'Segoe UI',sans-serif;background:var(--bg);color:#ddd;min-height:100vh;overflow-x:hidden;user-select:none}
+body{font-family:'Segoe UI',sans-serif;background:var(--bg);color:#ddd;
+  min-height:100vh;overflow-x:hidden;user-select:none}
 
-/* ── Background blobs ───────────────────────────────────────────── */
-.blob{position:fixed;border-radius:50%;filter:blur(90px);opacity:.1;pointer-events:none;z-index:0}
-
-/* ── Particles ──────────────────────────────────────────────────── */
+/* ── Atmosphere ────────────────────────────────────────────────── */
+.blob{position:fixed;border-radius:50%;filter:blur(100px);opacity:.09;pointer-events:none;z-index:0}
 #ptc{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
 .pt{position:absolute;border-radius:50%;opacity:0;animation:pf linear infinite}
-@keyframes pf{
-  0%{transform:translateY(105vh) scale(0);opacity:0}
-  8%{opacity:.65}85%{opacity:.25}
-  100%{transform:translateY(-5vh) scale(1.3);opacity:0}
-}
+@keyframes pf{0%{transform:translateY(105vh) scale(0);opacity:0}8%{opacity:.6}85%{opacity:.2}100%{transform:translateY(-5vh) scale(1.3);opacity:0}}
 
-/* ── Header ─────────────────────────────────────────────────────── */
-header{position:relative;z-index:10;padding:16px 24px 12px;
-  background:linear-gradient(180deg,rgba(12,0,34,.98),rgba(6,0,18,.88));
-  border-bottom:2px solid rgba(191,95,255,.3);
-  box-shadow:0 4px 50px rgba(191,95,255,.12)}
-.logo-row{display:flex;align-items:center;justify-content:center;gap:18px;flex-wrap:wrap;margin-bottom:10px}
-.wiz-svg{width:70px;height:76px;filter:drop-shadow(0 0 14px var(--gold));flex-shrink:0}
+/* ── Header ────────────────────────────────────────────────────── */
+header{position:relative;z-index:10;padding:14px 20px 10px;
+  background:linear-gradient(180deg,rgba(10,0,30,.99),rgba(5,0,14,.9));
+  border-bottom:2px solid rgba(191,95,255,.28);box-shadow:0 4px 60px rgba(191,95,255,.1)}
+.logo-row{display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;margin-bottom:8px}
+.wiz{flex-shrink:0;filter:drop-shadow(0 0 10px #c8a000) drop-shadow(0 0 20px rgba(255,215,0,.3))}
 .title-block{text-align:center}
-.gtitle{font-size:clamp(1.5rem,3.8vw,2.7rem);font-weight:900;letter-spacing:3px;text-transform:uppercase;
-  background:linear-gradient(90deg,var(--gold),var(--nblue),var(--npurp),var(--gold));
+.gtitle{font-size:clamp(1.4rem,3.5vw,2.6rem);font-weight:900;letter-spacing:3px;text-transform:uppercase;
+  background:linear-gradient(90deg,var(--gold),var(--nb),var(--np),var(--gold));
   background-size:300%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;
   animation:tsh 5s linear infinite}
 @keyframes tsh{to{background-position:300%}}
-.gsub{font-size:.72rem;color:rgba(191,95,255,.65);letter-spacing:3px;text-transform:uppercase;margin-top:3px}
+.gsub{font-size:.7rem;color:rgba(191,95,255,.6);letter-spacing:3px;text-transform:uppercase;margin-top:2px}
 
-/* Score bar */
-.sc-bar{display:flex;gap:24px;justify-content:center;flex-wrap:wrap;margin-top:12px}
+.sc-bar{display:flex;gap:22px;justify-content:center;flex-wrap:wrap;margin-top:10px}
 .sc-item{text-align:center}
-.sc-lbl{font-size:.56rem;letter-spacing:2px;color:#553368;text-transform:uppercase;margin-bottom:2px}
-.sc-val{font-size:1.65rem;font-weight:800;color:var(--gold);text-shadow:0 0 12px var(--goldglow)}
-.sc-unit{font-size:.62rem;color:#444}
+.sc-lbl{font-size:.54rem;letter-spacing:2px;color:#442255;text-transform:uppercase;margin-bottom:2px}
+.sc-val{font-size:1.6rem;font-weight:800;color:var(--gold);text-shadow:0 0 12px var(--goldg)}
+.sc-unit{font-size:.6rem;color:#444}
 
-/* ── Phase banner ───────────────────────────────────────────────── */
-#phase{position:relative;z-index:10;padding:8px 16px;text-align:center;
-  font-size:.76rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;
-  background:rgba(0,0,0,.45);border-bottom:1px solid rgba(191,95,255,.18);transition:color .4s}
+/* ── Phase banner ──────────────────────────────────────────────── */
+#phase{position:relative;z-index:10;padding:8px 14px;text-align:center;
+  font-size:.75rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+  background:rgba(0,0,0,.45);border-bottom:1px solid rgba(191,95,255,.15);transition:color .4s}
 
-/* ── Game area ──────────────────────────────────────────────────── */
-#ga{position:relative;z-index:5;max-width:1100px;margin:0 auto;padding:20px 24px}
+/* ── Game area ─────────────────────────────────────────────────── */
+#ga{position:relative;z-index:5;max-width:1100px;margin:0 auto;padding:18px 20px}
 
-/* ── Tray ───────────────────────────────────────────────────────── */
-.t-lbl{font-size:.6rem;letter-spacing:2px;color:#4a2860;text-transform:uppercase;margin-bottom:7px}
-#tray{min-height:76px;display:flex;flex-wrap:wrap;gap:9px;padding:11px;
-  background:rgba(255,255,255,.02);border:1.5px dashed rgba(191,95,255,.22);
-  border-radius:12px;transition:border-color .2s,background .2s;margin-bottom:22px}
-#tray.dov{border-color:var(--nblue);background:rgba(0,212,255,.045)}
+/* ── Tray ──────────────────────────────────────────────────────── */
+.t-lbl{font-size:.6rem;letter-spacing:2px;color:#3a1a50;text-transform:uppercase;margin-bottom:7px}
+#tray{min-height:90px;display:flex;flex-wrap:wrap;
+  justify-content:center;align-items:center;
+  gap:12px;padding:14px 16px;
+  background:rgba(255,255,255,.018);border:1.5px dashed rgba(191,95,255,.2);
+  border-radius:12px;transition:border-color .2s,background .2s;margin-bottom:20px}
+#tray.dov{border-color:var(--nb);background:rgba(0,212,255,.04)}
 
-/* ── Gold Blocks ────────────────────────────────────────────────── */
-.blk{width:60px;height:60px;border-radius:10px;cursor:grab;flex-shrink:0;
-  background:linear-gradient(135deg,#a07000,#ffd700,#d4a200,#ffcc00);
-  border:2px solid rgba(255,240,110,.65);
+/* ── 2-D Gold Tiles ─────────────────────────────────────────────
+   Flat, attractive gold blocks with rich gradients and glow.    */
+.blk{
+  width:62px;height:62px;border-radius:12px;cursor:grab;flex-shrink:0;
+  position:relative;overflow:hidden;
+  background:linear-gradient(145deg,#ffe566 0%,#ffd700 28%,#f5bb00 58%,#c87a00 100%);
+  border:2px solid rgba(255,238,100,.75);
   display:flex;flex-direction:column;align-items:center;justify-content:center;
-  font-weight:900;color:#2a1000;
-  box-shadow:0 0 13px rgba(255,215,0,.42),0 4px 10px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,160,.45);
-  transition:transform .14s,box-shadow .14s;position:relative}
-.blk:hover{transform:translateY(-4px) scale(1.08);
-  box-shadow:0 0 22px rgba(255,215,0,.72),0 8px 18px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,160,.45)}
-.blk:active{cursor:grabbing}
-.blk.dragging{opacity:.3;transform:scale(.9)}
-.blk.locked{cursor:default;filter:brightness(.72);pointer-events:none}
-.blk .bn{font-size:1.3rem;line-height:1}
-.blk .bl{font-size:.48rem;letter-spacing:1px;opacity:.62}
+  box-shadow:
+    0 0 18px rgba(255,215,0,.55),
+    0 5px 14px rgba(0,0,0,.45),
+    inset 0 1px 0 rgba(255,255,200,.7),
+    inset 0 -2px 4px rgba(100,50,0,.35);
+  transition:transform .15s,box-shadow .15s;
+  user-select:none}
+/* Upper shine strip */
+.blk::before{content:'';position:absolute;top:0;left:0;right:0;height:44%;
+  background:linear-gradient(180deg,rgba(255,255,220,.45) 0%,rgba(255,255,200,.04) 100%);
+  border-radius:10px 10px 0 0;pointer-events:none}
+/* Bottom shadow strip */
+.blk::after{content:'';position:absolute;bottom:0;left:0;right:0;height:22%;
+  background:linear-gradient(180deg,rgba(0,0,0,0) 0%,rgba(80,30,0,.28) 100%);
+  pointer-events:none}
+.blk:hover{
+  transform:translateY(-5px) scale(1.1);
+  box-shadow:
+    0 0 32px rgba(255,215,0,.8),
+    0 10px 22px rgba(0,0,0,.45),
+    inset 0 1px 0 rgba(255,255,200,.7)}
+.blk:active{cursor:grabbing;transform:scale(.92)}
+.blk.dragging{opacity:.28;transform:scale(.88)}
+.blk.locked{cursor:default;pointer-events:none;filter:brightness(.65) saturate(.6)}
 
-/* ── Buckets ────────────────────────────────────────────────────── */
-.bkts{display:flex;gap:16px;justify-content:center;margin-bottom:20px}
-.bw{flex:1;max-width:310px;display:flex;flex-direction:column;align-items:center;perspective:400px}
-.bw-lbl{font-size:.72rem;letter-spacing:3px;font-weight:700;text-transform:uppercase;margin-bottom:6px}
-.bkt{width:100%;min-height:190px;border-radius:12px 12px 0 0;
-  background:linear-gradient(180deg,#140620 0%,#0b0016 100%);
-  border:2px solid rgba(191,95,255,.32);border-bottom:none;
-  padding:10px;display:flex;flex-wrap:wrap;gap:7px;align-content:flex-end;
-  position:relative;transition:border-color .25s,box-shadow .25s,background .3s}
-.bkt.dov{border-color:var(--nblue);box-shadow:0 0 18px rgba(0,212,255,.22),inset 0 0 14px rgba(0,212,255,.04)}
-.bkt.bkt-ok{border-color:var(--ngreen);background:linear-gradient(180deg,#001410,#00090a);
-  animation:bpulse 1.4s ease-in-out infinite}
-@keyframes bpulse{0%,100%{box-shadow:0 0 28px rgba(0,255,136,.35)}50%{box-shadow:0 0 52px rgba(0,255,136,.65),0 0 90px rgba(0,255,136,.18)}}
-.bkt.bkt-bad{border-color:var(--nred);box-shadow:0 0 20px rgba(255,51,85,.3);
-  background:linear-gradient(180deg,#1e000a,#0e0005)}
-.bkt-cnt{position:absolute;top:7px;right:9px;font-size:.58rem;color:rgba(255,255,255,.2);font-weight:700}
-.bkt-sum{width:100%;text-align:center;padding:4px 0 2px;font-size:.68rem;font-weight:700;
-  letter-spacing:1px;min-height:18px;transition:color .3s}
+.bn{font-size:1.4rem;font-weight:900;color:#2a1000;line-height:1;
+  text-shadow:0 1px 0 rgba(255,235,120,.6);position:relative;z-index:1}
+.bl{font-size:.48rem;letter-spacing:1.5px;font-weight:700;
+  color:rgba(40,12,0,.6);margin-top:1px;position:relative;z-index:1}
 
-/* Trap door — hinged at top, swings open */
-.door{width:100%;height:26px;
-  background:linear-gradient(180deg,#221040 0%,#160828 55%,#0e0518 100%);
-  border:2px solid rgba(191,95,255,.32);border-top:none;border-radius:0 0 10px 10px;
-  position:relative;overflow:hidden;transform-origin:top center;
+/* ── Buckets ───────────────────────────────────────────────────── */
+.bkts{display:flex;gap:16px;justify-content:center;margin-bottom:18px}
+.bw{flex:1;max-width:300px;display:flex;flex-direction:column;align-items:center}
+.bw-lbl{font-size:.72rem;letter-spacing:3px;font-weight:700;text-transform:uppercase;margin-bottom:5px}
+
+/* 3-D crate illusion: main face + right-wall companion + bottom ledge */
+.bkt-frame{position:relative;width:100%}
+/* Right wall */
+.bkt-rw{position:absolute;top:7px;right:-11px;bottom:0;width:11px;
+  border-radius:0 5px 5px 0;z-index:-1;
+  background:linear-gradient(to right,#0a0122,#050012);
+  border:1px solid rgba(100,50,180,.25);border-left:none}
+/* Bottom ledge */
+.bkt-bl{position:absolute;bottom:-9px;left:8px;right:0;height:9px;
+  border-radius:0 0 5px 5px;z-index:-1;
+  background:linear-gradient(to bottom,#090118,#040010);
+  border:1px solid rgba(100,50,180,.2);border-top:none}
+
+.bkt{width:100%;min-height:200px;border-radius:10px 10px 0 0;
+  background:linear-gradient(155deg,#1d0740 0%,#130528 55%,#0c0118 100%);
+  border:2px solid rgba(160,90,255,.45);border-bottom:none;
+  padding:10px;display:flex;flex-wrap:wrap;gap:8px;align-content:flex-end;justify-content:center;
+  position:relative;
+  box-shadow:inset -5px 0 14px rgba(0,0,0,.55),inset 0 -5px 10px rgba(0,0,0,.4),
+    inset 3px 0 8px rgba(140,70,255,.04),inset 0 2px 0 rgba(200,160,255,.07)}
+/* Metal rim at top */
+.bkt::before{content:'';position:absolute;top:-1px;left:-1px;right:-1px;height:9px;
+  background:linear-gradient(180deg,rgba(200,160,255,.2) 0%,rgba(120,60,200,.12) 100%);
+  border-radius:10px 10px 0 0;border-top:2px solid rgba(210,170,255,.22)}
+/* Rivets */
+.bkt::after{content:'● ● ●';position:absolute;top:2px;right:8px;
+  font-size:5px;letter-spacing:3px;color:rgba(180,130,255,.35)}
+
+.bkt.dov{border-color:var(--nb);box-shadow:inset -5px 0 14px rgba(0,0,0,.55),0 0 16px rgba(0,212,255,.2)}
+.bkt.bkt-ok{border-color:var(--ng);background:linear-gradient(155deg,#001e12,#00100a,#000b06);
+  animation:bpulse 1.3s ease-in-out infinite}
+@keyframes bpulse{0%,100%{box-shadow:0 0 24px rgba(0,255,136,.3)}50%{box-shadow:0 0 46px rgba(0,255,136,.6),0 0 80px rgba(0,255,136,.15)}}
+.bkt.bkt-bad{border-color:var(--nr);background:linear-gradient(155deg,#200010,#110008,#080004);
+  box-shadow:0 0 20px rgba(255,51,85,.28)}
+.bkt-cnt{position:absolute;top:9px;right:12px;font-size:.58rem;color:rgba(255,255,255,.18);font-weight:700}
+
+/* Bucket point sum — bigger */
+.bkt-sum{width:100%;text-align:center;padding:5px 0 3px;
+  font-size:1.15rem;font-weight:900;letter-spacing:1px;min-height:28px;transition:color .3s}
+
+/* Trap door with hinge bolts */
+.door{width:100%;height:28px;transform-origin:top center;
+  background:linear-gradient(180deg,#200a44 0%,#160630 55%,#0e0420 100%);
+  border:2px solid rgba(160,90,255,.42);border-top:3px solid rgba(80,40,120,.5);
+  border-radius:0 0 10px 10px;position:relative;overflow:visible;
   transition:transform .6s cubic-bezier(.4,0,.2,1),border-color .3s,background .3s}
-.door::before{content:'';position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
-  width:36%;height:2px;background:rgba(191,95,255,.22);border-radius:2px}
-.door.d-bad{border-color:var(--nred);background:linear-gradient(180deg,#2a000e,#150008)}
-.door.d-open{transform:rotateX(90deg)}
+/* Hinge circles (left & right) */
+.door::before,.door::after{content:'';position:absolute;top:50%;transform:translateY(-50%);
+  width:9px;height:9px;border-radius:50%;
+  background:radial-gradient(circle at 35% 30%,#9966cc,#3a1060);
+  border:1px solid rgba(200,160,255,.3);box-shadow:0 0 4px rgba(160,90,255,.2)}
+.door::before{left:10px}
+.door::after{right:10px}
+/* Centre latch */
+.door-latch{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  width:20%;height:2px;background:rgba(160,90,255,.25);border-radius:2px}
+.door.d-bad{border-color:var(--nr);background:linear-gradient(180deg,#2c0012,#18000a,#0c0006)}
+.door.d-open{transform:perspective(300px) rotateX(110deg)}
 
-/* ── Buttons ────────────────────────────────────────────────────── */
-.act-row{display:flex;justify-content:center;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+/* ── Action button ─────────────────────────────────────────────── */
+.act-row{display:flex;justify-content:center;gap:12px;margin-bottom:14px;flex-wrap:wrap}
 .btn-fa{padding:14px 50px;font-size:1rem;font-weight:800;letter-spacing:2px;text-transform:uppercase;
-  background:linear-gradient(135deg,#b08000,var(--gold),#d09800);color:#180600;
-  border:2px solid rgba(255,235,90,.55);border-radius:12px;cursor:pointer;
-  box-shadow:0 0 20px rgba(255,215,0,.42),0 4px 12px rgba(0,0,0,.4);
+  background:linear-gradient(135deg,#a87a00,var(--gold),#cc9800);color:#180500;
+  border:2px solid rgba(255,235,80,.5);border-radius:12px;cursor:pointer;
+  box-shadow:0 0 18px rgba(255,215,0,.4),0 4px 12px rgba(0,0,0,.4);
   animation:fablink 2.8s ease-in-out infinite;transition:transform .14s}
-@keyframes fablink{0%,100%{box-shadow:0 0 20px rgba(255,215,0,.42)}50%{box-shadow:0 0 36px rgba(255,215,0,.72)}}
+@keyframes fablink{0%,100%{box-shadow:0 0 18px rgba(255,215,0,.4)}50%{box-shadow:0 0 34px rgba(255,215,0,.7)}}
 .btn-fa:hover{transform:scale(1.04)}
-.btn-fa:disabled{opacity:.28;animation:none;cursor:default;transform:none}
+.btn-fa:disabled{opacity:.25;animation:none;cursor:default;transform:none}
 
-/* ── Result banner ───────────────────────────────────────────────── */
-#res-banner{display:none;text-align:center;padding:14px 10px;
-  font-size:clamp(1rem,2.4vw,1.45rem);font-weight:900;letter-spacing:2px;
+/* ── Result banner ─────────────────────────────────────────────── */
+#res{display:none;text-align:center;padding:14px 10px;
+  font-size:clamp(1rem,2.4vw,1.4rem);font-weight:900;letter-spacing:2px;
   animation:rpop .45s cubic-bezier(.34,1.56,.64,1)}
 @keyframes rpop{from{transform:scale(.5);opacity:0}to{transform:scale(1);opacity:1}}
 
-/* ── Host panel ──────────────────────────────────────────────────── */
-hr.hd{border:none;border-top:1px solid rgba(191,95,255,.14)}
-#hp{position:relative;z-index:10;padding:11px 24px;background:rgba(4,0,12,.94);border-top:1px solid rgba(191,95,255,.18)}
-.hp-ttl{font-size:.56rem;letter-spacing:3px;color:#442255;text-transform:uppercase;margin-bottom:8px;text-align:center}
-.hp-row{display:flex;align-items:center;justify-content:center;gap:9px;flex-wrap:wrap}
-.hp-sep{width:1px;height:20px;background:rgba(191,95,255,.18);margin:0 3px}
-.hp-lbl{font-size:.58rem;color:#442255;letter-spacing:1px;text-transform:uppercase}
-
-.btn-hc{padding:5px 13px;border-radius:8px;cursor:pointer;font-size:.68rem;font-weight:600;
+/* ── Host panel ────────────────────────────────────────────────── */
+hr.hd{border:none;border-top:1px solid rgba(191,95,255,.12)}
+#hp{position:relative;z-index:10;padding:10px 20px;background:rgba(4,0,10,.95);border-top:1px solid rgba(191,95,255,.15)}
+.hp-ttl{font-size:.55rem;letter-spacing:3px;color:#382048;text-transform:uppercase;margin-bottom:7px;text-align:center}
+.hp-row{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap}
+.hp-sep{width:1px;height:18px;background:rgba(191,95,255,.15);margin:0 3px}
+.hp-lbl{font-size:.56rem;color:#382048;letter-spacing:1px;text-transform:uppercase}
+.btn-hc{padding:5px 12px;border-radius:8px;cursor:pointer;font-size:.67rem;font-weight:600;
   letter-spacing:.5px;text-transform:uppercase;border:1px solid;transition:all .2s}
-.btn-rst{background:rgba(70,25,110,.22);color:rgba(191,95,255,.75);border-color:rgba(191,95,255,.28)}
-.btn-rst:hover{background:rgba(90,35,140,.4)}
-.btn-ulk{background:rgba(0,70,120,.18);color:rgba(0,212,255,.75);border-color:rgba(0,212,255,.28)}
-.btn-ulk:hover{background:rgba(0,90,150,.35)}
-
-.btn-rv{padding:6px 17px;border-radius:8px;cursor:pointer;font-weight:800;font-size:.78rem;
+.b-rst{background:rgba(60,20,100,.22);color:rgba(191,95,255,.75);border-color:rgba(191,95,255,.25)}
+.b-rst:hover{background:rgba(80,30,130,.4)}
+.b-ulk{background:rgba(0,60,110,.18);color:rgba(0,212,255,.75);border-color:rgba(0,212,255,.25)}
+.b-ulk:hover{background:rgba(0,80,140,.35)}
+.btn-rv{padding:5px 15px;border-radius:8px;cursor:pointer;font-weight:800;font-size:.76rem;
   letter-spacing:1px;text-transform:uppercase;border:2px solid;transition:all .2s}
 .btn-rv:hover:not(:disabled){transform:scale(1.06);filter:brightness(1.22)}
-.btn-rv:disabled{opacity:.22;cursor:default;transform:none}
-.rva{background:rgba(0,180,255,.08);color:#00d4ff;border-color:rgba(0,212,255,.38)}
-.rvb{background:rgba(191,95,255,.08);color:#bf5fff;border-color:rgba(191,95,255,.38)}
-.rvc{background:rgba(255,155,0,.08);color:#ffa828;border-color:rgba(255,155,0,.38)}
+.btn-rv:disabled{opacity:.2;cursor:default;transform:none}
+.rva{background:rgba(0,170,255,.07);color:#00d4ff;border-color:rgba(0,212,255,.35)}
+.rvb{background:rgba(191,95,255,.07);color:#bf5fff;border-color:rgba(191,95,255,.35)}
+.rvc{background:rgba(255,155,0,.07);color:#ffaa20;border-color:rgba(255,155,0,.35)}
 
-/* ── Modal ───────────────────────────────────────────────────────── */
-.mbg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.87);z-index:300;align-items:center;justify-content:center}
-.mbg.open{display:flex}
-.mbox{background:linear-gradient(135deg,#100020,#090016);border:2px solid var(--gold);border-radius:18px;
-  padding:28px 32px;width:360px;max-width:92vw;text-align:center;
-  box-shadow:0 0 58px rgba(255,215,0,.22),0 18px 48px rgba(0,0,0,.6);
-  animation:mpop .28s cubic-bezier(.34,1.56,.64,1)}
-@keyframes mpop{from{transform:scale(.6);opacity:0}to{transform:scale(1);opacity:1}}
-.m-ico{font-size:2.3rem;margin-bottom:8px}
-.m-ttl{font-size:1.1rem;font-weight:800;color:var(--gold);margin-bottom:6px}
-.m-body{font-size:.8rem;color:#888;margin-bottom:20px;line-height:1.65}
-.m-btns{display:flex;gap:10px;justify-content:center}
-.btn-mc{background:linear-gradient(135deg,#a07800,var(--gold));color:#180500;padding:9px 24px;
-  border-radius:8px;border:none;cursor:pointer;font-weight:700;font-size:.8rem}
-.btn-mc:hover{filter:brightness(1.1)}
-.btn-mx{background:rgba(255,255,255,.06);color:#888;padding:9px 24px;border-radius:8px;
-  border:1px solid rgba(255,255,255,.12);cursor:pointer;font-size:.8rem}
-.btn-mx:hover{background:rgba(255,255,255,.1)}
 
-/* ── Responsive ──────────────────────────────────────────────────── */
-@media(max-width:660px){
-  .bkts{flex-direction:column;align-items:center}
-  .bw{max-width:100%;width:100%}
-  #ga{padding:14px 12px}
-  .logo-row{gap:10px}
-  .wiz-svg{width:52px;height:56px}
+/* ── Responsive ────────────────────────────────────────────────── */
+@media(max-width:640px){
+  .bkts{flex-direction:column;align-items:center}.bw{max-width:100%;width:100%}
+  #ga{padding:12px 10px}.wiz{width:68px!important;height:72px!important}
 }
 </style>
 </head>
 <body>
 
-<!-- Background glow blobs -->
-<div class="blob" style="width:480px;height:480px;background:#2800aa;top:-80px;left:-100px"></div>
-<div class="blob" style="width:360px;height:360px;background:#006688;bottom:-60px;right:-80px"></div>
-<div class="blob" style="width:280px;height:280px;background:#550022;top:45%;left:45%;transform:translate(-50%,-50%)"></div>
+<div class="blob" style="width:500px;height:500px;background:#2600aa;top:-100px;left:-100px"></div>
+<div class="blob" style="width:380px;height:380px;background:#005f80;bottom:-60px;right:-80px"></div>
+<div class="blob" style="width:260px;height:260px;background:#550025;top:50%;left:50%;transform:translate(-50%,-50%)"></div>
 <div id="ptc"></div>
 
-<!-- ═══════════════ HEADER ═══════════════════════════════════════ -->
+<!-- ═══════════════ HEADER ══════════════════════════════════════ -->
 <header>
-  <div class="logo-row">
+<div class="logo-row">
 
-    <!-- Left Dumbledore Wizard SVG -->
-    <svg class="wiz-svg" viewBox="0 0 72 80" xmlns="http://www.w3.org/2000/svg">
-      <!-- Stars -->
-      <polygon points="10,7 11.1,10.3 14.5,10.3 11.8,12.3 12.9,15.6 10,13.6 7.1,15.6 8.2,12.3 5.5,10.3 8.9,10.3" fill="#ffd700" opacity=".8"/>
-      <polygon points="62,10 62.9,12.8 65.8,12.8 63.5,14.4 64.4,17.2 62,15.6 59.6,17.2 60.5,14.4 58.2,12.8 61.1,12.8" fill="#ffd700" opacity=".55"/>
-      <circle cx="37" cy="3" r="1.8" fill="#00d4ff" opacity=".7"/>
-      <circle cx="22" cy="15" r="1.1" fill="#bf5fff" opacity=".55"/>
-      <!-- Hat brim -->
-      <ellipse cx="36" cy="44" rx="21" ry="5.5" fill="#16072a"/>
-      <ellipse cx="36" cy="44" rx="21" ry="5.5" fill="none" stroke="#8833dd" stroke-width="1.5"/>
-      <!-- Hat body -->
-      <path d="M18,44 L25,14 Q36,3 47,14 L54,44 Z" fill="#16072a"/>
-      <path d="M18,44 L25,14 Q36,3 47,14 L54,44 Z" fill="none" stroke="#8833dd" stroke-width="1.5"/>
-      <!-- Hat band -->
-      <rect x="21" y="36" width="30" height="6" rx="2" fill="#5511aa" opacity=".7"/>
-      <!-- Star on hat -->
-      <polygon points="36,34 36.9,36.8 39.9,36.8 37.5,38.4 38.4,41.2 36,39.6 33.6,41.2 34.5,38.4 32.1,36.8 35.1,36.8" fill="#ffd700"/>
-      <!-- Face -->
-      <ellipse cx="36" cy="52" rx="11" ry="10.5" fill="#f0c46a"/>
-      <ellipse cx="36" cy="52" rx="11" ry="10.5" fill="none" stroke="#c09030" stroke-width=".8"/>
-      <!-- Half-moon glasses frames -->
-      <path d="M27,51 Q31.5,47.5 35,51" fill="rgba(200,200,255,.07)" stroke="#7a5010" stroke-width="1.3"/>
-      <path d="M37,51 Q40.5,47.5 45,51" fill="rgba(200,200,255,.07)" stroke="#7a5010" stroke-width="1.3"/>
-      <line x1="35" y1="50" x2="37" y2="50" stroke="#7a5010" stroke-width="1"/>
-      <line x1="27" y1="51" x2="24.5" y2="51.5" stroke="#7a5010" stroke-width="1"/>
-      <line x1="45" y1="51" x2="47.5" y2="51.5" stroke="#7a5010" stroke-width="1"/>
-      <!-- Eyes -->
-      <ellipse cx="31" cy="50" rx="2" ry="1.8" fill="#3366cc"/>
-      <ellipse cx="41" cy="50" rx="2" ry="1.8" fill="#3366cc"/>
-      <ellipse cx="31" cy="50" rx=".9" ry=".9" fill="#112"/>
-      <ellipse cx="41" cy="50" rx=".9" ry=".9" fill="#112"/>
-      <!-- Bushy eyebrows -->
-      <path d="M28,46.5 Q31.5,44.8 35,46.5" stroke="#ccc" stroke-width="2.2" fill="none" stroke-linecap="round"/>
-      <path d="M37,46.5 Q40.5,44.8 44,46.5" stroke="#ccc" stroke-width="2.2" fill="none" stroke-linecap="round"/>
-      <!-- Nose -->
-      <path d="M36,51.5 Q34.2,55 35.3,55.6 Q36,56 36.7,55.6 Q37.8,55 36,51.5" fill="#c8922a" opacity=".75"/>
-      <!-- Mustache -->
-      <path d="M32.5,57 Q36,59 39.5,57" stroke="#ddd" stroke-width="1.8" fill="none" stroke-linecap="round"/>
-      <!-- Long beard -->
-      <path d="M27,57.5 Q25,65 29,71 Q36,77 43,71 Q47,65 45,57.5 Q41.5,60.5 36,61 Q30.5,60.5 27,57.5Z" fill="#ddd"/>
-      <path d="M30,59.5 Q29,65 31,69" stroke="#bbb" stroke-width=".9" fill="none"/>
-      <path d="M36,61 Q36,66.5 36,71" stroke="#bbb" stroke-width=".9" fill="none"/>
-      <path d="M42,59.5 Q43,65 41,69" stroke="#bbb" stroke-width=".9" fill="none"/>
-      <!-- Robe collar hint -->
-      <path d="M26,58 Q20,64 22,72 L36,78 L50,72 Q52,64 46,58" fill="#220a44" opacity=".5"/>
-      <!-- Wand -->
-      <line x1="46" y1="62" x2="65" y2="45" stroke="#c8a028" stroke-width="2.8" stroke-linecap="round"/>
-      <circle cx="46" cy="62" r="3" fill="#f0c840" opacity=".9"/>
-      <circle cx="65" cy="45" r="5.5" fill="#ffd700" opacity=".45"/>
-      <circle cx="65" cy="45" r="9" fill="#ffd700" opacity=".12"/>
-    </svg>
+<!-- ── LEFT: Dumbledore portrait ── -->
+<svg class="wiz" width="90" height="108" viewBox="0 0 90 108" xmlns="http://www.w3.org/2000/svg">
+  <!-- portrait oval frame -->
+  <ellipse cx="45" cy="54" rx="43" ry="52" fill="#0c0024" stroke="#a07800" stroke-width="2.2"/>
+  <ellipse cx="45" cy="54" rx="43" ry="52" fill="none" stroke="rgba(255,215,0,.22)" stroke-width="1"/>
+  <!-- outer glow ring -->
+  <ellipse cx="45" cy="54" rx="43" ry="52" fill="none" stroke="#ffd700" stroke-width=".5" opacity=".4"/>
 
-    <div class="title-block">
-      <div class="gtitle">Stargazers Jackpot</div>
-      <div class="gsub">Money Drop Edition &nbsp;·&nbsp; Hosted by Stargazers</div>
-    </div>
+  <!-- WIZARD HAT — tall pointed -->
+  <!-- hat body -->
+  <path d="M18,54 L28,17 Q45,3 62,17 L72,54 Z" fill="#14062e"/>
+  <path d="M18,54 L28,17 Q45,3 62,17 L72,54 Z" fill="none" stroke="#7733cc" stroke-width="1.8"/>
+  <!-- hat highlight sheen -->
+  <path d="M35,20 Q40,10 50,16 Q44,14 38,22 Z" fill="rgba(200,150,255,.1)"/>
+  <!-- hat band (metallic purple) -->
+  <rect x="20" y="44" width="50" height="8" rx="2.5" fill="#5511aa" opacity=".8"/>
+  <rect x="20" y="44" width="50" height="8" rx="2.5" fill="none" stroke="rgba(200,150,255,.4)" stroke-width=".8"/>
+  <!-- stars on hat -->
+  <polygon points="45,10 46.2,13.6 50,13.6 47.1,15.7 48.3,19.3 45,17.2 41.7,19.3 42.9,15.7 40,13.6 43.8,13.6" fill="#ffd700" opacity=".9"/>
+  <circle cx="32" cy="32" r="1.6" fill="#ffd700" opacity=".55"/>
+  <circle cx="58" cy="28" r="1.4" fill="#00d4ff" opacity=".5"/>
+  <circle cx="52" cy="40" r="1" fill="#ffd700" opacity=".5"/>
+  <!-- hat brim (wide ellipse) -->
+  <ellipse cx="45" cy="54" rx="27" ry="6" fill="#1c0840" stroke="#7733cc" stroke-width="1.6"/>
 
-    <!-- Right wizard (mirrored) -->
-    <svg class="wiz-svg" viewBox="0 0 72 80" xmlns="http://www.w3.org/2000/svg" style="transform:scaleX(-1)">
-      <polygon points="10,7 11.1,10.3 14.5,10.3 11.8,12.3 12.9,15.6 10,13.6 7.1,15.6 8.2,12.3 5.5,10.3 8.9,10.3" fill="#ffd700" opacity=".8"/>
-      <polygon points="62,10 62.9,12.8 65.8,12.8 63.5,14.4 64.4,17.2 62,15.6 59.6,17.2 60.5,14.4 58.2,12.8 61.1,12.8" fill="#ffd700" opacity=".55"/>
-      <circle cx="37" cy="3" r="1.8" fill="#00d4ff" opacity=".7"/>
-      <circle cx="22" cy="15" r="1.1" fill="#bf5fff" opacity=".55"/>
-      <ellipse cx="36" cy="44" rx="21" ry="5.5" fill="#16072a"/>
-      <ellipse cx="36" cy="44" rx="21" ry="5.5" fill="none" stroke="#8833dd" stroke-width="1.5"/>
-      <path d="M18,44 L25,14 Q36,3 47,14 L54,44 Z" fill="#16072a"/>
-      <path d="M18,44 L25,14 Q36,3 47,14 L54,44 Z" fill="none" stroke="#8833dd" stroke-width="1.5"/>
-      <rect x="21" y="36" width="30" height="6" rx="2" fill="#5511aa" opacity=".7"/>
-      <polygon points="36,34 36.9,36.8 39.9,36.8 37.5,38.4 38.4,41.2 36,39.6 33.6,41.2 34.5,38.4 32.1,36.8 35.1,36.8" fill="#ffd700"/>
-      <ellipse cx="36" cy="52" rx="11" ry="10.5" fill="#f0c46a"/>
-      <ellipse cx="36" cy="52" rx="11" ry="10.5" fill="none" stroke="#c09030" stroke-width=".8"/>
-      <path d="M27,51 Q31.5,47.5 35,51" fill="rgba(200,200,255,.07)" stroke="#7a5010" stroke-width="1.3"/>
-      <path d="M37,51 Q40.5,47.5 45,51" fill="rgba(200,200,255,.07)" stroke="#7a5010" stroke-width="1.3"/>
-      <line x1="35" y1="50" x2="37" y2="50" stroke="#7a5010" stroke-width="1"/>
-      <line x1="27" y1="51" x2="24.5" y2="51.5" stroke="#7a5010" stroke-width="1"/>
-      <line x1="45" y1="51" x2="47.5" y2="51.5" stroke="#7a5010" stroke-width="1"/>
-      <ellipse cx="31" cy="50" rx="2" ry="1.8" fill="#3366cc"/>
-      <ellipse cx="41" cy="50" rx="2" ry="1.8" fill="#3366cc"/>
-      <ellipse cx="31" cy="50" rx=".9" ry=".9" fill="#112"/>
-      <ellipse cx="41" cy="50" rx=".9" ry=".9" fill="#112"/>
-      <path d="M28,46.5 Q31.5,44.8 35,46.5" stroke="#ccc" stroke-width="2.2" fill="none" stroke-linecap="round"/>
-      <path d="M37,46.5 Q40.5,44.8 44,46.5" stroke="#ccc" stroke-width="2.2" fill="none" stroke-linecap="round"/>
-      <path d="M36,51.5 Q34.2,55 35.3,55.6 Q36,56 36.7,55.6 Q37.8,55 36,51.5" fill="#c8922a" opacity=".75"/>
-      <path d="M32.5,57 Q36,59 39.5,57" stroke="#ddd" stroke-width="1.8" fill="none" stroke-linecap="round"/>
-      <path d="M27,57.5 Q25,65 29,71 Q36,77 43,71 Q47,65 45,57.5 Q41.5,60.5 36,61 Q30.5,60.5 27,57.5Z" fill="#ddd"/>
-      <path d="M30,59.5 Q29,65 31,69" stroke="#bbb" stroke-width=".9" fill="none"/>
-      <path d="M36,61 Q36,66.5 36,71" stroke="#bbb" stroke-width=".9" fill="none"/>
-      <path d="M42,59.5 Q43,65 41,69" stroke="#bbb" stroke-width=".9" fill="none"/>
-      <path d="M26,58 Q20,64 22,72 L36,78 L50,72 Q52,64 46,58" fill="#220a44" opacity=".5"/>
-      <line x1="46" y1="62" x2="65" y2="45" stroke="#c8a028" stroke-width="2.8" stroke-linecap="round"/>
-      <circle cx="46" cy="62" r="3" fill="#f0c840" opacity=".9"/>
-      <circle cx="65" cy="45" r="5.5" fill="#ffd700" opacity=".45"/>
-      <circle cx="65" cy="45" r="9" fill="#ffd700" opacity=".12"/>
-    </svg>
-  </div>
+  <!-- HAIR (white, wavy, peeking under hat) -->
+  <path d="M20,54 Q15,58 18,68 Q21,74 26,72" stroke="#e8e8e8" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <path d="M70,54 Q75,58 72,68 Q69,74 64,72" stroke="#e0e0e0" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <path d="M22,62 Q20,65 22,68" stroke="#d0d0d0" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <path d="M68,62 Q70,65 68,68" stroke="#d0d0d0" stroke-width="2.5" fill="none" stroke-linecap="round"/>
 
-  <!-- Score bar -->
-  <div class="sc-bar">
-    <div class="sc-item">
-      <div class="sc-lbl">Blocks Remaining</div>
-      <div class="sc-val" id="sv-blk">10</div>
-      <div class="sc-unit">blocks</div>
-    </div>
-    <div class="sc-item">
-      <div class="sc-lbl">Points Available</div>
-      <div class="sc-val" id="sv-pts">100</div>
-      <div class="sc-unit">pts</div>
-    </div>
-    <div class="sc-item">
-      <div class="sc-lbl">In Tray</div>
-      <div class="sc-val" id="sv-tray">10</div>
-      <div class="sc-unit">unplaced</div>
-    </div>
-    <div class="sc-item">
-      <div class="sc-lbl">Round</div>
-      <div class="sc-val" id="sv-round">1</div>
-      <div class="sc-unit">round</div>
-    </div>
-  </div>
+  <!-- FACE -->
+  <ellipse cx="45" cy="67" rx="16" ry="15" fill="#f0c26a"/>
+  <ellipse cx="45" cy="67" rx="16" ry="15" fill="none" stroke="#c49030" stroke-width=".8"/>
+  <!-- face shading -->
+  <ellipse cx="45" cy="67" rx="14" ry="12" fill="none" stroke="rgba(180,100,20,.15)" stroke-width="3"/>
+
+  <!-- HALF-MOON GLASSES -->
+  <!-- left half-circle lens -->
+  <path d="M30,65 Q35,61 40,65" fill="rgba(200,220,255,.12)" stroke="#8b6010" stroke-width="1.4"/>
+  <!-- right half-circle lens -->
+  <path d="M50,65 Q55,61 60,65" fill="rgba(200,220,255,.12)" stroke="#8b6010" stroke-width="1.4"/>
+  <!-- bridge -->
+  <line x1="40" y1="64.5" x2="50" y2="64.5" stroke="#8b6010" stroke-width="1.2"/>
+  <!-- earpieces -->
+  <line x1="30" y1="65" x2="27" y2="65" stroke="#8b6010" stroke-width="1.2"/>
+  <line x1="60" y1="65" x2="63" y2="65" stroke="#8b6010" stroke-width="1.2"/>
+
+  <!-- EYES (behind glasses) -->
+  <ellipse cx="35" cy="64.5" rx="2.8" ry="2.5" fill="#3d6fcc"/>
+  <ellipse cx="55" cy="64.5" rx="2.8" ry="2.5" fill="#3d6fcc"/>
+  <ellipse cx="35" cy="64.5" rx="1.3" ry="1.2" fill="#0d1a44"/>
+  <ellipse cx="55" cy="64.5" rx="1.3" ry="1.2" fill="#0d1a44"/>
+  <!-- eye sparkle -->
+  <circle cx="36.2" cy="63.5" r=".6" fill="white" opacity=".7"/>
+  <circle cx="56.2" cy="63.5" r=".6" fill="white" opacity=".7"/>
+
+  <!-- BUSHY EYEBROWS -->
+  <path d="M30,62 Q35,59.5 40,61.5" stroke="#ccc" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+  <path d="M50,61.5 Q55,59.5 60,62" stroke="#ccc" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+
+  <!-- LONG CROOKED NOSE -->
+  <path d="M45,66 Q43,70 42,72 Q41,73.5 43,74 Q45,74.5 47,74 Q49,73.5 48,72 Q47,70 45,66" fill="#c88a28" opacity=".82"/>
+
+  <!-- MOUTH (slight smile) -->
+  <path d="M40,77 Q45,79.5 50,77" stroke="#a07030" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+
+  <!-- MOUSTACHE -->
+  <path d="M40,75 Q45,77.5 50,75" stroke="#ddd" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+
+  <!-- LONG FLOWING BEARD -->
+  <path d="M30,74 Q26,82 28,91 Q30,98 36,101 Q45,104 54,101 Q60,98 62,91 Q64,82 60,74
+           Q55,78 45,79 Q35,78 30,74 Z" fill="#e0e0e0"/>
+  <!-- beard shading/texture -->
+  <path d="M33,76 Q31,83 33,90" stroke="#bbb" stroke-width="1" fill="none"/>
+  <path d="M45,79 Q45,87 45,96" stroke="#bbb" stroke-width="1" fill="none"/>
+  <path d="M57,76 Q59,83 57,90" stroke="#bbb" stroke-width="1" fill="none"/>
+  <path d="M38,79 Q36,86 38,93" stroke="#ccc" stroke-width=".7" fill="none"/>
+  <path d="M52,79 Q54,86 52,93" stroke="#ccc" stroke-width=".7" fill="none"/>
+  <!-- beard highlight -->
+  <path d="M38,76 Q37,80 38,85" stroke="rgba(255,255,255,.4)" stroke-width="1.5" fill="none"/>
+
+  <!-- ROBE (visible at portrait bottom) -->
+  <path d="M28,94 Q26,100 28,106 L62,106 Q64,100 62,94 Q54,98 45,98.5 Q36,98 28,94 Z" fill="#1c0844" opacity=".8"/>
+  <path d="M28,94 Q26,100 28,106 L62,106 Q64,100 62,94" fill="none" stroke="#4422aa" stroke-width=".8"/>
+
+  <!-- WAND (lower right, glowing tip) -->
+  <line x1="57" y1="82" x2="70" y2="68" stroke="#c8a028" stroke-width="3" stroke-linecap="round" opacity=".9"/>
+  <circle cx="57" cy="82" r="3.5" fill="#f0c840" opacity=".85"/>
+  <circle cx="70" cy="68" r="6" fill="#ffd700" opacity=".4"/>
+  <circle cx="70" cy="68" r="10" fill="#ffd700" opacity=".1"/>
+
+  <!-- portrait sparkles -->
+  <circle cx="22" cy="20" r="1.5" fill="#ffd700" opacity=".6"/>
+  <circle cx="68" cy="14" r="1.2" fill="#00d4ff" opacity=".5"/>
+  <circle cx="78" cy="40" r="1" fill="#bf5fff" opacity=".5"/>
+</svg>
+
+<!-- ── TITLE ── -->
+<div class="title-block">
+  <div class="gtitle">Stargazers Jackpot</div>
+  <div class="gsub">Money Drop Edition &nbsp;·&nbsp; Hosted by Stargazers</div>
+</div>
+
+<!-- ── RIGHT: Dumbledore portrait (mirror) ── -->
+<svg class="wiz" width="90" height="108" viewBox="0 0 90 108" xmlns="http://www.w3.org/2000/svg" style="transform:scaleX(-1)">
+  <ellipse cx="45" cy="54" rx="43" ry="52" fill="#0c0024" stroke="#a07800" stroke-width="2.2"/>
+  <ellipse cx="45" cy="54" rx="43" ry="52" fill="none" stroke="rgba(255,215,0,.22)" stroke-width="1"/>
+  <ellipse cx="45" cy="54" rx="43" ry="52" fill="none" stroke="#ffd700" stroke-width=".5" opacity=".4"/>
+  <path d="M18,54 L28,17 Q45,3 62,17 L72,54 Z" fill="#14062e"/>
+  <path d="M18,54 L28,17 Q45,3 62,17 L72,54 Z" fill="none" stroke="#7733cc" stroke-width="1.8"/>
+  <path d="M35,20 Q40,10 50,16 Q44,14 38,22 Z" fill="rgba(200,150,255,.1)"/>
+  <rect x="20" y="44" width="50" height="8" rx="2.5" fill="#5511aa" opacity=".8"/>
+  <rect x="20" y="44" width="50" height="8" rx="2.5" fill="none" stroke="rgba(200,150,255,.4)" stroke-width=".8"/>
+  <polygon points="45,10 46.2,13.6 50,13.6 47.1,15.7 48.3,19.3 45,17.2 41.7,19.3 42.9,15.7 40,13.6 43.8,13.6" fill="#ffd700" opacity=".9"/>
+  <circle cx="32" cy="32" r="1.6" fill="#ffd700" opacity=".55"/>
+  <circle cx="58" cy="28" r="1.4" fill="#00d4ff" opacity=".5"/>
+  <circle cx="52" cy="40" r="1" fill="#ffd700" opacity=".5"/>
+  <ellipse cx="45" cy="54" rx="27" ry="6" fill="#1c0840" stroke="#7733cc" stroke-width="1.6"/>
+  <path d="M20,54 Q15,58 18,68 Q21,74 26,72" stroke="#e8e8e8" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <path d="M70,54 Q75,58 72,68 Q69,74 64,72" stroke="#e0e0e0" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <path d="M22,62 Q20,65 22,68" stroke="#d0d0d0" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <path d="M68,62 Q70,65 68,68" stroke="#d0d0d0" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <ellipse cx="45" cy="67" rx="16" ry="15" fill="#f0c26a"/>
+  <ellipse cx="45" cy="67" rx="16" ry="15" fill="none" stroke="#c49030" stroke-width=".8"/>
+  <ellipse cx="45" cy="67" rx="14" ry="12" fill="none" stroke="rgba(180,100,20,.15)" stroke-width="3"/>
+  <path d="M30,65 Q35,61 40,65" fill="rgba(200,220,255,.12)" stroke="#8b6010" stroke-width="1.4"/>
+  <path d="M50,65 Q55,61 60,65" fill="rgba(200,220,255,.12)" stroke="#8b6010" stroke-width="1.4"/>
+  <line x1="40" y1="64.5" x2="50" y2="64.5" stroke="#8b6010" stroke-width="1.2"/>
+  <line x1="30" y1="65" x2="27" y2="65" stroke="#8b6010" stroke-width="1.2"/>
+  <line x1="60" y1="65" x2="63" y2="65" stroke="#8b6010" stroke-width="1.2"/>
+  <ellipse cx="35" cy="64.5" rx="2.8" ry="2.5" fill="#3d6fcc"/>
+  <ellipse cx="55" cy="64.5" rx="2.8" ry="2.5" fill="#3d6fcc"/>
+  <ellipse cx="35" cy="64.5" rx="1.3" ry="1.2" fill="#0d1a44"/>
+  <ellipse cx="55" cy="64.5" rx="1.3" ry="1.2" fill="#0d1a44"/>
+  <circle cx="36.2" cy="63.5" r=".6" fill="white" opacity=".7"/>
+  <circle cx="56.2" cy="63.5" r=".6" fill="white" opacity=".7"/>
+  <path d="M30,62 Q35,59.5 40,61.5" stroke="#ccc" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+  <path d="M50,61.5 Q55,59.5 60,62" stroke="#ccc" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+  <path d="M45,66 Q43,70 42,72 Q41,73.5 43,74 Q45,74.5 47,74 Q49,73.5 48,72 Q47,70 45,66" fill="#c88a28" opacity=".82"/>
+  <path d="M40,77 Q45,79.5 50,77" stroke="#a07030" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+  <path d="M40,75 Q45,77.5 50,75" stroke="#ddd" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+  <path d="M30,74 Q26,82 28,91 Q30,98 36,101 Q45,104 54,101 Q60,98 62,91 Q64,82 60,74
+           Q55,78 45,79 Q35,78 30,74 Z" fill="#e0e0e0"/>
+  <path d="M33,76 Q31,83 33,90" stroke="#bbb" stroke-width="1" fill="none"/>
+  <path d="M45,79 Q45,87 45,96" stroke="#bbb" stroke-width="1" fill="none"/>
+  <path d="M57,76 Q59,83 57,90" stroke="#bbb" stroke-width="1" fill="none"/>
+  <path d="M38,79 Q36,86 38,93" stroke="#ccc" stroke-width=".7" fill="none"/>
+  <path d="M52,79 Q54,86 52,93" stroke="#ccc" stroke-width=".7" fill="none"/>
+  <path d="M38,76 Q37,80 38,85" stroke="rgba(255,255,255,.4)" stroke-width="1.5" fill="none"/>
+  <path d="M28,94 Q26,100 28,106 L62,106 Q64,100 62,94 Q54,98 45,98.5 Q36,98 28,94 Z" fill="#1c0844" opacity=".8"/>
+  <path d="M28,94 Q26,100 28,106 L62,106 Q64,100 62,94" fill="none" stroke="#4422aa" stroke-width=".8"/>
+  <line x1="57" y1="82" x2="70" y2="68" stroke="#c8a028" stroke-width="3" stroke-linecap="round" opacity=".9"/>
+  <circle cx="57" cy="82" r="3.5" fill="#f0c840" opacity=".85"/>
+  <circle cx="70" cy="68" r="6" fill="#ffd700" opacity=".4"/>
+  <circle cx="70" cy="68" r="10" fill="#ffd700" opacity=".1"/>
+  <circle cx="22" cy="20" r="1.5" fill="#ffd700" opacity=".6"/>
+  <circle cx="68" cy="14" r="1.2" fill="#00d4ff" opacity=".5"/>
+  <circle cx="78" cy="40" r="1" fill="#bf5fff" opacity=".5"/>
+</svg>
+</div>
+
+<!-- Score bar -->
+<div class="sc-bar">
+  <div class="sc-item"><div class="sc-lbl">Blocks Remaining</div><div class="sc-val" id="sv-blk">10</div><div class="sc-unit">blocks</div></div>
+  <div class="sc-item"><div class="sc-lbl">Points Available</div><div class="sc-val" id="sv-pts">100</div><div class="sc-unit">pts</div></div>
+  <div class="sc-item"><div class="sc-lbl">In Tray</div><div class="sc-val" id="sv-tray">10</div><div class="sc-unit">unplaced</div></div>
+  <div class="sc-item"><div class="sc-lbl">Round</div><div class="sc-val" id="sv-round">1</div><div class="sc-unit">round</div></div>
+</div>
 </header>
 
-<!-- Phase banner -->
-<div id="phase" style="color:var(--nblue)">🎯 Drag blocks to the buckets — then lock your final answer!</div>
+<div id="phase" style="color:#00d4ff">🎯 Drag gold blocks to the buckets — place ALL blocks, then lock your final answer!</div>
 
-<!-- ═══════════════ GAME AREA ═════════════════════════════════ -->
+<!-- ═══════════════ GAME ════════════════════════════════════════ -->
 <div id="ga">
   <div class="t-lbl">Available Blocks — drag to a bucket below</div>
   <div id="tray"></div>
   <div class="bkts" id="bkts"></div>
-  <div id="res-banner"></div>
+  <div id="res"></div>
   <div class="act-row">
     <button class="btn-fa" id="btn-fa" onclick="confirmFinal()">🔒 Final Answer</button>
   </div>
@@ -332,8 +408,8 @@ hr.hd{border:none;border-top:1px solid rgba(191,95,255,.14)}
   <div class="hp-ttl">🎬 Host Control Panel</div>
   <div class="hp-row">
     <span class="hp-lbl">Controls</span>
-    <button class="btn-hc btn-rst" onclick="resetRound()">↺ Reset Round</button>
-    <button class="btn-hc btn-ulk" onclick="unlockDragging()">🔓 Unlock Dragging</button>
+    <button class="btn-hc b-rst" onclick="resetRound()">↺ Reset Round</button>
+    <button class="btn-hc b-ulk" onclick="unlockDragging()">🔓 Unlock Dragging</button>
     <div class="hp-sep"></div>
     <span class="hp-lbl">Correct Bucket:</span>
     <button class="btn-rv rva" id="hb0" onclick="revealCorrect(0)" disabled>Bucket A</button>
@@ -342,146 +418,122 @@ hr.hd{border:none;border-top:1px solid rgba(191,95,255,.14)}
   </div>
 </div>
 
-<!-- ═══════════════ CONFIRMATION MODAL ═══════════════════════ -->
-<div class="mbg" id="modal">
-  <div class="mbox">
-    <div class="m-ico">🔒</div>
-    <div class="m-ttl">Lock Your Answer?</div>
-    <div class="m-body">Are you sure you want to lock your answer?<br>Blocks cannot be moved after confirming.</div>
-    <div class="m-btns">
-      <button class="btn-mx" onclick="closeModal()">Cancel</button>
-      <button class="btn-mc" onclick="lockAnswer()">Confirm!</button>
-    </div>
-  </div>
-</div>
 
 <script>
 // ════════════════════════════════════════════════════════════════
-//  STARGAZERS JACKPOT — Game Engine
+//  STARGAZERS JACKPOT — Engine
 // ════════════════════════════════════════════════════════════════
 
 const LABELS = ['A','B','C'];
-const COLORS = ['#00d4ff','#bf5fff','#ffa828'];
-const N      = 10; // total blocks
+const COLORS = ['#00d4ff','#bf5fff','#ffaa20'];
+const N = 10;
 
 // ── State ─────────────────────────────────────────────────────
-let S = {
-  round  : 1,
-  blocks : [],            // { id, loc: 'tray'|0|1|2 }
-  phase  : 'placing',     // 'placing' | 'locked' | 'revealed'
-  dragId : null,
-};
+let S = { round:1, blocks:[], phase:'placing', dragId:null };
 
-// ── Init ──────────────────────────────────────────────────────
+// ── Boot ──────────────────────────────────────────────────────
 function init(keepBlocks) {
   if (!keepBlocks) {
     S.blocks = Array.from({length:N}, (_,i) => ({id:i, loc:'tray'}));
     S.round  = 1;
   } else {
-    // Next round: surviving blocks go back to tray
     S.blocks = S.blocks.map(b => ({...b, loc:'tray'}));
     S.round++;
   }
   S.phase  = 'placing';
   S.dragId = null;
-  document.getElementById('res-banner').style.display = 'none';
+  document.getElementById('res').style.display = 'none';
   renderAll();
   spawnParticles();
+  startMusic();
 }
 
-// ── Render all ────────────────────────────────────────────────
-function renderAll() {
-  renderTray();
-  renderBuckets();
-  updateUI();
-}
+// ── Render ────────────────────────────────────────────────────
+function renderAll() { renderTray(); renderBuckets(); updateUI(); }
 
-// ── Tray ──────────────────────────────────────────────────────
 function renderTray() {
   const el = document.getElementById('tray');
   el.innerHTML = '';
   S.blocks.filter(b => b.loc === 'tray').forEach(b => el.appendChild(mkBlock(b)));
   el.ondragover  = e => { if (S.phase!=='placing') return; e.preventDefault(); el.classList.add('dov'); };
   el.ondragleave = () => el.classList.remove('dov');
-  el.ondrop      = e => {
-    e.preventDefault(); el.classList.remove('dov');
-    if (S.phase==='placing' && S.dragId!==null) moveBlock(S.dragId,'tray');
-  };
+  el.ondrop      = e => { e.preventDefault(); el.classList.remove('dov');
+    if (S.phase==='placing' && S.dragId!==null) moveBlock(S.dragId,'tray'); };
 }
 
-// ── Buckets ───────────────────────────────────────────────────
 function renderBuckets() {
   const row = document.getElementById('bkts');
   row.innerHTML = '';
   LABELS.forEach((lbl, i) => {
     const inside = S.blocks.filter(b => b.loc === i);
     const pts    = inside.length * 10;
+    const wrap   = mk('div','bw');
 
-    const wrap = el('div','bw');
-
-    const topLbl = el('div','bw-lbl', `Bucket ${lbl}`);
+    const topLbl = mk('div','bw-lbl', `Bucket ${lbl}`);
     topLbl.style.color = COLORS[i];
     wrap.appendChild(topLbl);
 
-    const bkt = el('div','bkt');
+    // 3D crate frame
+    const frame = mk('div','bkt-frame');
+    const rw    = mk('div','bkt-rw'); // right wall
+    const bl    = mk('div','bkt-bl'); // bottom ledge
+    frame.appendChild(rw);
+    frame.appendChild(bl);
+
+    const bkt = mk('div','bkt');
     bkt.id = `bkt${i}`;
-
-    // Block count badge
-    const badge = el('div','bkt-cnt', inside.length ? `${inside.length}×` : '');
-    bkt.appendChild(badge);
-
-    // Blocks stacked inside bucket
+    bkt.appendChild(mk('div','bkt-cnt', inside.length ? `${inside.length}×` : ''));
     inside.forEach(b => bkt.appendChild(mkBlock(b)));
 
-    // Drag-over bucket events
     bkt.ondragover  = e => { if (S.phase!=='placing') return; e.preventDefault(); bkt.classList.add('dov'); };
     bkt.ondragleave = () => bkt.classList.remove('dov');
-    bkt.ondrop      = e => {
-      e.preventDefault(); bkt.classList.remove('dov');
-      if (S.phase==='placing' && S.dragId!==null) moveBlock(S.dragId, i);
-    };
+    bkt.ondrop      = e => { e.preventDefault(); bkt.classList.remove('dov');
+      if (S.phase==='placing' && S.dragId!==null) moveBlock(S.dragId, i); };
 
-    // Points sum below bucket
-    const sum = el('div','bkt-sum', inside.length ? `${pts} pts` : '');
+    frame.appendChild(bkt);
+    wrap.appendChild(frame);
+
+    // Bigger points label
+    const sum = mk('div','bkt-sum', inside.length ? `${pts} pts` : '');
     sum.style.color = COLORS[i];
-
-    // Trap door (metallic flap at bottom)
-    const door = el('div','door');
-    door.id = `door${i}`;
-
-    wrap.appendChild(bkt);
     wrap.appendChild(sum);
+
+    // Trap door
+    const door = mk('div','door');
+    door.id = `door${i}`;
+    door.appendChild(mk('div','door-latch'));
     wrap.appendChild(door);
     row.appendChild(wrap);
   });
 }
 
-// ── Block element factory ─────────────────────────────────────
+// ── 3-D Cube block ────────────────────────────────────────────
 function mkBlock(b) {
-  const e = el('div','blk');
-  e.id        = `blk${b.id}`;
-  e.draggable = S.phase === 'placing';
-  e.innerHTML = `<span class="bn">10</span><span class="bl">PTS</span>`;
-  if (S.phase !== 'placing') e.classList.add('locked');
+  const wrap = mk('div','blk');
+  wrap.id = `blk${b.id}`;
+  wrap.draggable = S.phase === 'placing';
+  if (S.phase !== 'placing') wrap.classList.add('locked');
 
-  e.ondragstart = () => {
+  wrap.innerHTML = `<span class="bn">10</span><span class="bl">PTS</span>`;
+
+  wrap.ondragstart = () => {
     if (S.phase !== 'placing') return;
     S.dragId = b.id;
-    setTimeout(() => e.classList.add('dragging'), 0);
-    // sound placeholder: playSound('drag_start')
+    setTimeout(() => wrap.classList.add('dragging'), 0);
+    snd.drag();
   };
-  e.ondragend = () => { e.classList.remove('dragging'); S.dragId = null; };
-  return e;
+  wrap.ondragend = () => { wrap.classList.remove('dragging'); S.dragId = null; };
+  return wrap;
 }
 
 function moveBlock(id, loc) {
   const b = S.blocks.find(x => x.id === id);
   if (b) b.loc = loc;
   renderAll();
-  // sound placeholder: playSound('block_place')
+  snd.drop();
 }
 
-// ── Update scores / UI state ──────────────────────────────────
+// ── UI sync ───────────────────────────────────────────────────
 function updateUI() {
   const tray = S.blocks.filter(b => b.loc === 'tray').length;
   document.getElementById('sv-blk').textContent   = S.blocks.length;
@@ -495,167 +547,365 @@ function updateUI() {
   const ph  = document.getElementById('phase');
   const btn = document.getElementById('btn-fa');
   if (S.phase === 'placing') {
-    ph.textContent = '🎯 Drag blocks to the buckets — then lock your final answer!';
-    ph.style.color = '#00d4ff';
-    btn.disabled   = false;
+    ph.textContent = '🎯 Drag gold blocks to the buckets — then lock your final answer!';
+    ph.style.color = '#00d4ff'; btn.disabled = false;
   } else if (S.phase === 'locked') {
     ph.textContent = '🔒 Answer locked! Host — select the correct bucket below';
-    ph.style.color = '#ffd700';
-    btn.disabled   = true;
+    ph.style.color = '#ffd700'; btn.disabled = true;
   } else {
     btn.disabled = true;
   }
 }
 
-// ── Final Answer flow ─────────────────────────────────────────
-function confirmFinal() { document.getElementById('modal').classList.add('open'); }
-function closeModal()   { document.getElementById('modal').classList.remove('open'); }
+// ── Final Answer — no popup, locks immediately ────────────────
+function confirmFinal() { lockAnswer(); }
+
 function lockAnswer() {
-  closeModal();
-  S.phase = 'locked';
-  renderAll();
-  // sound placeholder: playSound('lock_click')
+  // Drop any blocks still in tray — they are forfeit
+  const trayBlocks = S.blocks.filter(b => b.loc === 'tray');
+  trayBlocks.forEach((b, i) => {
+    setTimeout(() => {
+      const orig = document.getElementById(`blk${b.id}`);
+      if (orig) dropAnimate(orig, b.id);
+    }, i * 80);
+  });
+  // Remove tray blocks from state after animation
+  setTimeout(() => {
+    S.blocks = S.blocks.filter(b => b.loc !== 'tray');
+    S.phase  = 'locked';
+    renderAll();
+    stopMusic();
+  }, trayBlocks.length * 80 + 600);
 }
 
-// ── Host: reveal correct bucket ───────────────────────────────
+// ── Host reveal ───────────────────────────────────────────────
 function revealCorrect(ci) {
   if (S.phase !== 'locked') return;
   S.phase = 'revealed';
   [0,1,2].forEach(i => document.getElementById(`hb${i}`).disabled = true);
 
-  // Correct bucket: glow green
   document.getElementById(`bkt${ci}`).classList.add('bkt-ok');
-  // sound placeholder: playSound('correct_reveal')
+  snd.correct();
 
-  // Wrong buckets: red flash → door opens → blocks fall
   [0,1,2].filter(i => i !== ci).forEach((wi, seq) => {
     setTimeout(() => {
       document.getElementById(`bkt${wi}`).classList.add('bkt-bad');
-      const doorEl = document.getElementById(`door${wi}`);
-      doorEl.classList.add('d-bad');
-      // sound placeholder: playSound('wrong_buzz')
-
+      document.getElementById(`door${wi}`).classList.add('d-bad');
+      snd.buzz();
       setTimeout(() => {
-        doorEl.classList.add('d-open');
-        // sound placeholder: playSound('door_creak')
+        document.getElementById(`door${wi}`).classList.add('d-open');
+        snd.doorOpen();
         dropBlocks(wi);
       }, 580);
-    }, seq * 650);
+    }, seq * 680);
   });
 
-  // Show result after all animations settle
   const kept = S.blocks.filter(b => b.loc === ci).length;
-  setTimeout(() => showResult(kept), 3000);
+  setTimeout(() => showResult(kept), 3200);
 }
 
-// Animate blocks falling from a wrong bucket
+// Animate a block falling with gravity (uses fixed-position clone)
+function dropAnimate(orig, id) {
+  if (!orig) return;
+  const r = orig.getBoundingClientRect();
+  const clone = orig.cloneNode(true);
+  clone.style.cssText = `position:fixed;left:${r.left}px;top:${r.top}px;width:${r.width}px;height:${r.height}px;margin:0;z-index:500;pointer-events:none;transition:none`;
+  document.body.appendChild(clone);
+  orig.style.visibility = 'hidden';
+  requestAnimationFrame(() => {
+    const dy  = window.innerHeight - r.top + 80;
+    const rot = (Math.random() - .5) * 100;
+    clone.style.transition = 'transform .88s ease-in, opacity .82s ease-in';
+    clone.style.transform  = `translateY(${dy}px) rotate(${rot}deg)`;
+    clone.style.opacity    = '0';
+    snd.fall();
+    setTimeout(() => { clone.remove(); S.blocks = S.blocks.filter(x => x.id !== id); updateUI(); }, 940);
+  });
+}
+
 function dropBlocks(bucketIdx) {
   S.blocks.filter(b => b.loc === bucketIdx).forEach((b, i) => {
     setTimeout(() => {
-      const orig = document.getElementById(`blk${b.id}`);
-      if (!orig) return;
-      const r = orig.getBoundingClientRect();
-
-      // Create fixed-position clone to animate freely
-      const clone = orig.cloneNode(true);
-      clone.style.cssText = [
-        `position:fixed`,`left:${r.left}px`,`top:${r.top}px`,
-        `width:${r.width}px`,`height:${r.height}px`,
-        `margin:0`,`z-index:500`,`pointer-events:none`,`transition:none`,
-      ].join(';');
-      document.body.appendChild(clone);
-      orig.style.visibility = 'hidden';
-
-      // Trigger gravity fall on next frame
-      requestAnimationFrame(() => {
-        const dy  = window.innerHeight - r.top + 80;
-        const rot = (Math.random() - 0.5) * 90;
-        clone.style.transition = 'transform .9s ease-in, opacity .85s ease-in';
-        clone.style.transform  = `translateY(${dy}px) rotate(${rot}deg)`;
-        clone.style.opacity    = '0';
-        // sound placeholder: playSound('block_clatter')
-
-        setTimeout(() => {
-          clone.remove();
-          S.blocks = S.blocks.filter(x => x.id !== b.id);
-          updateUI();
-        }, 950);
-      });
+      dropAnimate(document.getElementById(`blk${b.id}`), b.id);
     }, i * 110);
   });
 }
 
-// ── Show result banner ────────────────────────────────────────
 function showResult(kept) {
   const pts    = kept * 10;
-  const banner = document.getElementById('res-banner');
+  const banner = document.getElementById('res');
   const ph     = document.getElementById('phase');
-
   if (kept === 0) {
     banner.innerHTML = `<span style="color:#ff3355">💀 All blocks lost — 0 points remaining!</span>`;
-    ph.textContent   = '💀 No blocks survived · Use Reset Round to start fresh';
+    ph.textContent   = '💀 No blocks survived · Host: Reset Round to start fresh';
     ph.style.color   = '#ff3355';
-    // sound placeholder: playSound('lose_jingle')
+    snd.lose();
   } else {
     banner.innerHTML = `<span style="color:#00ff88">🎉 ${kept} block${kept>1?'s':''} survived!&nbsp;&nbsp;<span style="color:#ffd700">${pts} pts kept!</span></span>`;
-    ph.textContent   = `✅ ${kept} block(s) survived → ${pts} pts · Press Reset Round to continue`;
+    ph.textContent   = `✅ ${kept} block(s) survived → ${pts} pts · Host: Reset Round to continue`;
     ph.style.color   = '#00ff88';
-    // sound placeholder: playSound('win_fanfare')
+    snd.win();
   }
   banner.style.display = 'block';
 }
 
 // ── Host controls ─────────────────────────────────────────────
 function resetRound() {
-  // Surviving blocks go back to tray, advance round
+  // Only surviving blocks carry forward (blocks in state now = those from correct bucket)
   S.blocks = S.blocks.map(b => ({...b, loc:'tray'}));
-  S.round++;
-  S.phase  = 'placing';
-  S.dragId = null;
-  document.getElementById('res-banner').style.display = 'none';
+  S.round++; S.phase = 'placing'; S.dragId = null;
+  document.getElementById('res').style.display = 'none';
   renderAll();
-  // sound placeholder: playSound('round_start')
+  startMusic();
 }
 
 function unlockDragging() {
-  // If already revealed, collect all remaining blocks to tray
+  // Reveal phase: only already-surviving blocks remain in state, move to tray
   if (S.phase === 'revealed') S.blocks = S.blocks.map(b => ({...b, loc:'tray'}));
-  S.phase  = 'placing';
-  S.dragId = null;
-  document.getElementById('res-banner').style.display = 'none';
+  // Locked phase: put bucket blocks back to tray (undo lock, keep tray blocks removed)
+  else S.blocks = S.blocks.map(b => ({...b, loc:'tray'}));
+  stopMusic();
+  S.phase = 'placing'; S.dragId = null;
+  document.getElementById('res').style.display = 'none';
   renderAll();
+  startMusic();
 }
 
 // ── Particles ─────────────────────────────────────────────────
 function spawnParticles() {
-  const c    = document.getElementById('ptc');
-  c.innerHTML = '';
-  const cols = ['#ffd700','#bf5fff','#00d4ff','#ff6699','#66ffaa','#ff9900'];
-  for (let i = 0; i < 46; i++) {
-    const p  = document.createElement('div');
-    p.className = 'pt';
-    const s = Math.random() * 5 + 2;
-    p.style.cssText = [
-      `left:${Math.random()*100}%`,
-      `width:${s}px`,`height:${s}px`,
-      `background:${cols[Math.floor(Math.random()*cols.length)]}`,
-      `animation-duration:${Math.random()*13+8}s`,
-      `animation-delay:${Math.random()*11}s`,
-      `box-shadow:0 0 ${s*2}px currentColor`,
-    ].join(';');
+  const c = document.getElementById('ptc'); c.innerHTML = '';
+  const cols = ['#ffd700','#bf5fff','#00d4ff','#ff6699','#66ffaa','#ffaa00'];
+  for (let i=0;i<44;i++) {
+    const p=document.createElement('div'); p.className='pt';
+    const s=Math.random()*5+2;
+    p.style.cssText=`left:${Math.random()*100}%;width:${s}px;height:${s}px;background:${cols[i%cols.length]};animation-duration:${Math.random()*13+8}s;animation-delay:${Math.random()*11}s;box-shadow:0 0 ${s*2}px currentColor`;
     c.appendChild(p);
   }
 }
 
-// ── Utility ────────────────────────────────────────────────────
-function el(tag, cls='', text='') {
-  const e = document.createElement(tag);
-  if (cls)  e.className   = cls;
-  if (text) e.textContent = text;
-  return e;
+// ── Utility ───────────────────────────────────────────────────
+function mk(tag,cls='',text=''){const e=document.createElement(tag);if(cls)e.className=cls;if(text)e.textContent=text;return e;}
+
+// ════════════════════════════════════════════════════════════════
+//  WEB AUDIO SOUND ENGINE
+// ════════════════════════════════════════════════════════════════
+
+let _ac = null;
+function ac() {
+  if (!_ac) _ac = new (window.AudioContext || window.webkitAudioContext)();
+  if (_ac.state === 'suspended') _ac.resume();
+  return _ac;
 }
 
-// ── Start ──────────────────────────────────────────────────────
+// ── Background Music (tense ~20-second loop) ──────────────────
+let _bgm = null;
+
+function startMusic() {
+  stopMusic();
+  _bgm = { alive: true };
+  scheduleMusicLoop(ac().currentTime + 0.05);
+}
+
+function stopMusic(fade=true) {
+  if (_bgm) { _bgm.alive = false; _bgm = null; }
+}
+
+function scheduleMusicLoop(t0) {
+  if (!_bgm || !_bgm.alive) return;
+  const ctx   = ac();
+  const BPS   = 60/120; // 120 BPM → 0.5 s/beat
+  const beats = 40;     // 40 beats × 0.5s = 20 seconds per loop
+
+  // ── Master gain for this loop
+  const mG = ctx.createGain(); mG.gain.value = 0;
+  mG.connect(ctx.destination);
+  // Fade in
+  mG.gain.linearRampToValueAtTime(.28, t0 + 0.3);
+
+  // ── A-minor pentatonic scale (A3-based, Hz)
+  const scale = [220, 246.9, 261.6, 293.7, 329.6, 349.2, 392, 440];
+
+  // Melody pattern (beat indices → scale index)
+  const mel = [
+    [0,4],[2,5],[4,6],[6,7],[8,5],[10,4],[12,6],[14,7],
+    [16,5],[18,4],[20,3],[22,2],[24,4],[26,5],[28,6],[30,7],
+    [32,6],[34,5],[36,4],[38,3]
+  ];
+
+  mel.forEach(([beat, si]) => {
+    const t   = t0 + beat * BPS;
+    const len = BPS * 0.65;
+    const osc = ctx.createOscillator();
+    const gn  = ctx.createGain();
+    const fl  = ctx.createBiquadFilter();
+    osc.type = 'sawtooth'; osc.frequency.value = scale[si];
+    fl.type = 'lowpass'; fl.frequency.value = 900;
+    osc.connect(fl); fl.connect(gn); gn.connect(mG);
+    gn.gain.setValueAtTime(0, t);
+    gn.gain.linearRampToValueAtTime(.14, t + 0.02);
+    gn.gain.linearRampToValueAtTime(0,   t + len);
+    osc.start(t); osc.stop(t + len + 0.05);
+  });
+
+  // ── Bass line (every 4 beats, A2=110Hz, E2=82.4Hz)
+  [[0,110],[8,110],[16,82.4],[24,110],[32,110]].forEach(([beat, freq]) => {
+    const t   = t0 + beat * BPS;
+    const osc = ctx.createOscillator();
+    const gn  = ctx.createGain();
+    osc.type = 'sine'; osc.frequency.value = freq;
+    osc.connect(gn); gn.connect(mG);
+    gn.gain.setValueAtTime(.38, t);
+    gn.gain.exponentialRampToValueAtTime(.001, t + BPS * 3.5);
+    osc.start(t); osc.stop(t + BPS * 4);
+  });
+
+  // ── Bass kick (every 4 beats)
+  for (let b = 0; b < beats; b += 4) {
+    const t = t0 + b * BPS;
+    const osc = ctx.createOscillator();
+    const gn  = ctx.createGain();
+    osc.frequency.setValueAtTime(100, t);
+    osc.frequency.exponentialRampToValueAtTime(25, t + .12);
+    gn.gain.setValueAtTime(.45, t);
+    gn.gain.exponentialRampToValueAtTime(.001, t + .16);
+    osc.connect(gn); gn.connect(mG);
+    osc.start(t); osc.stop(t + .2);
+  }
+
+  // ── Hi-hat (every odd beat)
+  for (let b = 1; b < beats; b += 2) {
+    const t   = t0 + b * BPS;
+    const buf = ctx.createBuffer(1, Math.floor(ctx.sampleRate * .04), ctx.sampleRate);
+    const d   = buf.getChannelData(0);
+    for (let j = 0; j < d.length; j++) d[j] = (Math.random()*2-1)*(1-j/d.length);
+    const src = ctx.createBufferSource(); src.buffer = buf;
+    const fl  = ctx.createBiquadFilter(); fl.type='highpass'; fl.frequency.value=7000;
+    const gn  = ctx.createGain(); gn.gain.value = .06;
+    src.connect(fl); fl.connect(gn); gn.connect(mG);
+    src.start(t);
+  }
+
+  // ── Tension riser (last 8 beats of loop)
+  const riserT = t0 + 32 * BPS;
+  const rOsc = ctx.createOscillator();
+  const rGn  = ctx.createGain();
+  rOsc.type = 'sine';
+  rOsc.frequency.setValueAtTime(55, riserT);
+  rOsc.frequency.exponentialRampToValueAtTime(220, riserT + 8 * BPS);
+  rGn.gain.setValueAtTime(0, riserT);
+  rGn.gain.linearRampToValueAtTime(.08, riserT + 4 * BPS);
+  rGn.gain.linearRampToValueAtTime(0, riserT + 8 * BPS);
+  rOsc.connect(rGn); rGn.connect(mG);
+  rOsc.start(riserT); rOsc.stop(riserT + 8 * BPS + .1);
+
+  // ── Schedule next loop iteration
+  const loopDur = beats * BPS;
+  const nextT   = t0 + loopDur;
+  const delay   = (nextT - ctx.currentTime - .2) * 1000;
+  if (_bgm) _bgm.timer = setTimeout(() => scheduleMusicLoop(nextT), Math.max(delay, 50));
+}
+
+const snd = {
+
+  drag() {
+    try {
+      const ctx = ac(), t = ctx.currentTime;
+      const osc = ctx.createOscillator(), gn = ctx.createGain();
+      osc.type = 'sine'; osc.frequency.setValueAtTime(800, t); osc.frequency.exponentialRampToValueAtTime(400, t+.08);
+      gn.gain.setValueAtTime(.12, t); gn.gain.exponentialRampToValueAtTime(.001, t+.09);
+      osc.connect(gn); gn.connect(ctx.destination); osc.start(t); osc.stop(t+.1);
+    } catch(e){}
+  },
+
+  drop() {
+    try {
+      const ctx = ac(), t = ctx.currentTime;
+      const osc = ctx.createOscillator(), gn = ctx.createGain();
+      osc.type = 'sine'; osc.frequency.setValueAtTime(200, t); osc.frequency.exponentialRampToValueAtTime(80, t+.12);
+      gn.gain.setValueAtTime(.25, t); gn.gain.exponentialRampToValueAtTime(.001, t+.14);
+      osc.connect(gn); gn.connect(ctx.destination); osc.start(t); osc.stop(t+.15);
+    } catch(e){}
+  },
+
+  fall() {
+    try {
+      const ctx = ac(), t = ctx.currentTime;
+      // metallic clatter
+      const buf = ctx.createBuffer(1, Math.floor(ctx.sampleRate*.08), ctx.sampleRate);
+      const d = buf.getChannelData(0);
+      for (let i=0;i<d.length;i++) d[i] = (Math.random()*2-1)*(1-i/d.length)*.9;
+      const src = ctx.createBufferSource(); src.buffer = buf;
+      const fl = ctx.createBiquadFilter(); fl.type='bandpass'; fl.frequency.value=1200; fl.Q.value=.5;
+      const gn = ctx.createGain(); gn.gain.value = .3;
+      src.connect(fl); fl.connect(gn); gn.connect(ctx.destination); src.start(t);
+    } catch(e){}
+  },
+
+  buzz() {
+    try {
+      const ctx = ac(), t = ctx.currentTime;
+      const osc = ctx.createOscillator(), gn = ctx.createGain();
+      osc.type = 'square'; osc.frequency.value = 80;
+      gn.gain.setValueAtTime(.35, t); gn.gain.exponentialRampToValueAtTime(.001, t+.22);
+      osc.connect(gn); gn.connect(ctx.destination); osc.start(t); osc.stop(t+.25);
+    } catch(e){}
+  },
+
+  doorOpen() {
+    try {
+      const ctx = ac(), t = ctx.currentTime;
+      [0,.08,.16].forEach((dt, i) => {
+        const osc = ctx.createOscillator(), gn = ctx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(220-i*40, t+dt); osc.frequency.exponentialRampToValueAtTime(40, t+dt+.18);
+        gn.gain.setValueAtTime(.22, t+dt); gn.gain.exponentialRampToValueAtTime(.001, t+dt+.2);
+        osc.connect(gn); gn.connect(ctx.destination); osc.start(t+dt); osc.stop(t+dt+.22);
+      });
+    } catch(e){}
+  },
+
+  correct() {
+    try {
+      const ctx = ac();
+      [0,.12,.24,.38].forEach((dt, i) => {
+        const freq = [440,554,659,880][i];
+        const osc = ctx.createOscillator(), gn = ctx.createGain();
+        osc.type = 'sine'; osc.frequency.value = freq;
+        const t = ctx.currentTime + dt;
+        gn.gain.setValueAtTime(.22, t); gn.gain.exponentialRampToValueAtTime(.001, t+.35);
+        osc.connect(gn); gn.connect(ctx.destination); osc.start(t); osc.stop(t+.4);
+      });
+    } catch(e){}
+  },
+
+  win() {
+    try {
+      const ctx = ac();
+      [220,277,330,440,554,660,880].forEach((freq, i) => {
+        const t = ctx.currentTime + i*.1;
+        const osc = ctx.createOscillator(), gn = ctx.createGain();
+        osc.type = 'sine'; osc.frequency.value = freq;
+        gn.gain.setValueAtTime(.2, t); gn.gain.exponentialRampToValueAtTime(.001, t+.55);
+        osc.connect(gn); gn.connect(ctx.destination); osc.start(t); osc.stop(t+.6);
+      });
+    } catch(e){}
+  },
+
+  lose() {
+    try {
+      const ctx = ac();
+      [330,294,262,220,196,165,110].forEach((freq, i) => {
+        const t = ctx.currentTime + i*.14;
+        const osc = ctx.createOscillator(), gn = ctx.createGain();
+        osc.type = 'sawtooth'; osc.frequency.value = freq;
+        gn.gain.setValueAtTime(.18, t); gn.gain.exponentialRampToValueAtTime(.001, t+.55);
+        osc.connect(gn); gn.connect(ctx.destination); osc.start(t); osc.stop(t+.6);
+      });
+    } catch(e){}
+  }
+};
+
+// ── Start ─────────────────────────────────────────────────────
 init(false);
 </script>
 </body>
