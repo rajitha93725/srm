@@ -72,7 +72,7 @@ header{position:relative;z-index:10;padding:14px 20px 10px;
     inset 0 1px 0 rgba(255,255,200,.7),
     inset 0 -2px 4px rgba(100,50,0,.35);
   transition:transform .15s,box-shadow .15s;
-  user-select:none}
+  user-select:none;touch-action:none}
 /* Upper shine strip */
 .blk::before{content:'';position:absolute;top:0;left:0;right:0;height:44%;
   background:linear-gradient(180deg,rgba(255,255,220,.45) 0%,rgba(255,255,200,.04) 100%);
@@ -203,6 +203,17 @@ hr.hd{border:none;border-top:1px solid rgba(191,95,255,.12)}
 @media(max-width:640px){
   .bkts{flex-direction:column;align-items:center}.bw{max-width:100%;width:100%}
   #ga{padding:12px 10px}.wiz{width:68px!important;height:72px!important}
+}
+@media(max-width:480px){
+  .blk{width:52px;height:52px;border-radius:9px}
+  .bn{font-size:1.15rem}.bl{font-size:.44rem}
+  .sc-bar{gap:8px}.sc-val{font-size:1.2rem}.sc-lbl{font-size:.48rem}
+  .bkts{gap:8px}.btn-fa{padding:11px 26px;font-size:.85rem;letter-spacing:1px}
+  .hp-row{gap:4px;flex-direction:column;align-items:flex-start}
+  .hp-sep{display:none}
+  .btn-hc,.btn-rv{font-size:.62rem;padding:5px 9px}
+  #tray{gap:8px;padding:10px 10px}
+  .gtitle{letter-spacing:1px}
 }
 </style>
 </head>
@@ -429,7 +440,8 @@ const COLORS = ['#00d4ff','#bf5fff','#ffaa20'];
 const N = 10;
 
 // ── State ─────────────────────────────────────────────────────
-let S = { round:1, blocks:[], phase:'placing', dragId:null };
+let S  = { round:1, blocks:[], phase:'placing', dragId:null };
+let _td = null; // active touch-drag descriptor
 
 // ── Boot ──────────────────────────────────────────────────────
 function init(keepBlocks) {
@@ -523,6 +535,25 @@ function mkBlock(b) {
     snd.drag();
   };
   wrap.ondragend = () => { wrap.classList.remove('dragging'); S.dragId = null; };
+
+  // ── Touch drag ──────────────────────────────────────────────
+  wrap.addEventListener('touchstart', e => {
+    if (S.phase !== 'placing') return;
+    e.preventDefault();
+    const t = e.touches[0];
+    const r = wrap.getBoundingClientRect();
+    const clone = wrap.cloneNode(true);
+    clone.style.cssText = `position:fixed;left:${r.left}px;top:${r.top}px;`
+      + `width:${r.width}px;height:${r.height}px;margin:0;z-index:1000;`
+      + `pointer-events:none;opacity:.9;transform:scale(1.14);`
+      + `box-shadow:0 0 44px rgba(255,215,0,.95);transition:none`;
+    document.body.appendChild(clone);
+    wrap.style.opacity = '.28';
+    _td = { blockId:b.id, clone, wrap, ox:t.clientX-r.left, oy:t.clientY-r.top };
+    S.dragId = b.id;
+    snd.drag();
+  }, { passive:false });
+
   return wrap;
 }
 
@@ -904,6 +935,44 @@ const snd = {
     } catch(e){}
   }
 };
+
+// ── Touch drag: document-level move + release ─────────────────
+document.addEventListener('touchmove', e => {
+  if (!_td) return;
+  e.preventDefault();
+  const t = e.touches[0];
+  _td.clone.style.left = `${t.clientX - _td.ox}px`;
+  _td.clone.style.top  = `${t.clientY - _td.oy}px`;
+  // highlight the drop target under the finger
+  document.querySelectorAll('.dov').forEach(x => x.classList.remove('dov'));
+  _td.clone.style.display = 'none';          // hide clone so hit-test sees what's beneath
+  const el = document.elementFromPoint(t.clientX, t.clientY);
+  _td.clone.style.display = '';
+  if (el) {
+    const bkt = el.closest && el.closest('[id^="bkt"]');
+    const tr  = el.closest && el.closest('#tray');
+    if (bkt) bkt.classList.add('dov');
+    if (tr)  tr.classList.add('dov');
+  }
+}, { passive:false });
+
+document.addEventListener('touchend', e => {
+  if (!_td) return;
+  const t = e.changedTouches[0];
+  const { blockId, clone, wrap } = _td;
+  clone.remove();
+  wrap.style.opacity = '';
+  document.querySelectorAll('.dov').forEach(x => x.classList.remove('dov'));
+  // clone is gone — elementFromPoint now sees the real elements
+  const el = document.elementFromPoint(t.clientX, t.clientY);
+  _td = null; S.dragId = null;
+  if (el) {
+    const bkt = el.closest && el.closest('[id^="bkt"]');
+    const tr  = el.closest && el.closest('#tray');
+    if (bkt) moveBlock(blockId, parseInt(bkt.id.replace('bkt', '')));
+    else if (tr) moveBlock(blockId, 'tray');
+  }
+}, { passive:false });
 
 // ── Start ─────────────────────────────────────────────────────
 init(false);
