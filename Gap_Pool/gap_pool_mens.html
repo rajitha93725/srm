@@ -358,14 +358,14 @@ const BASE_GROUPS=[
 ];
 const GROUP_MATCHES=[[0,1],[0,2],[1,2]];
 const R16=[
-  {id:'r16_1',left:'G1 Winner', right:'BL 4'},
-  {id:'r16_2',left:'G2 Winner', right:'G3 Winner'},
-  {id:'r16_3',left:'G4 Winner', right:'BL 2'},
-  {id:'r16_4',left:'G5 Winner', right:'G6 Winner'},
+  {id:'r16_1',left:'G1 Winner', right:'G2 Winner'},
+  {id:'r16_2',left:'G3 Winner', right:'BL 4'},
+  {id:'r16_3',left:'G4 Winner', right:'G5 Winner'},
+  {id:'r16_4',left:'G6 Winner', right:'BL 2'},
   {id:'r16_5',left:'G7 Winner', right:'G8 Winner'},
-  {id:'r16_6',left:'G9 Winner', right:'BL 3'},
-  {id:'r16_7',left:'G10 Winner',right:'G11 Winner'},
-  {id:'r16_8',left:'G12 Winner',right:'BL 1'},
+  {id:'r16_6',left:'G9 Winner', right:'G10 Winner'},
+  {id:'r16_7',left:'G11 Winner',right:'BL 1'},
+  {id:'r16_8',left:'G12 Winner',right:'BL 3'},
 ];
 
 // ── State ─────────────────────────────────────────────────────────────────────
@@ -633,7 +633,7 @@ function mkSlot(id,t1n,t1h,t2n,t2h,ll,rl){
 }
 function renderBracket(){
   const qfIds=['qf1','qf2','qf3','qf4'],sfIds=['sf1','sf2'];
-  const r16Html=`<div class="round"><div class="round-title">Round of 16</div>${R16.map(m=>{
+  const r16Html=`<div class="round"><div class="round-title">Knockout</div>${R16.map(m=>{
     const t1=getKnockoutTeam(m.left),t2=getKnockoutTeam(m.right);
     return mkSlot(m.id,t1?t1.name:m.left,t1?t1.house:'orion',t2?t2.name:m.right,t2?t2.house:'orion',m.left,m.right);
   }).join('')}</div>`;
@@ -704,13 +704,13 @@ function getKnockoutPoints(pairName){
   }
   for(const m of R16){
     if(wonM(m.id))  return{pts:25, stage:'Quarterfinals'};
-    if(lostM(m.id)) return{pts:15, stage:'R16 Loser'};
-    if(inM(m.id))   return{pts:15, stage:'R16'};
+    if(lostM(m.id)) return{pts:15, stage:'KO Loser'};
+    if(inM(m.id))   return{pts:15, stage:'Knockout'};
   }
   // Pair qualified for bracket but match slot not yet opened in UI
-  for(const bg of BASE_GROUPS){const w=getGroupWinner(bg.id);if(w&&w.n===pairName)return{pts:15,stage:'R16'};}
+  for(const bg of BASE_GROUPS){const w=getGroupWinner(bg.id);if(w&&w.n===pairName)return{pts:15,stage:'Knockout'};}
   const blTop4=getBestLosers().slice(0,4).map(p=>p.n);
-  if(blTop4.includes(pairName))return{pts:15,stage:'R16'};
+  if(blTop4.includes(pairName))return{pts:15,stage:'Knockout'};
   return null;
 }
 
@@ -739,7 +739,7 @@ function getPairTotalPoints(pairName){
 // ── Render Standings ──────────────────────────────────────────────────────────
 function renderStandings(){
   const STAGE_CLS={'Champion':'s200','Finalist':'s100','3rd Place':'s75','4th Place':'s50',
-    'Semifinals':'s50','Quarterfinals':'s25','QF Loser':'s25','R16 Loser':'s15','R16':'s15',
+    'Semifinals':'s50','Quarterfinals':'s25','QF Loser':'s25','KO Loser':'s15','Knockout':'s15',
     'Best Loser':'s15','Group 1st':'s15','Group 2nd':'s10','Group 3rd':'s5',
     'Not Started':'s5','No Data':'s5'};
 
