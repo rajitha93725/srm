@@ -9,7 +9,9 @@
       "Bash(node server.js)",
       "Bash(curl -s http://localhost:3000/api/pricing)",
       "Bash(node -e \"const d=require\\('fs'\\).readFileSync\\('/dev/stdin','utf8'\\); console.log\\(JSON.parse\\(d\\).base ? 'Server OK' : 'bad response'\\)\")",
-      "Bash(node -c server.js)"
+      "Bash(node -c server.js)",
+      "Bash(Rename-Item *)",
+      "PowerShell(Rename-Item *)"
     ]
   }
 }
