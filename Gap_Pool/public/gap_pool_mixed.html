@@ -317,23 +317,23 @@ function hDot(h){return`<span style="width:7px;height:7px;border-radius:50%;back
 
 // 8 groups × 3 pairs — edit names via ✏ button
 const BASE_GROUPS=[
-  {id:1, pairs:[{n:'MX Pair 1',h:'orion'}, {n:'MX Pair 2',h:'draco'},   {n:'MX Pair 3',h:'cygnus'}]},
-  {id:2, pairs:[{n:'MX Pair 4',h:'aquilla'},{n:'MX Pair 5',h:'orion'},  {n:'MX Pair 6',h:'draco'}]},
-  {id:3, pairs:[{n:'MX Pair 7',h:'cygnus'}, {n:'MX Pair 8',h:'aquilla'},{n:'MX Pair 9',h:'orion'}]},
-  {id:4, pairs:[{n:'MX Pair 10',h:'draco'}, {n:'MX Pair 11',h:'cygnus'},{n:'MX Pair 12',h:'aquilla'}]},
-  {id:5, pairs:[{n:'MX Pair 13',h:'orion'}, {n:'MX Pair 14',h:'draco'}, {n:'MX Pair 15',h:'aquilla'}]},
-  {id:6, pairs:[{n:'MX Pair 16',h:'cygnus'},{n:'MX Pair 17',h:'orion'}, {n:'MX Pair 18',h:'draco'}]},
-  {id:7, pairs:[{n:'MX Pair 19',h:'aquilla'},{n:'MX Pair 20',h:'cygnus'},{n:'MX Pair 21',h:'orion'}]},
-  {id:8, pairs:[{n:'MX Pair 22',h:'draco'}, {n:'MX Pair 23',h:'aquilla'},{n:'MX Pair 24',h:'cygnus'}]},
+  {id:1, pairs:[{n:'Nabil & Dureksha',   h:'orion'},  {n:'Adrian & Amani',     h:'draco'},   {n:'Rajitha & Madhu',     h:'cygnus'}]},
+  {id:2, pairs:[{n:'Selection 2',        h:'aquilla'},{n:'Janath & Ruvinda',   h:'orion'},   {n:'Abrar & Harshani',    h:'draco'}]},
+  {id:3, pairs:[{n:'Stasz & Suli',       h:'cygnus'}, {n:'Dimantha & Tharindya',h:'aquilla'},{n:'Abdul & Maaya',       h:'orion'}]},
+  {id:4, pairs:[{n:'Deesara & Thifya',   h:'draco'},  {n:'Sukith & Shavini',   h:'cygnus'},  {n:'Rafath & Thilanka',   h:'aquilla'}]},
+  {id:5, pairs:[{n:'Lasith & Harini',    h:'orion'},  {n:'Sanjula & Oreliya',  h:'draco'},   {n:'DasunBNS & Jeshreen', h:'cygnus'}]},
+  {id:6, pairs:[{n:'Selection 3',        h:'aquilla'},{n:'Thimal & Upeksha',   h:'orion'},   {n:'Malindu & Thilini',   h:'draco'}]},
+  {id:7, pairs:[{n:'Sahan & Bishmika',   h:'cygnus'}, {n:'Mazar & Yumna',      h:'aquilla'}, {n:'Arun & Peu',          h:'orion'}]},
+  {id:8, pairs:[{n:'Dilshan & Oshadi',   h:'draco'},  {n:'Shashi & Natasha',   h:'cygnus'},  {n:'Selection 1',         h:'aquilla'}]},
 ];
 const GROUP_MATCHES=[[0,1],[0,2],[1,2]];
 
 // 8 group winners → QF (4 matches) → SF (2) → Final + 3rd
 const QFS=[
-  {id:'qf1',left:'G1 Winner',right:'G2 Winner'},
-  {id:'qf2',left:'G3 Winner',right:'G4 Winner'},
-  {id:'qf3',left:'G5 Winner',right:'G6 Winner'},
-  {id:'qf4',left:'G7 Winner',right:'G8 Winner'},
+  {id:'qf1',left:'G1 Winner',right:'G4 Winner'},
+  {id:'qf2',left:'G2 Winner',right:'G3 Winner'},
+  {id:'qf3',left:'G5 Winner',right:'G8 Winner'},
+  {id:'qf4',left:'G6 Winner',right:'G7 Winner'},
 ];
 
 // ── State ─────────────────────────────────────────────────────────────────────
@@ -439,8 +439,9 @@ function renderGroups(){
     const matchHtml=GROUP_MATCHES.map((m,mi)=>{
       const p1=grp.pairs[m[0]],p2=grp.pairs[m[1]], key=`g${bg.id}_m${mi}`;
       const res=calcMatchup(STATE.groupScores[key]), done=res&&res.winner!==null;
+      const winHex=done?(res.winner===0?hc(p1.h):hc(p2.h)):null;
       const summary=done
-        ?`${res.t1pts.toFixed(1)} - ${res.t2pts.toFixed(1)} <span style="font-size:.72rem;padding:1px 5px;border-radius:8px;background:rgba(34,197,94,.15);color:#4ade80;font-weight:700;margin-left:4px">✓</span>`
+        ?`<span style="color:${hc(p1.h)};font-weight:700">${res.t1pts.toFixed(1)}</span> - <span style="color:${hc(p2.h)};font-weight:700">${res.t2pts.toFixed(1)}</span> <span style="font-size:.72rem;padding:1px 5px;border-radius:8px;background:${winHex}22;color:${winHex};font-weight:700;margin-left:4px">✓</span>`
         :'<span style="font-size:.62rem;padding:1px 6px;border-radius:8px;background:rgba(100,116,139,.15);color:#64748b;font-weight:700">!Played</span>';
       const dateVal=(STATE.matchDates&&STATE.matchDates[key])||'';
       const timeVal=(STATE.matchTimes&&STATE.matchTimes[key])||'';
@@ -567,7 +568,7 @@ function getKnockoutPoints(pairName){
     if(lostM(qf.id))return{pts:25, stage:'QF Loser'};
     if(inM(qf.id))  return{pts:25, stage:'Quarterfinals'};
   }
-  for(const bg of BASE_GROUPS){const w=getGroupWinner(bg.id);if(w&&w.n===pairName)return{pts:15,stage:'QF Entry'};}
+  for(const bg of BASE_GROUPS){const w=getGroupWinner(bg.id);if(w&&w.n===pairName)return{pts:25,stage:'QF Entry'};}
   return null;
 }
 
@@ -578,9 +579,9 @@ function getGroupPairPoints(pairName){
       if(st[rank].n!==pairName)continue;
       const anyPlayed=GROUP_MATCHES.some((_,mi)=>calcMatchup(STATE.groupScores[`g${bg.id}_m${mi}`])!==null);
       if(!anyPlayed)return{pts:0,stage:'Not Started'};
-      if(rank===0)return{pts:15,stage:'Group 1st'};
-      if(rank===1)return{pts:10,stage:'Group 2nd'};
-      return{pts:5,stage:'Group 3rd'};
+      if(rank===0)return{pts:25,stage:'Group 1st'};
+      if(rank===1)return{pts:15,stage:'Group 2nd'};
+      return{pts:10,stage:'Group 3rd'};
     }
   }
   return{pts:0,stage:'No Data'};
@@ -597,16 +598,23 @@ function isGroupComplete(gId){
 function countHouseCompletedPairs(house){
   let n=0;
   BASE_GROUPS.forEach(bg=>{
-    if(!isGroupComplete(bg.id))return;
-    for(let pi=0;pi<3;pi++){if(getPair(bg.id,pi).h===house)n++;}
+    for(let pi=0;pi<3;pi++){
+      if(getPair(bg.id,pi).h!==house) continue;
+      const done=GROUP_MATCHES.every((m,mi)=>{
+        if(!m.includes(pi)) return true;
+        const r=calcMatchup(STATE.groupScores[`g${bg.id}_m${mi}`]);
+        return r&&r.winner!==null;
+      });
+      if(done) n++;
+    }
   });
   return n;
 }
 
 function renderStandings(){
   const STAGE_CLS={'Champion':'s200','Finalist':'s100','3rd Place':'s75','4th Place':'s50',
-    'Semifinals':'s50','Quarterfinals':'s25','QF Entry':'s15','QF Loser':'s25',
-    'Group 1st':'s15','Group 2nd':'s10','Group 3rd':'s5','Not Started':'s5','No Data':'s5'};
+    'Semifinals':'s50','Quarterfinals':'s25','QF Entry':'s25','QF Loser':'s25',
+    'Group 1st':'s25','Group 2nd':'s15','Group 3rd':'s10','Not Started':'s5','No Data':'s5'};
   const hd={};
   Object.keys(HOUSES).forEach(h=>{hd[h]={pairs:[],total:0,bonus:0,completed:0};});
   BASE_GROUPS.forEach(bg=>{

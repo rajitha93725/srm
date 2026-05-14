@@ -579,7 +579,7 @@ function renderGroups(){
       const res=calcMatchup(STATE.groupScores[key]), done=res&&res.winner!==null;
       const winHex=done?(res.winner===0?hc(p1.h):hc(p2.h)):null;
       const summary=done
-        ?`${res.t1pts.toFixed(1)} - ${res.t2pts.toFixed(1)} <span style="font-size:.72rem;padding:1px 5px;border-radius:8px;background:${winHex}22;color:${winHex};font-weight:700;margin-left:4px">✓</span>`
+        ?`<span style="color:${hc(p1.h)};font-weight:700">${res.t1pts.toFixed(1)}</span> - <span style="color:${hc(p2.h)};font-weight:700">${res.t2pts.toFixed(1)}</span> <span style="font-size:.72rem;padding:1px 5px;border-radius:8px;background:${winHex}22;color:${winHex};font-weight:700;margin-left:4px">✓</span>`
         :'<span style="font-size:.62rem;padding:1px 6px;border-radius:8px;background:rgba(100,116,139,.15);color:#64748b;font-weight:700">!Played</span>';
       const dateVal=(STATE.matchDates&&STATE.matchDates[key])||'';
       const timeVal=(STATE.matchTimes&&STATE.matchTimes[key])||'';
@@ -695,8 +695,15 @@ function isGroupComplete(gId){
 function countHouseCompletedPairs(house){
   let n=0;
   BASE_GROUPS.forEach(bg=>{
-    if(!isGroupComplete(bg.id))return;
-    for(let pi=0;pi<3;pi++){if(getPair(bg.id,pi).h===house)n++;}
+    for(let pi=0;pi<3;pi++){
+      if(getPair(bg.id,pi).h!==house) continue;
+      const done=GROUP_MATCHES.every((m,mi)=>{
+        if(!m.includes(pi)) return true;
+        const r=calcMatchup(STATE.groupScores[`g${bg.id}_m${mi}`]);
+        return r&&r.winner!==null;
+      });
+      if(done) n++;
+    }
   });
   return n;
 }
@@ -780,7 +787,7 @@ function renderStandings(){
 
   Object.keys(HOUSES).forEach(h=>{
     hd[h].completed=countHouseCompletedPairs(h);
-    hd[h].bonus=hd[h].completed>=7?100:0;
+    hd[h].bonus=hd[h].completed>=4?100:0;
     hd[h].total=hd[h].pairs.reduce((s,p)=>s+p.res.pts,0)+hd[h].bonus;
   });
 
