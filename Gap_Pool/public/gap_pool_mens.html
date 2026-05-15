@@ -50,7 +50,7 @@ h2{font-size:1rem;font-weight:600;margin-bottom:14px;color:#f1f5f9}
 .edit-btn{padding:1px 5px;font-size:.65rem;background:#334155;color:#94a3b8;border:none;border-radius:4px;cursor:pointer;flex-shrink:0}
 .edit-btn:hover{background:#475569;color:#e2e8f0}
 .group-standings{margin-top:8px}
-.standing-row{display:flex;align-items:flex-start;gap:6px;padding:4px 5px;border-radius:6px;font-size:.75rem;margin-bottom:2px}
+.standing-row{display:flex;align-items:center;gap:6px;padding:4px 5px;border-radius:6px;font-size:.75rem;margin-bottom:2px}
 .standing-row.rank-1{background:rgba(234,179,8,.12);border:1px solid rgba(234,179,8,.25)}
 .standing-row.rank-2{background:rgba(148,163,184,.05)}
 .rank-circle{width:17px;height:17px;border-radius:50%;background:#334155;display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:700;flex-shrink:0}
@@ -63,7 +63,7 @@ h2{font-size:1rem;font-weight:600;margin-bottom:14px;color:#f1f5f9}
 .score-btn.score-btn-done:hover{background:rgba(71,85,105,.75);color:#cbd5e1}
 .match-names{font-size:.75rem;margin-bottom:4px;line-height:1.4;display:flex;flex-wrap:wrap;align-items:center;}
 .match-names .vs{color:#475569;margin:0 4px}
-.match-meta{display:flex;align-items:center;gap:5px;flex-wrap:nowrap;margin-top:5px}
+.match-meta{display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-top:5px}
 .score-txt{font-size:.65rem;color:#64748b;flex-shrink:0}
 .score-txt.done{color:#4ade80}
 .score-btn{padding:4px 10px;background:#3b82f6;color:#fff;border:none;border-radius:5px;cursor:pointer;font-size:.72rem;font-weight:600;flex-shrink:0;margin-left:auto}
@@ -566,20 +566,18 @@ function renderGroups(){
     const standHtml=st.map((p,rank)=>`
       <div class="standing-row rank-${rank+1}">
         <div class="rank-circle">${rank+1}</div>
-        <span style="flex:1;color:${hc(p.h)};font-weight:600;font-size:.72rem;min-width:0;word-break:break-word;line-height:1.3">${p.n}</span>
-        <span style="display:inline-flex;align-items:center;gap:3px;font-size:.63rem;color:${hc(p.h)};opacity:.9;flex-shrink:0;margin:0 4px">
-          <svg width="12" height="12" viewBox="0 0 12 12" style="flex-shrink:0;filter:drop-shadow(0 0 3px ${hc(p.h)}88)">
-            <defs>
-              <radialGradient id="sd_${bg.id}_${rank}" cx="36%" cy="30%" r="65%">
-                <stop offset="0%" stop-color="#fff" stop-opacity="0.9"/>
-                <stop offset="45%" stop-color="${hc(p.h)}"/>
-                <stop offset="100%" stop-color="${hc(p.h)}" stop-opacity="0.8"/>
-              </radialGradient>
-            </defs>
-            <circle cx="6" cy="6" r="5.2" fill="url(#sd_${bg.id}_${rank})"/>
-            <ellipse cx="4.1" cy="3.6" rx="1.5" ry="0.9" fill="white" opacity="0.55" transform="rotate(-20,4.1,3.6)"/>
-          </svg>${hn(p.h)}
-        </span>
+        <span style="flex:1;color:${hc(p.h)};font-weight:600;font-size:.72rem;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.n}</span>
+        <svg width="10" height="10" viewBox="0 0 12 12" style="flex-shrink:0;filter:drop-shadow(0 0 3px ${hc(p.h)}88);margin:0 3px">
+          <defs>
+            <radialGradient id="sd_${bg.id}_${rank}" cx="36%" cy="30%" r="65%">
+              <stop offset="0%" stop-color="#fff" stop-opacity="0.9"/>
+              <stop offset="45%" stop-color="${hc(p.h)}"/>
+              <stop offset="100%" stop-color="${hc(p.h)}" stop-opacity="0.8"/>
+            </radialGradient>
+          </defs>
+          <circle cx="6" cy="6" r="5.2" fill="url(#sd_${bg.id}_${rank})"/>
+          <ellipse cx="4.1" cy="3.6" rx="1.5" ry="0.9" fill="white" opacity="0.55" transform="rotate(-20,4.1,3.6)"/>
+        </svg>
         <span style="font-weight:700;color:${rank===0?'#fbbf24':'#94a3b8'};font-size:.76rem;flex-shrink:0">${p.pts.toFixed(1)}</span>
         <button class="edit-btn" style="margin-left:4px;flex-shrink:0" onclick="openNameEdit(${bg.id},${p.idx})">✏</button>
       </div>`).join('');
