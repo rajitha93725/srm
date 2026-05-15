@@ -50,7 +50,7 @@ h2{font-size:1rem;font-weight:600;margin-bottom:14px;color:#f1f5f9}
 .edit-btn{padding:1px 5px;font-size:.65rem;background:#334155;color:#94a3b8;border:none;border-radius:4px;cursor:pointer;flex-shrink:0}
 .edit-btn:hover{background:#475569;color:#e2e8f0}
 .group-standings{margin-top:8px}
-.standing-row{display:flex;align-items:center;gap:6px;padding:4px 5px;border-radius:6px;font-size:.75rem;margin-bottom:2px}
+.standing-row{display:flex;align-items:flex-start;gap:6px;padding:4px 5px;border-radius:6px;font-size:.75rem;margin-bottom:2px}
 .standing-row.rank-1{background:rgba(234,179,8,.12);border:1px solid rgba(234,179,8,.25)}
 .standing-row.rank-2{background:rgba(148,163,184,.05)}
 .rank-circle{width:17px;height:17px;border-radius:50%;background:#334155;display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:700;flex-shrink:0}
@@ -61,7 +61,7 @@ h2{font-size:1rem;font-weight:600;margin-bottom:14px;color:#f1f5f9}
 .match-row.match-done{border-left-width:3px;border-left-style:solid}
 .score-btn.score-btn-done{background:rgba(51,65,85,.6);color:#94a3b8}
 .score-btn.score-btn-done:hover{background:rgba(71,85,105,.75);color:#cbd5e1}
-.match-names{font-size:.75rem;margin-bottom:4px;line-height:1.4}
+.match-names{font-size:.75rem;margin-bottom:4px;line-height:1.4;display:flex;flex-wrap:wrap;align-items:center;}
 .match-names .vs{color:#475569;margin:0 4px}
 .match-meta{display:flex;align-items:center;gap:5px;flex-wrap:nowrap;margin-top:5px}
 .score-txt{font-size:.65rem;color:#64748b;flex-shrink:0}
@@ -566,7 +566,7 @@ function renderGroups(){
     const standHtml=st.map((p,rank)=>`
       <div class="standing-row rank-${rank+1}">
         <div class="rank-circle">${rank+1}</div>
-        <span style="flex:1;color:${hc(p.h)};font-weight:600;font-size:.75rem;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.n}</span>
+        <span style="flex:1;color:${hc(p.h)};font-weight:600;font-size:.72rem;min-width:0;word-break:break-word;line-height:1.3">${p.n}</span>
         <span style="display:inline-flex;align-items:center;gap:3px;font-size:.63rem;color:${hc(p.h)};opacity:.9;flex-shrink:0;margin:0 4px">
           <svg width="12" height="12" viewBox="0 0 12 12" style="flex-shrink:0;filter:drop-shadow(0 0 3px ${hc(p.h)}88)">
             <defs>
@@ -595,10 +595,10 @@ function renderGroups(){
       const dateDisp=fmtMatchDate(dateVal)||'—';
       return`<div class="match-row${done?' match-done':''}"${done?` style="border-left-color:${winHex}99;background:linear-gradient(90deg,${winHex}14 0%,rgba(15,23,42,0) 65%)"`:''}>
         <div class="match-names">
-          <span style="color:${hc(p1.h)};font-weight:600">${p1.n}</span>
+          <span style="color:${hc(p1.h)};font-weight:700">${p1.n}</span>
           <span class="vs">vs</span>
-          <span style="color:${hc(p2.h)};font-weight:600">${p2.n}</span>
-          <span class="score-txt ${done?'done':''}" style="margin-left:auto">${summary}</span>
+          <span style="color:${hc(p2.h)};font-weight:700">${p2.n}</span>
+          <span class="score-txt ${done?'done':''}" style="margin-left:auto;flex-shrink:0">${summary}</span>
         </div>
         <div class="match-meta">
           <span class="deadline-lbl">On or<br>before</span>

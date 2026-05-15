@@ -8,11 +8,10 @@
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Segoe UI',sans-serif;background:#06010f;color:#e2e8f0;min-height:100vh;overflow-x:hidden}
 
-/* ── Floating rocket particles ──────────────────────────────── */
+/* ── Floating rocket particles ──────────────────────────── */
 #ptc{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
 .pt{position:absolute;opacity:0;animation:pf linear infinite;font-style:normal;line-height:1;user-select:none}
 @keyframes pf{
-  /* Travel: bottom → top in first 38% of cycle, then hide and wait */
   0%    {transform:translateY(112vh) rotate(-45deg) scale(.55);opacity:0}
   5%    {opacity:.95}
   34%   {transform:translateY(-12vh) rotate(-45deg) scale(1.05);opacity:0}
@@ -20,194 +19,200 @@ body{font-family:'Segoe UI',sans-serif;background:#06010f;color:#e2e8f0;min-heig
   100%  {transform:translateY(112vh) rotate(-45deg) scale(.55);opacity:0}
 }
 
-/* ── Gapstars wordmark ──────────────────────────────────────── */
-.gs-wordmark{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:10px}
-.gs-name{font-size:clamp(1rem,3vw,1.5rem);font-weight:900;letter-spacing:6px;text-transform:uppercase;
+/* ── Gapstars wordmark ──────────────────────────────────── */
+.gs-wordmark{display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:12px}
+.gs-name{font-size:clamp(1.2rem,2.5vw,2rem);font-weight:900;letter-spacing:8px;text-transform:uppercase;
   color:#ff7a00;text-shadow:0 0 22px rgba(255,122,0,.6),0 0 44px rgba(255,80,0,.2)}
 
-/* ── Ambient blobs ──────────────────────────────────────────── */
+/* ── Ambient blobs ──────────────────────────────────────── */
 .blob{position:fixed;border-radius:50%;filter:blur(120px);opacity:.07;pointer-events:none;z-index:0}
 
-/* ── Header ─────────────────────────────────────────────────── */
-header{position:relative;z-index:10;padding:42px 24px 32px;text-align:center;
+/* ── Header ─────────────────────────────────────────────── */
+header{position:relative;z-index:10;padding:48px 24px 36px;text-align:center;
   background:linear-gradient(180deg,rgba(8,0,22,.98),rgba(6,1,16,.92));
   border-bottom:1px solid rgba(191,95,255,.18);
   box-shadow:0 4px 80px rgba(120,60,255,.08)}
 
-.crown{font-size:2rem;margin-bottom:10px;display:block;
-  filter:drop-shadow(0 0 12px rgba(255,215,0,.6))}
+.crown{font-size:2.8rem;margin-bottom:12px;display:block;
+  filter:drop-shadow(0 0 16px rgba(255,215,0,.6))}
 
 .main-title{
-  font-size:clamp(1.6rem,4.5vw,3.2rem);font-weight:900;letter-spacing:3px;
-  text-transform:uppercase;line-height:1.1;margin-bottom:14px;
+  font-size:clamp(2rem,5vw,4rem);font-weight:900;letter-spacing:4px;
+  text-transform:uppercase;line-height:1.1;margin-bottom:18px;
   background:linear-gradient(90deg,#ffd700 0%,#ffaa00 20%,#bf5fff 45%,#00d4ff 70%,#ffd700 100%);
   background-size:300%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;
   animation:tsh 7s linear infinite}
 @keyframes tsh{to{background-position:300%}}
 
-.sub-row{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;margin-bottom:6px}
-.sub-pill{font-size:.72rem;color:rgba(200,180,255,.55);letter-spacing:1.8px;
-  padding:4px 16px;border:1px solid rgba(191,95,255,.18);border-radius:20px;
-  display:inline-flex;align-items:center;gap:6px}
+.sub-row{display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;margin-bottom:6px}
+.sub-pill{font-size:.82rem;color:rgba(200,180,255,.6);letter-spacing:1.8px;
+  padding:6px 20px;border:1px solid rgba(191,95,255,.2);border-radius:20px;
+  display:inline-flex;align-items:center;gap:8px}
 .sub-pill svg{flex-shrink:0}
 
-/* ── Main ───────────────────────────────────────────────────── */
-main{position:relative;z-index:5;max-width:1060px;margin:0 auto;padding:36px 20px 60px}
+/* ── Main ───────────────────────────────────────────────── */
+main{position:relative;z-index:5;max-width:1840px;margin:0 auto;padding:44px 60px 70px}
 
-/* ── Sport section ──────────────────────────────────────────── */
-.sport-section{margin-bottom:44px}
+/* ── Two-section side-by-side ───────────────────────────── */
+.sections-row{display:grid;grid-template-columns:1fr 1fr;gap:44px}
+@media(max-width:1200px){.sections-row{grid-template-columns:1fr}}
+.sport-section{margin-bottom:0}
 
-.sport-header{display:flex;align-items:center;gap:16px;margin-bottom:18px;
-  padding:14px 22px;border-radius:14px}
+/* ── Sport section header ───────────────────────────────── */
+.sport-header{display:flex;align-items:center;gap:20px;margin-bottom:22px;
+  padding:18px 26px;border-radius:16px}
 .pool-section .sport-header{
-  background:linear-gradient(135deg,rgba(56,189,248,.06),rgba(14,116,144,.04));
-  border:1px solid rgba(56,189,248,.18)}
+  background:linear-gradient(135deg,rgba(56,189,248,.08),rgba(14,116,144,.04));
+  border:1px solid rgba(56,189,248,.2)}
 .carrom-section .sport-header{
-  background:linear-gradient(135deg,rgba(245,158,11,.06),rgba(120,60,0,.04));
-  border:1px solid rgba(245,158,11,.18)}
+  background:linear-gradient(135deg,rgba(245,158,11,.08),rgba(120,60,0,.04));
+  border:1px solid rgba(245,158,11,.2)}
 
-.sport-img{flex-shrink:0;filter:drop-shadow(0 0 14px rgba(0,0,0,.5))}
-.sport-text{}
-.sport-name{font-size:1.1rem;font-weight:800;letter-spacing:.5px}
+.sport-img{flex-shrink:0;filter:drop-shadow(0 0 16px rgba(0,0,0,.5))}
+.sport-name{font-size:1.4rem;font-weight:800;letter-spacing:.5px}
 .pool-section .sport-name{color:#38bdf8}
 .carrom-section .sport-name{color:#f59e0b}
-.sport-sub{font-size:.65rem;letter-spacing:2px;text-transform:uppercase;margin-top:3px;opacity:.45}
+.sport-sub{font-size:.72rem;letter-spacing:2px;text-transform:uppercase;margin-top:4px;opacity:.45}
 
 .sport-divider{flex:1;height:1px;margin-left:8px;
   background:linear-gradient(90deg,rgba(255,255,255,.1),transparent)}
 
-/* ── Tiles grid ─────────────────────────────────────────────── */
-.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
-@media(max-width:640px){.tiles{grid-template-columns:1fr;gap:10px}}
+/* ── Tiles grid ─────────────────────────────────────────── */
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+@media(max-width:640px){.tiles{grid-template-columns:1fr;gap:12px}}
 
-/* ── Tile ───────────────────────────────────────────────────── */
-.tile{border-radius:14px;padding:26px 20px 22px;position:relative;
+/* ── Tile ───────────────────────────────────────────────── */
+.tile{border-radius:18px;padding:44px 24px 38px;position:relative;
   overflow:hidden;border:2px solid;text-align:center;transition:transform .22s,box-shadow .22s}
 
 .tile.active{
   border-color:rgba(255,215,0,.42);cursor:pointer;
   background:linear-gradient(145deg,rgba(255,215,0,.07) 0%,rgba(160,100,0,.04) 100%);
   box-shadow:0 0 28px rgba(255,215,0,.1),0 6px 22px rgba(0,0,0,.45)}
-.tile.active:hover{transform:translateY(-6px) scale(1.025);
-  box-shadow:0 0 44px rgba(255,215,0,.22),0 18px 36px rgba(0,0,0,.45)}
+.tile.active:hover{transform:translateY(-8px) scale(1.03);
+  box-shadow:0 0 50px rgba(255,215,0,.25),0 22px 40px rgba(0,0,0,.5)}
 
-.tile.disabled{border-color:rgba(255,255,255,.06);cursor:not-allowed;
-  background:rgba(255,255,255,.018);opacity:.55}
+.tile.disabled{border-color:rgba(255,255,255,.07);cursor:pointer;
+  background:rgba(255,255,255,.018);opacity:.6;transition:opacity .2s,transform .15s}
+.tile.disabled:hover{opacity:.75;transform:scale(1.01)}
 
 /* Hover shine sweep on active tile */
 .tile-shine{position:absolute;top:0;left:-70%;width:45%;height:100%;
-  background:linear-gradient(90deg,transparent,rgba(255,255,255,.06),transparent);
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.07),transparent);
   transform:skewX(-18deg);transition:left .6s ease;pointer-events:none}
 .tile.active:hover .tile-shine{left:135%}
 
-.tile-icon-wrap{margin-bottom:12px}
+.tile-icon-wrap{margin-bottom:16px}
 
-.tile-name{font-size:1rem;font-weight:700;letter-spacing:.3px;margin-bottom:4px}
+.tile-name{font-size:1.15rem;font-weight:700;letter-spacing:.3px;margin-bottom:5px}
 .tile.active .tile-name{color:#ffd700}
 .tile.disabled .tile-name{color:#94a3b8}
 
-.tile-cat{font-size:.6rem;letter-spacing:2px;text-transform:uppercase;
-  opacity:.4;margin-bottom:13px}
+.tile-cat{font-size:.68rem;letter-spacing:2px;text-transform:uppercase;
+  opacity:.4;margin-bottom:16px}
 
-.tile-badge{display:inline-block;padding:4px 13px;border-radius:10px;
-  font-size:.65rem;font-weight:700;letter-spacing:.5px}
+.tile-badge{display:inline-block;padding:6px 16px;border-radius:10px;
+  font-size:.72rem;font-weight:700;letter-spacing:.5px}
 .badge-go{background:rgba(255,215,0,.14);color:#ffd700;border:1px solid rgba(255,215,0,.35)}
 .badge-soon{background:rgba(100,116,139,.14);color:#64748b;border:1px solid rgba(100,116,139,.22)}
 
 /* arrow pulse on active */
 .arrow-pulse{display:inline-block;margin-left:4px;animation:ap 1.2s ease-in-out infinite}
-@keyframes ap{0%,100%{transform:translateX(0)}50%{transform:translateX(3px)}}
+@keyframes ap{0%,100%{transform:translateX(0)}50%{transform:translateX(4px)}}
 
-footer{position:relative;z-index:5;text-align:center;padding:16px;
-  font-size:.62rem;color:rgba(100,116,139,.4);letter-spacing:1.5px;text-transform:uppercase;
+footer{position:relative;z-index:5;text-align:center;padding:20px;
+  font-size:.68rem;color:rgba(100,116,139,.4);letter-spacing:1.5px;text-transform:uppercase;
   border-top:1px solid rgba(255,255,255,.04)}
+
+/* ── Funny toast ────────────────────────────────────────── */
+#funny-toast{
+  position:fixed;bottom:60px;left:50%;transform:translateX(-50%) translateY(30px);
+  max-width:520px;width:90%;z-index:999;
+  background:linear-gradient(135deg,#1e1040,#0a0020);
+  border:1px solid rgba(191,95,255,.4);border-radius:16px;
+  padding:20px 24px;text-align:center;
+  box-shadow:0 8px 60px rgba(120,60,255,.35),0 0 0 1px rgba(255,255,255,.04);
+  opacity:0;pointer-events:none;
+  transition:opacity .35s ease,transform .35s ease}
+#funny-toast.show{opacity:1;pointer-events:auto;transform:translateX(-50%) translateY(0)}
+#funny-toast .toast-emoji{font-size:2.2rem;display:block;margin-bottom:10px}
+#funny-toast .toast-msg{font-size:.9rem;line-height:1.55;color:#d4b8ff;font-weight:500}
+#funny-toast .toast-close{
+  margin-top:14px;display:inline-block;font-size:.7rem;letter-spacing:1.5px;
+  color:rgba(191,95,255,.5);cursor:pointer;text-transform:uppercase;
+  border:1px solid rgba(191,95,255,.2);border-radius:8px;padding:4px 12px;
+  transition:.2s}
+#funny-toast .toast-close:hover{color:#c084fc;border-color:rgba(191,95,255,.5)}
 </style>
 </head>
 <body>
 
-<div class="blob" style="width:520px;height:520px;background:#2a00bb;top:-140px;left:-130px"></div>
-<div class="blob" style="width:400px;height:400px;background:#004f80;bottom:-80px;right:-100px"></div>
-<div class="blob" style="width:280px;height:280px;background:#5a0030;top:48%;left:50%;transform:translate(-50%,-50%)"></div>
-<div class="blob" style="width:320px;height:320px;background:#cc4400;top:-60px;left:50%;transform:translateX(-50%);opacity:.06"></div>
+<div class="blob" style="width:600px;height:600px;background:#2a00bb;top:-160px;left:-160px"></div>
+<div class="blob" style="width:480px;height:480px;background:#004f80;bottom:-100px;right:-120px"></div>
+<div class="blob" style="width:320px;height:320px;background:#5a0030;top:48%;left:50%;transform:translate(-50%,-50%)"></div>
+<div class="blob" style="width:380px;height:380px;background:#cc4400;top:-80px;left:50%;transform:translateX(-50%);opacity:.06"></div>
 <div id="ptc"></div>
 
-<!-- ═══════ HEADER ══════════════════════════════════════════════ -->
+<!-- ═══════ HEADER ═══════════════════════════════════════════ -->
 <header>
   <div class="gs-wordmark">
-    <span style="font-size:2.2rem;filter:drop-shadow(0 0 10px rgba(255,215,0,.7))">🏆</span>
+    <span style="font-size:2.8rem;filter:drop-shadow(0 0 14px rgba(255,215,0,.7))">🏆</span>
     <span class="gs-name">Gapstars</span>
-    <span style="font-size:2.2rem;filter:drop-shadow(0 0 10px rgba(255,215,0,.7))">🏆</span>
+    <span style="font-size:2.8rem;filter:drop-shadow(0 0 14px rgba(255,215,0,.7))">🏆</span>
   </div>
   <div class="main-title">Grand Table Clash</div>
   <div class="sub-row">
     <span class="sub-pill">
-      <!-- mini pool ball -->
-      <svg width="14" height="14" viewBox="0 0 14 14"><circle cx="7" cy="7" r="6.5" fill="#1a6b2e"/><circle cx="7" cy="7" r="3.5" fill="#1e1e1e"/><circle cx="7" cy="7" r="1.8" fill="white"/></svg>
+      <svg width="16" height="16" viewBox="0 0 14 14"><circle cx="7" cy="7" r="6.5" fill="#1a6b2e"/><circle cx="7" cy="7" r="3.5" fill="#1e1e1e"/><circle cx="7" cy="7" r="1.8" fill="white"/></svg>
       Gapstars Pool Tournament 2026
     </span>
-    <span style="color:rgba(191,95,255,.25);font-size:.8rem">·</span>
+    <span style="color:rgba(191,95,255,.25);font-size:1rem">·</span>
     <span class="sub-pill">
-      <!-- mini carrom coin -->
-      <svg width="14" height="14" viewBox="0 0 14 14"><rect x="0" y="0" width="14" height="14" rx="2.5" fill="#8b5e2a"/><rect x="2" y="2" width="10" height="10" rx="1.5" fill="#d4a55a"/><circle cx="7" cy="7" r="2.5" fill="none" stroke="#b8862e" stroke-width=".8"/><circle cx="7" cy="7" r="1" fill="#ef4444"/></svg>
+      <svg width="16" height="16" viewBox="0 0 14 14"><rect x="0" y="0" width="14" height="14" rx="2.5" fill="#8b5e2a"/><rect x="2" y="2" width="10" height="10" rx="1.5" fill="#d4a55a"/><circle cx="7" cy="7" r="2.5" fill="none" stroke="#b8862e" stroke-width=".8"/><circle cx="7" cy="7" r="1" fill="#ef4444"/></svg>
       Gapstars Carrom Tournament 2026
     </span>
   </div>
 </header>
 
-<!-- ═══════ MAIN ════════════════════════════════════════════════ -->
+<!-- ═══════ MAIN ═════════════════════════════════════════════ -->
 <main>
+<div class="sections-row">
 
-  <!-- ── POOL SECTION ────────────────────────────────────────── -->
+  <!-- ── POOL SECTION ───────────────────────────────────────── -->
   <div class="sport-section pool-section">
     <div class="sport-header">
-
-      <!-- Pool table top-down SVG -->
-      <svg class="sport-img" width="96" height="60" viewBox="0 0 96 60" xmlns="http://www.w3.org/2000/svg">
-        <!-- outer cushion / wood frame -->
+      <svg class="sport-img" width="110" height="68" viewBox="0 0 96 60" xmlns="http://www.w3.org/2000/svg">
         <rect x="0" y="0" width="96" height="60" rx="9" fill="#5a3010"/>
         <rect x="1.5" y="1.5" width="93" height="57" rx="8" fill="none" stroke="#8b5e30" stroke-width="1.2"/>
-        <!-- felt -->
         <rect x="8" y="8" width="80" height="44" rx="4" fill="#1a6b2e" stroke="#0d4018" stroke-width="1"/>
-        <!-- felt texture (subtle diagonal lines) -->
         <rect x="8" y="8" width="80" height="44" rx="4" fill="url(#felt)" opacity=".18"/>
         <defs>
           <pattern id="felt" patternUnits="userSpaceOnUse" width="4" height="4" patternTransform="rotate(45)">
             <line x1="0" y1="0" x2="0" y2="4" stroke="white" stroke-width=".4" opacity=".5"/>
           </pattern>
         </defs>
-        <!-- 6 pockets -->
         <circle cx="8"  cy="8"  r="5.5" fill="#1a0800" stroke="#3a1800" stroke-width=".6"/>
         <circle cx="48" cy="8"  r="4.2" fill="#1a0800" stroke="#3a1800" stroke-width=".6"/>
         <circle cx="88" cy="8"  r="5.5" fill="#1a0800" stroke="#3a1800" stroke-width=".6"/>
         <circle cx="8"  cy="52" r="5.5" fill="#1a0800" stroke="#3a1800" stroke-width=".6"/>
         <circle cx="48" cy="52" r="4.2" fill="#1a0800" stroke="#3a1800" stroke-width=".6"/>
         <circle cx="88" cy="52" r="5.5" fill="#1a0800" stroke="#3a1800" stroke-width=".6"/>
-        <!-- centre spot & line -->
         <line x1="48" y1="9" x2="48" y2="51" stroke="rgba(255,255,255,.1)" stroke-width=".8"/>
         <circle cx="48" cy="30" r="7" fill="none" stroke="rgba(255,255,255,.14)" stroke-width=".9"/>
         <circle cx="48" cy="30" r="1.2" fill="rgba(255,255,255,.2)"/>
-        <!-- D arc (left) -->
         <path d="M28,18 A16,16 0 0,1 28,42" fill="none" stroke="rgba(255,255,255,.1)" stroke-width=".8"/>
-        <!-- baulk line -->
         <line x1="28" y1="9" x2="28" y2="51" stroke="rgba(255,255,255,.08)" stroke-width=".7"/>
-        <!-- ball triangle (right side) -->
-        <!-- row 1 -->
-        <circle cx="68" cy="30" r="3.6" fill="#1e1e1e" stroke="#444" stroke-width=".5"/><!-- 8-ball -->
+        <circle cx="68" cy="30" r="3.6" fill="#1e1e1e" stroke="#444" stroke-width=".5"/>
         <circle cx="68" cy="30" r="1.8" fill="white"/>
-        <!-- row 2 -->
         <circle cx="74" cy="26.5" r="3.6" fill="#ef4444"/>
         <circle cx="74" cy="33.5" r="3.6" fill="#fbbf24"/>
-        <!-- row 3 -->
         <circle cx="80" cy="23" r="3.6" fill="#3b82f6"/>
         <circle cx="80" cy="30" r="3.6" fill="#8b5cf6"/>
         <circle cx="80" cy="37" r="3.6" fill="#22c55e"/>
-        <!-- cue ball -->
         <circle cx="22" cy="30" r="3.6" fill="#f8fafc" stroke="rgba(0,0,0,.2)" stroke-width=".5"/>
-        <!-- cue stick -->
         <line x1="8" y1="36" x2="18" y2="31.5" stroke="#d4a855" stroke-width="2.5" stroke-linecap="round" opacity=".9"/>
         <line x1="8" y1="36" x2="9.5" y2="35.4" stroke="#f0d090" stroke-width="3" stroke-linecap="round"/>
       </svg>
-
       <div class="sport-text">
         <div class="sport-name">Pool Tournament</div>
         <div class="sport-sub">Gapstars 2026 · Mens · Mixed · Womens</div>
@@ -220,7 +225,7 @@ footer{position:relative;z-index:5;text-align:center;padding:16px;
       <div class="tile active" onclick="window.location.href='gap_pool_mens.html'">
         <div class="tile-shine"></div>
         <div class="tile-icon-wrap">
-          <svg width="48" height="48" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+          <svg width="68" height="68" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
             <circle cx="24" cy="24" r="22" fill="#1a6b2e" stroke="#ffd700" stroke-width="1.5"/>
             <circle cx="24" cy="24" r="9" fill="#1e1e1e"/>
             <circle cx="24" cy="24" r="4.5" fill="white"/>
@@ -240,7 +245,7 @@ footer{position:relative;z-index:5;text-align:center;padding:16px;
       <div class="tile active" onclick="window.location.href='gap_pool_mixed.html'">
         <div class="tile-shine"></div>
         <div class="tile-icon-wrap">
-          <svg width="48" height="48" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+          <svg width="68" height="68" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
             <circle cx="24" cy="24" r="22" fill="#1a3b6e" stroke="#a78bfa" stroke-width="1.5"/>
             <circle cx="24" cy="24" r="9" fill="#1e1e1e"/>
             <circle cx="24" cy="24" r="4.5" fill="white"/>
@@ -257,9 +262,9 @@ footer{position:relative;z-index:5;text-align:center;padding:16px;
       </div>
 
       <!-- DISABLED: Pool Womens Double -->
-      <div class="tile disabled">
+      <div class="tile disabled" onclick="showFunny('pool-womens')">
         <div class="tile-icon-wrap">
-          <svg width="48" height="48" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" opacity=".5">
+          <svg width="68" height="68" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" opacity=".5">
             <circle cx="24" cy="24" r="22" fill="#1a3b4e" stroke="#334155" stroke-width="1.5"/>
             <circle cx="24" cy="24" r="9" fill="#1e293b"/>
             <circle cx="24" cy="24" r="4.5" fill="#334155"/>
@@ -276,50 +281,36 @@ footer{position:relative;z-index:5;text-align:center;padding:16px;
     </div>
   </div>
 
-  <!-- ── CARROM SECTION ──────────────────────────────────────── -->
+  <!-- ── CARROM SECTION ─────────────────────────────────────── -->
   <div class="sport-section carrom-section">
     <div class="sport-header">
-
-      <!-- Carrom board top-down SVG -->
-      <svg class="sport-img" width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
-        <!-- board outer frame -->
+      <svg class="sport-img" width="68" height="68" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
         <rect x="0" y="0" width="60" height="60" rx="6" fill="#7a4e1e"/>
         <rect x="1.5" y="1.5" width="57" height="57" rx="5" fill="none" stroke="#a0702a" stroke-width="1"/>
-        <!-- playing surface -->
         <rect x="5" y="5" width="50" height="50" rx="3" fill="#d4a55a" stroke="#b8862e" stroke-width=".8"/>
-        <!-- inner border line -->
         <rect x="9" y="9" width="42" height="42" rx="2" fill="none" stroke="#b07828" stroke-width=".9"/>
-        <!-- diagonal lines (corner-to-corner arrows) -->
         <line x1="9" y1="9"  x2="51" y2="51" stroke="#b07828" stroke-width=".5" opacity=".4"/>
         <line x1="51" y1="9" x2="9"  y2="51" stroke="#b07828" stroke-width=".5" opacity=".4"/>
-        <!-- 4 corner pockets -->
         <circle cx="9"  cy="9"  r="4.5" fill="#5a3010" stroke="#3a1800" stroke-width=".6"/>
         <circle cx="51" cy="9"  r="4.5" fill="#5a3010" stroke="#3a1800" stroke-width=".6"/>
         <circle cx="9"  cy="51" r="4.5" fill="#5a3010" stroke="#3a1800" stroke-width=".6"/>
         <circle cx="51" cy="51" r="4.5" fill="#5a3010" stroke="#3a1800" stroke-width=".6"/>
-        <!-- center circle -->
         <circle cx="30" cy="30" r="10" fill="none" stroke="#c0892a" stroke-width="1.2"/>
         <circle cx="30" cy="30" r="4"  fill="none" stroke="#c0892a" stroke-width=".9"/>
-        <!-- queen (red) -->
         <circle cx="30" cy="30" r="2.6" fill="#ef4444" stroke="#cc2222" stroke-width=".5"/>
-        <!-- black coins ring -->
         <circle cx="30" cy="20" r="2.6" fill="#1e1e1e" stroke="#555" stroke-width=".6"/>
         <circle cx="40" cy="30" r="2.6" fill="#1e1e1e" stroke="#555" stroke-width=".6"/>
         <circle cx="30" cy="40" r="2.6" fill="#1e1e1e" stroke="#555" stroke-width=".6"/>
         <circle cx="20" cy="30" r="2.6" fill="#1e1e1e" stroke="#555" stroke-width=".6"/>
-        <!-- white coins -->
         <circle cx="35" cy="25" r="2.6" fill="#f8fafc" stroke="#ccc" stroke-width=".6"/>
         <circle cx="25" cy="25" r="2.6" fill="#f8fafc" stroke="#ccc" stroke-width=".6"/>
         <circle cx="25" cy="35" r="2.6" fill="#f8fafc" stroke="#ccc" stroke-width=".6"/>
         <circle cx="35" cy="35" r="2.6" fill="#f8fafc" stroke="#ccc" stroke-width=".6"/>
-        <!-- striker (bottom) -->
         <circle cx="30" cy="48" r="3.8" fill="#d4a0ff" stroke="#9b59b6" stroke-width=".9"/>
         <circle cx="30" cy="48" r="1.5" fill="rgba(180,120,255,.4)"/>
-        <!-- striker baseline -->
         <line x1="18" y1="48" x2="26" y2="48" stroke="#b07828" stroke-width=".7"/>
         <line x1="34" y1="48" x2="42" y2="48" stroke="#b07828" stroke-width=".7"/>
       </svg>
-
       <div class="sport-text">
         <div class="sport-name">Carrom Tournament</div>
         <div class="sport-sub">Gapstars 2026 · Mens · Mixed · Womens</div>
@@ -329,9 +320,9 @@ footer{position:relative;z-index:5;text-align:center;padding:16px;
 
     <div class="tiles">
       <!-- DISABLED: Carrom Mens Double -->
-      <div class="tile disabled">
+      <div class="tile disabled" onclick="showFunny('carrom-mens')">
         <div class="tile-icon-wrap">
-          <svg width="48" height="48" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" opacity=".5">
+          <svg width="68" height="68" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" opacity=".5">
             <rect x="2" y="2" width="44" height="44" rx="6" fill="#2a1a08"/>
             <rect x="6" y="6" width="36" height="36" rx="4" fill="#4a3018"/>
             <circle cx="24" cy="24" r="7" fill="none" stroke="#5a4028" stroke-width="1.2"/>
@@ -348,9 +339,9 @@ footer{position:relative;z-index:5;text-align:center;padding:16px;
       </div>
 
       <!-- DISABLED: Carrom Mixed Double -->
-      <div class="tile disabled">
+      <div class="tile disabled" onclick="showFunny('carrom-mixed')">
         <div class="tile-icon-wrap">
-          <svg width="48" height="48" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" opacity=".5">
+          <svg width="68" height="68" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" opacity=".5">
             <rect x="2" y="2" width="44" height="44" rx="6" fill="#2a1a08"/>
             <rect x="6" y="6" width="36" height="36" rx="4" fill="#4a3018"/>
             <circle cx="24" cy="24" r="7" fill="none" stroke="#5a4028" stroke-width="1.2"/>
@@ -367,9 +358,9 @@ footer{position:relative;z-index:5;text-align:center;padding:16px;
       </div>
 
       <!-- DISABLED: Carrom Womens Double -->
-      <div class="tile disabled">
+      <div class="tile disabled" onclick="showFunny('carrom-womens')">
         <div class="tile-icon-wrap">
-          <svg width="48" height="48" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" opacity=".5">
+          <svg width="68" height="68" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" opacity=".5">
             <rect x="2" y="2" width="44" height="44" rx="6" fill="#2a1a08"/>
             <rect x="6" y="6" width="36" height="36" rx="4" fill="#4a3018"/>
             <circle cx="24" cy="24" r="7" fill="none" stroke="#5a4028" stroke-width="1.2"/>
@@ -387,38 +378,74 @@ footer{position:relative;z-index:5;text-align:center;padding:16px;
     </div>
   </div>
 
+</div><!-- end sections-row -->
 </main>
 
 <footer>Hosted by Stargazers &nbsp;·&nbsp; Gapstars Grand Table Clash 2026</footer>
 
+<!-- ── Funny toast ─────────────────────────────────────────── -->
+<div id="funny-toast">
+  <span class="toast-emoji" id="toast-emoji"></span>
+  <div class="toast-msg" id="toast-msg"></div>
+  <div class="toast-close" onclick="hideToast()">got it, close ✕</div>
+</div>
+
 <script>
-// Rockets launch in waves — quiet gaps between bursts
+// ── Rockets ──────────────────────────────────────────────────
 (function(){
-  const c = document.getElementById('ptc');
-  const CYCLE = 24; // seconds per full cycle (travel ~8.2s, then hidden ~15.8s)
-  // 3 waves per cycle — spaced to keep clear quiet gaps between bursts
-  const waves = [
-    { base: 0,    count: 5 },   // launch burst at t=0s
-    { base: 9,    count: 4 },   // launch burst at t=9s
-    { base: 17,   count: 4 },   // launch burst at t=17s
-    // next cycle starts at t=24s → ~7s quiet after last wave
-  ];
-  waves.forEach(wave => {
-    for(let j = 0; j < wave.count; j++){
-      const p = document.createElement('span'); p.className = 'pt';
-      const sz = Math.random() * 14 + 16; // 16–30px
-      p.textContent = '🚀';
-      p.style.cssText =
+  const c=document.getElementById('ptc');
+  const CYCLE=24;
+  const waves=[{base:0,count:5},{base:9,count:4},{base:17,count:4}];
+  waves.forEach(wave=>{
+    for(let j=0;j<wave.count;j++){
+      const p=document.createElement('span'); p.className='pt';
+      const sz=Math.random()*14+16;
+      p.textContent='🚀';
+      p.style.cssText=
         `left:${Math.random()*88+5}%;`+
         `font-size:${sz}px;`+
         `animation-duration:${CYCLE}s;`+
-        `animation-delay:${wave.base + j * 0.28}s;`+
+        `animation-delay:${wave.base+j*0.28}s;`+
         `filter:drop-shadow(0 0 ${Math.round(sz*.38)}px rgba(255,110,0,.85));`+
         `opacity:0`;
       c.appendChild(p);
     }
   });
 })();
+
+// ── Funny messages ────────────────────────────────────────────
+const FUNNY={
+  'pool-womens':{
+    emoji:'🎱',
+    msg:"Women's Double is in the pipeline. Watch this space — good things take time."
+  },
+  'carrom-mens':{
+    emoji:'🪙',
+    msg:"Carrom Men's Double is coming. The board is ready; we're just waiting on the players."
+  },
+  'carrom-mixed':{
+    emoji:'🎯',
+    msg:"Carrom Mixed Double is on the way. Coordination takes a little longer — ask any team."
+  },
+  'carrom-womens':{
+    emoji:'👑',
+    msg:"Carrom Women's Double is being set up. Patience — greatness doesn't rush."
+  }
+};
+
+let toastTimer=null;
+function showFunny(key){
+  const d=FUNNY[key]; if(!d) return;
+  document.getElementById('toast-emoji').textContent=d.emoji;
+  document.getElementById('toast-msg').textContent=d.msg;
+  const t=document.getElementById('funny-toast');
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(hideToast,5000);
+}
+function hideToast(){
+  document.getElementById('funny-toast').classList.remove('show');
+}
 </script>
 </body>
 </html>
