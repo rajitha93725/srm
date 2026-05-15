@@ -36,8 +36,7 @@ h2{font-size:1rem;font-weight:600;margin-bottom:14px;color:#f1f5f9}
 /* Groups */
 .groups-wrap{overflow-x:auto}
 .groups-grid{display:grid;grid-template-columns:repeat(6,minmax(155px,1fr));gap:9px}
-@media(max-width:1300px){.groups-grid{grid-template-columns:repeat(4,minmax(155px,1fr))}}
-@media(max-width:860px){.groups-grid{grid-template-columns:repeat(3,minmax(155px,1fr))}}
+@media(max-width:1000px){.groups-grid{grid-template-columns:repeat(3,minmax(155px,1fr))}}
 @media(max-width:600px){.groups-grid{grid-template-columns:repeat(2,minmax(140px,1fr))}}
 @media(max-width:380px){.groups-grid{grid-template-columns:1fr}}
 .group-card{background:#1e293b;border:1px solid #334155;border-radius:10px;overflow:hidden}
@@ -233,7 +232,10 @@ h2{font-size:1rem;font-weight:600;margin-bottom:14px;color:#f1f5f9}
 <input type="file" id="import-file" accept=".json" style="display:none" onchange="handleImport(event)">
 
 <div id="tab-groups" class="section active">
-  <h2>Group Stage League</h2>
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px">
+    <h2 style="margin-bottom:0">Group Stage League</h2>
+    <span id="match-count-display" style="font-size:.78rem;color:#64748b;font-weight:600;background:#1e293b;padding:4px 12px;border-radius:8px;border:1px solid #334155"></span>
+  </div>
   <div class="groups-wrap"><div class="groups-grid" id="groups-container"></div></div>
 </div>
 
@@ -552,6 +554,13 @@ function genTimeOpts(selected){
 
 // ── Render Groups ─────────────────────────────────────────────────────────────
 function renderGroups(){
+  const totalM=BASE_GROUPS.length*GROUP_MATCHES.length;
+  const playedM=BASE_GROUPS.reduce((n,bg)=>n+GROUP_MATCHES.filter((_,mi)=>{
+    const r=calcMatchup(STATE.groupScores[`g${bg.id}_m${mi}`]);
+    return r&&r.winner!==null;
+  }).length,0);
+  const el=document.getElementById('match-count-display');
+  if(el) el.textContent=`${playedM} / ${totalM} matches played`;
   document.getElementById('groups-container').innerHTML=BASE_GROUPS.map(bg=>{
     const grp=getGroup(bg.id), st=getGroupStandings(bg.id);
     const standHtml=st.map((p,rank)=>`
@@ -787,7 +796,7 @@ function renderStandings(){
 
   Object.keys(HOUSES).forEach(h=>{
     hd[h].completed=countHouseCompletedPairs(h);
-    hd[h].bonus=hd[h].completed>=4?100:0;
+    hd[h].bonus=hd[h].completed>=7?100:0;
     hd[h].total=hd[h].pairs.reduce((s,p)=>s+p.res.pts,0)+hd[h].bonus;
   });
 
