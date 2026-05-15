@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trivia Night · Gapstars 2026</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',sans-serif;background:#0a0014;color:#e2e8f0;min-height:100vh}
+:root{--orion:#60a5fa;--aquilla:#a78bfa;--cygnus:#f87171;--draco:#4ade80;
+  --orion-d:#1e3a8a;--aquilla-d:#4c1d95;--cygnus-d:#7f1d1d;--draco-d:#14532d}
+
+/* Header */
+header{background:linear-gradient(135deg,#12001f,#0a0014);border-bottom:1px solid rgba(192,132,252,.2);
+  padding:16px 32px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.back-btn{padding:6px 14px;border-radius:8px;font-size:.75rem;font-weight:600;cursor:pointer;
+  border:1px solid rgba(100,116,139,.3);background:rgba(100,116,139,.1);color:#94a3b8;
+  text-decoration:none;transition:.2s}
+.back-btn:hover{background:rgba(100,116,139,.2);color:#e2e8f0}
+.hdr-title{font-size:1.6rem;font-weight:900;letter-spacing:2px;
+  background:linear-gradient(90deg,#c084fc,#818cf8,#67e8f9);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hdr-sub{font-size:.7rem;color:#475569;letter-spacing:2px;text-transform:uppercase;margin-left:auto}
+
+/* Layout */
+.page-wrap{display:grid;grid-template-columns:1fr 320px;gap:0;min-height:calc(100vh - 65px)}
+@media(max-width:1100px){.page-wrap{grid-template-columns:1fr}}
+.main-col{padding:24px 28px;overflow-y:auto}
+.side-col{background:#0d0020;border-left:1px solid rgba(192,132,252,.12);
+  padding:20px;position:sticky;top:0;height:calc(100vh - 65px);overflow-y:auto}
+@media(max-width:1100px){.side-col{position:static;height:auto;border-left:none;border-top:1px solid rgba(192,132,252,.12)}}
+
+/* Team names section */
+.section-title{font-size:.72rem;font-weight:700;color:#475569;letter-spacing:2px;
+  text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.section-title::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.06)}
+.teams-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:28px}
+@media(max-width:900px){.teams-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:500px){.teams-grid{grid-template-columns:1fr}}
+.team-card{border-radius:12px;padding:14px 14px;border:1px solid}
+.team-card.orion{background:rgba(96,165,250,.05);border-color:rgba(96,165,250,.2)}
+.team-card.aquilla{background:rgba(167,139,250,.05);border-color:rgba(167,139,250,.2)}
+.team-card.cygnus{background:rgba(248,113,113,.05);border-color:rgba(248,113,113,.2)}
+.team-card.draco{background:rgba(74,222,128,.05);border-color:rgba(74,222,128,.2)}
+.tc-house{font-size:.8rem;font-weight:800;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px}
+.orion .tc-house{color:var(--orion)}.aquilla .tc-house{color:var(--aquilla)}
+.cygnus .tc-house{color:var(--cygnus)}.draco .tc-house{color:var(--draco)}
+.tc-field{margin-bottom:8px}
+.tc-label{font-size:.62rem;color:#475569;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px}
+.tc-input{width:100%;background:#0f172a;border:1px solid #334155;border-radius:7px;
+  color:#e2e8f0;font-size:.82rem;font-weight:600;padding:7px 10px;outline:none;
+  font-family:inherit;transition:.2s}
+.tc-input:focus{border-color:rgba(192,132,252,.4)}
+
+/* Segment tabs */
+.seg-tabs{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:20px;
+  background:#0d0020;border-radius:12px;padding:6px}
+.seg-tab{padding:8px 16px;border-radius:8px;cursor:pointer;font-size:.78rem;font-weight:600;
+  color:#64748b;border:none;background:transparent;white-space:nowrap;transition:.2s;font-family:inherit}
+.seg-tab:hover{background:rgba(192,132,252,.1);color:#c084fc}
+.seg-tab.active{background:rgba(192,132,252,.18);color:#c084fc;border:1px solid rgba(192,132,252,.3)}
+.seg-panel{display:none}.seg-panel.active{display:block}
+
+/* Segment rule banner */
+.rule-banner{background:rgba(192,132,252,.06);border:1px solid rgba(192,132,252,.15);
+  border-radius:10px;padding:12px 16px;margin-bottom:18px;font-size:.75rem;
+  color:#94a3b8;line-height:1.6}
+.rule-banner strong{color:#c084fc}
+
+/* Score tables */
+.score-table{width:100%;border-collapse:collapse;font-size:.82rem}
+.score-table th{background:#12001f;padding:10px 12px;text-align:left;
+  color:#475569;font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+.score-table td{padding:8px 10px;border-bottom:1px solid rgba(255,255,255,.04)}
+.score-table tr:last-child td{border-bottom:none}
+.score-table tr:hover td{background:rgba(255,255,255,.02)}
+.house-cell{font-weight:700;font-size:.85rem;min-width:80px}
+.orion-clr{color:var(--orion)}.aquilla-clr{color:var(--aquilla)}
+.cygnus-clr{color:var(--cygnus)}.draco-clr{color:var(--draco)}
+.team-name-cell{font-size:.75rem;color:#94a3b8;min-width:100px;max-width:130px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.score-input{width:80px;background:#0f172a;border:1px solid #334155;border-radius:6px;
+  color:#e2e8f0;font-size:.85rem;font-weight:700;padding:5px 8px;outline:none;
+  font-family:inherit;text-align:center;transition:.2s}
+.score-input:focus{border-color:rgba(192,132,252,.4);background:#12001f}
+.house-avg{font-weight:700;font-size:.88rem;min-width:70px;text-align:right;padding-right:8px}
+.seg-total-row td{background:rgba(192,132,252,.04);font-weight:700}
+
+/* Bonus */
+.bonus-info{font-size:.75rem;color:#64748b;margin-bottom:4px}
+
+/* Leaderboard sidebar */
+.lb-title{font-size:.72rem;font-weight:700;color:#475569;letter-spacing:2px;
+  text-transform:uppercase;margin-bottom:16px}
+.lb-house-card{border-radius:12px;padding:14px 16px;margin-bottom:12px;border:1px solid}
+.lb-house-card.orion{background:rgba(96,165,250,.06);border-color:rgba(96,165,250,.2)}
+.lb-house-card.aquilla{background:rgba(167,139,250,.06);border-color:rgba(167,139,250,.2)}
+.lb-house-card.cygnus{background:rgba(248,113,113,.06);border-color:rgba(248,113,113,.2)}
+.lb-house-card.draco{background:rgba(74,222,128,.06);border-color:rgba(74,222,128,.2)}
+.lb-rank-name{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.lb-rank-emoji{font-size:1.1rem}
+.lb-house-label{font-size:.82rem;font-weight:800;text-transform:uppercase;letter-spacing:1px}
+.orion .lb-house-label{color:var(--orion)}.aquilla .lb-house-label{color:var(--aquilla)}
+.cygnus .lb-house-label{color:var(--cygnus)}.draco .lb-house-label{color:var(--draco)}
+.lb-total{font-size:2rem;font-weight:900;line-height:1}
+.orion .lb-total{color:var(--orion)}.aquilla .lb-total{color:var(--aquilla)}
+.cygnus .lb-total{color:var(--cygnus)}.draco .lb-total{color:var(--draco)}
+.lb-seg-breakdown{margin-top:8px;font-size:.68rem;color:#475569;line-height:1.7}
+.lb-bar-wrap{background:#1e293b;border-radius:6px;height:6px;margin-top:8px;overflow:hidden}
+.lb-bar{height:100%;border-radius:6px;transition:width .4s}
+.orion .lb-bar{background:#1d4ed8}.aquilla .lb-bar{background:#6d28d9}
+.cygnus .lb-bar{background:#b91c1c}.draco .lb-bar{background:#15803d}
+
+.save-btn{width:100%;margin-top:16px;padding:11px;border-radius:10px;font-size:.82rem;
+  font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:1px;transition:.2s;
+  background:rgba(192,132,252,.12);color:#c084fc;border:1px solid rgba(192,132,252,.3)}
+.save-btn:hover{background:rgba(192,132,252,.22)}
+.saved-msg{text-align:center;font-size:.68rem;color:#4ade80;margin-top:6px;
+  opacity:0;transition:opacity .3s}
+.saved-msg.show{opacity:1}
+</style>
+</head>
+<body>
+
+<header>
+  <a class="back-btn" href="index.html">← Back</a>
+  <span class="hdr-title">🧠 Trivia Night</span>
+  <span class="hdr-sub">Gapstars 2026 · 6 Segments · 4 Houses</span>
+</header>
+
+<div class="page-wrap">
+
+<!-- ── MAIN COL ───────────────────────────────────────────── -->
+<div class="main-col">
+
+  <!-- Team Names -->
+  <div class="section-title">House Teams</div>
+  <div class="teams-grid">
+    <div class="team-card orion">
+      <div class="tc-house">⭐ Orion</div>
+      <div class="tc-field"><div class="tc-label">Team A Name</div>
+        <input class="tc-input" id="tn-orion-a" placeholder="Team A" oninput="saveData();renderNames()"></div>
+      <div class="tc-field"><div class="tc-label">Team B Name</div>
+        <input class="tc-input" id="tn-orion-b" placeholder="Team B" oninput="saveData();renderNames()"></div>
+    </div>
+    <div class="team-card aquilla">
+      <div class="tc-house">🦅 Aquilla</div>
+      <div class="tc-field"><div class="tc-label">Team A Name</div>
+        <input class="tc-input" id="tn-aquilla-a" placeholder="Team A" oninput="saveData();renderNames()"></div>
+      <div class="tc-field"><div class="tc-label">Team B Name</div>
+        <input class="tc-input" id="tn-aquilla-b" placeholder="Team B" oninput="saveData();renderNames()"></div>
+    </div>
+    <div class="team-card cygnus">
+      <div class="tc-house">🦢 Cygnus</div>
+      <div class="tc-field"><div class="tc-label">Team A Name</div>
+        <input class="tc-input" id="tn-cygnus-a" placeholder="Team A" oninput="saveData();renderNames()"></div>
+      <div class="tc-field"><div class="tc-label">Team B Name</div>
+        <input class="tc-input" id="tn-cygnus-b" placeholder="Team B" oninput="saveData();renderNames()"></div>
+    </div>
+    <div class="team-card draco">
+      <div class="tc-house">🐉 Draco</div>
+      <div class="tc-field"><div class="tc-label">Team A Name</div>
+        <input class="tc-input" id="tn-draco-a" placeholder="Team A" oninput="saveData();renderNames()"></div>
+      <div class="tc-field"><div class="tc-label">Team B Name</div>
+        <input class="tc-input" id="tn-draco-b" placeholder="Team B" oninput="saveData();renderNames()"></div>
+    </div>
+  </div>
+
+  <!-- Segment Tabs -->
+  <div class="seg-tabs">
+    <button class="seg-tab active" onclick="switchSeg('sprint',this)">S1 · Sprint</button>
+    <button class="seg-tab" onclick="switchSeg('dingbats',this)">S2 · Dingbats</button>
+    <button class="seg-tab" onclick="switchSeg('shots',this)">S3 · Shots</button>
+    <button class="seg-tab" onclick="switchSeg('hangman',this)">S4 · Hangman</button>
+    <button class="seg-tab" onclick="switchSeg('gk',this)">S5 · General Knowledge</button>
+    <button class="seg-tab" onclick="switchSeg('bonus',this)">S6 · Bonus Round</button>
+  </div>
+
+  <!-- S1: Sprint -->
+  <div class="seg-panel active" id="panel-sprint">
+    <div class="rule-banner">
+      <strong>Segment 1 — The Sprint</strong><br>
+      20 maths questions per team. Enter <strong>correct answers</strong> (0–20) for each team.
+      House score = <strong>(Team A correct + Team B correct) ÷ 2</strong>, then × 5 pts.
+    </div>
+    <table class="score-table">
+      <thead><tr>
+        <th>House</th><th>Team A</th><th>Correct (0–20)</th>
+        <th>Team B</th><th>Correct (0–20)</th><th style="text-align:right">House Pts</th>
+      </tr></thead>
+      <tbody id="sprint-rows"></tbody>
+    </table>
+  </div>
+
+  <!-- S2: Dingbats -->
+  <div class="seg-panel" id="panel-dingbats">
+    <div class="rule-banner">
+      <strong>Segment 2 — Dingbats</strong><br>
+      10 picture puzzles. Buzzer to answer. <strong>+10</strong> correct · <strong>−5</strong> wrong (buzzer &amp; incorrect).
+      Second team gets the chance if first is wrong. Enter each team's final score.
+    </div>
+    <table class="score-table">
+      <thead><tr>
+        <th>House</th><th>Team A</th><th>Score</th>
+        <th>Team B</th><th>Score</th><th style="text-align:right">House Total</th>
+      </tr></thead>
+      <tbody id="dingbats-rows"></tbody>
+    </table>
+  </div>
+
+  <!-- S3: Shots -->
+  <div class="seg-panel" id="panel-shots">
+    <div class="rule-banner">
+      <strong>Segment 3 — Shots for Losers</strong><br>
+      12 questions. Fastest buzzer answers. <strong>+10</strong> correct · <strong>−5</strong> wrong buzzer.
+      Enter each team's final score.
+    </div>
+    <table class="score-table">
+      <thead><tr>
+        <th>House</th><th>Team A</th><th>Score</th>
+        <th>Team B</th><th>Score</th><th style="text-align:right">House Total</th>
+      </tr></thead>
+      <tbody id="shots-rows"></tbody>
+    </table>
+  </div>
+
+  <!-- S4: Hangman -->
+  <div class="seg-panel" id="panel-hangman">
+    <div class="rule-banner">
+      <strong>Segment 4 — Hangman</strong><br>
+      8 words, 1 per house first guess. <strong>+25</strong> if team guesses correctly first.
+      Buzzer available — <strong>+5</strong> for correct answer from another team.
+      Enter each team's total score.
+    </div>
+    <table class="score-table">
+      <thead><tr>
+        <th>House</th><th>Team A</th><th>Score</th>
+        <th>Team B</th><th>Score</th><th style="text-align:right">House Total</th>
+      </tr></thead>
+      <tbody id="hangman-rows"></tbody>
+    </table>
+  </div>
+
+  <!-- S5: GK -->
+  <div class="seg-panel" id="panel-gk">
+    <div class="rule-banner">
+      <strong>Segment 5 — General Knowledge</strong><br>
+      20 questions. Buzzer to answer. <strong>+10</strong> correct · <strong>−5</strong> wrong buzzer.
+      Enter each team's final score.
+    </div>
+    <table class="score-table">
+      <thead><tr>
+        <th>House</th><th>Team A</th><th>Score</th>
+        <th>Team B</th><th>Score</th><th style="text-align:right">House Total</th>
+      </tr></thead>
+      <tbody id="gk-rows"></tbody>
+    </table>
+  </div>
+
+  <!-- S6: Bonus -->
+  <div class="seg-panel" id="panel-bonus">
+    <div class="rule-banner">
+      <strong>Segment 6 — Bonus Round</strong><br>
+      Each team starts with <strong>100 points</strong>. Teams can keep or lose their points.
+      Enter the amount each team <strong>keeps</strong> (0–100). House total = Team A kept + Team B kept.
+    </div>
+    <table class="score-table">
+      <thead><tr>
+        <th>House</th><th>Team A</th><th>Points Kept (0–100)</th>
+        <th>Team B</th><th>Points Kept (0–100)</th><th style="text-align:right">House Total</th>
+      </tr></thead>
+      <tbody id="bonus-rows"></tbody>
+    </table>
+  </div>
+
+</div><!-- end main-col -->
+
+<!-- ── SIDE COL ───────────────────────────────────────────── -->
+<div class="side-col">
+  <div class="lb-title">🏆 House Leaderboard</div>
+  <div id="lb-cards"></div>
+  <button class="save-btn" onclick="saveData();showSaved()">💾 Save Progress</button>
+  <div class="saved-msg" id="saved-msg">Saved ✓</div>
+</div>
+
+</div><!-- end page-wrap -->
+
+<script>
+const HOUSES=[
+  {key:'orion',  label:'Orion',  clr:'orion',   emoji:'⭐'},
+  {key:'aquilla',label:'Aquilla',clr:'aquilla',  emoji:'🦅'},
+  {key:'cygnus', label:'Cygnus', clr:'cygnus',   emoji:'🦢'},
+  {key:'draco',  label:'Draco',  clr:'draco',    emoji:'🐉'},
+];
+const SEGS=['sprint','dingbats','shots','hangman','gk','bonus'];
+const SEG_LABELS={sprint:'Sprint',dingbats:'Dingbats',shots:'Shots',hangman:'Hangman',gk:'GK',bonus:'Bonus'};
+
+// STATE
+let DATA={teamNames:{},scores:{}};
+SEGS.forEach(s=>{DATA.scores[s]={};});
+HOUSES.forEach(h=>{
+  DATA.teamNames[`${h.key}_a`]=''; DATA.teamNames[`${h.key}_b`]='';
+  SEGS.forEach(s=>{DATA.scores[s][`${h.key}_a`]=0; DATA.scores[s][`${h.key}_b`]=0;});
+});
+
+function tname(key){return DATA.teamNames[key]||key.replace('_a',' A').replace('_b',' B');}
+
+function buildRows(segId,isCorrect,isBonus){
+  const tbody=document.getElementById(`${segId}-rows`);
+  tbody.innerHTML=HOUSES.map(h=>{
+    const ka=`${h.key}_a`, kb=`${h.key}_b`;
+    const va=DATA.scores[segId][ka]||0, vb=DATA.scores[segId][kb]||0;
+    const houseVal=segId==='sprint'
+      ? (((+va||0)+(+vb||0))/2*5).toFixed(1)
+      : (+va||0)+(+vb||0);
+    return`<tr>
+      <td class="house-cell ${h.clr}-clr">${h.emoji} ${h.label}</td>
+      <td class="team-name-cell" id="tnc-${segId}-${h.key}-a">${tname(ka)}</td>
+      <td><input class="score-input" id="sc-${segId}-${ka}"
+        type="number" value="${va}"
+        ${isBonus?'min="0" max="100"':isCorrect?'min="0" max="20"':''}
+        oninput="onScore('${segId}','${ka}',this.value)"></td>
+      <td class="team-name-cell" id="tnc-${segId}-${h.key}-b">${tname(kb)}</td>
+      <td><input class="score-input" id="sc-${segId}-${kb}"
+        type="number" value="${vb}"
+        ${isBonus?'min="0" max="100"':isCorrect?'min="0" max="20"':''}
+        oninput="onScore('${segId}','${kb}',this.value)"></td>
+      <td class="house-avg ${h.clr}-clr" id="hv-${segId}-${h.key}">${houseVal}</td>
+    </tr>`;
+  }).join('');
+}
+
+function buildAllRows(){
+  buildRows('sprint',true,false);
+  buildRows('dingbats',false,false);
+  buildRows('shots',false,false);
+  buildRows('hangman',false,false);
+  buildRows('gk',false,false);
+  buildRows('bonus',false,true);
+}
+
+function onScore(seg,teamKey,val){
+  DATA.scores[seg][teamKey]=+val||0;
+  updateHouseVal(seg,teamKey.split('_')[0]);
+  updateLeaderboard();
+  saveData();
+}
+
+function updateHouseVal(seg,houseKey){
+  const ka=`${houseKey}_a`, kb=`${houseKey}_b`;
+  const va=+DATA.scores[seg][ka]||0, vb=+DATA.scores[seg][kb]||0;
+  const el=document.getElementById(`hv-${seg}-${houseKey}`);
+  if(!el) return;
+  el.textContent=seg==='sprint'?((va+vb)/2*5).toFixed(1):(va+vb);
+}
+
+function houseSegPts(h,seg){
+  const va=+DATA.scores[seg][`${h.key}_a`]||0;
+  const vb=+DATA.scores[seg][`${h.key}_b`]||0;
+  return seg==='sprint'?((va+vb)/2*5):(va+vb);
+}
+
+function houseTotal(h){return SEGS.reduce((s,seg)=>s+houseSegPts(h,seg),0);}
+
+function updateLeaderboard(){
+  const sorted=[...HOUSES].map(h=>({...h,total:houseTotal(h)}))
+    .sort((a,b)=>b.total-a.total);
+  const max=Math.max(...sorted.map(s=>s.total),1);
+  const ranks=['🥇','🥈','🥉','4️⃣'];
+  document.getElementById('lb-cards').innerHTML=sorted.map((h,i)=>{
+    const breakdown=SEGS.map(s=>`${SEG_LABELS[s]}: <strong>${houseSegPts(h,s).toFixed(0)}</strong>`).join(' · ');
+    return`<div class="lb-house-card ${h.clr}">
+      <div class="lb-rank-name">
+        <span class="lb-rank-emoji">${ranks[i]}</span>
+        <span class="lb-house-label">${h.emoji} ${h.label}</span>
+      </div>
+      <div class="lb-total">${h.total.toFixed(0)}<span style="font-size:.9rem;opacity:.5;font-weight:400"> pts</span></div>
+      <div class="lb-bar-wrap"><div class="lb-bar" style="width:${Math.round(h.total/max*100)}%"></div></div>
+      <div class="lb-seg-breakdown">${breakdown}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderNames(){
+  HOUSES.forEach(h=>{
+    DATA.teamNames[`${h.key}_a`]=document.getElementById(`tn-${h.key}-a`).value;
+    DATA.teamNames[`${h.key}_b`]=document.getElementById(`tn-${h.key}-b`).value;
+  });
+  SEGS.forEach(seg=>{
+    HOUSES.forEach(h=>{
+      const ea=document.getElementById(`tnc-${seg}-${h.key}-a`);
+      const eb=document.getElementById(`tnc-${seg}-${h.key}-b`);
+      if(ea) ea.textContent=tname(`${h.key}_a`);
+      if(eb) eb.textContent=tname(`${h.key}_b`);
+    });
+  });
+}
+
+function switchSeg(seg,btn){
+  document.querySelectorAll('.seg-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.seg-panel').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById(`panel-${seg}`).classList.add('active');
+}
+
+function saveData(){
+  HOUSES.forEach(h=>{
+    DATA.teamNames[`${h.key}_a`]=document.getElementById(`tn-${h.key}-a`).value;
+    DATA.teamNames[`${h.key}_b`]=document.getElementById(`tn-${h.key}-b`).value;
+  });
+  localStorage.setItem('gapstars_trivia_2026',JSON.stringify(DATA));
+}
+
+function showSaved(){
+  const el=document.getElementById('saved-msg');
+  el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),2000);
+}
+
+function loadData(){
+  const raw=localStorage.getItem('gapstars_trivia_2026');
+  if(raw){
+    try{
+      const d=JSON.parse(raw);
+      if(d.teamNames) DATA.teamNames={...DATA.teamNames,...d.teamNames};
+      if(d.scores) SEGS.forEach(s=>{if(d.scores[s]) DATA.scores[s]={...DATA.scores[s],...d.scores[s]};});
+    }catch(e){}
+  }
+  // Populate team name inputs
+  HOUSES.forEach(h=>{
+    document.getElementById(`tn-${h.key}-a`).value=DATA.teamNames[`${h.key}_a`]||'';
+    document.getElementById(`tn-${h.key}-b`).value=DATA.teamNames[`${h.key}_b`]||'';
+  });
+  buildAllRows();
+  updateLeaderboard();
+}
+
+loadData();
+</script>
+</body>
+</html>

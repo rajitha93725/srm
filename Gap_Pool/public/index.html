@@ -124,6 +124,77 @@ footer{position:relative;z-index:5;text-align:center;padding:20px;
   font-size:.68rem;color:rgba(100,116,139,.4);letter-spacing:1.5px;text-transform:uppercase;
   border-top:1px solid rgba(255,255,255,.04)}
 
+/* ── Event tiles (top row) ──────────────────────────────── */
+.events-row{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:40px}
+@media(max-width:700px){.events-row{grid-template-columns:1fr}}
+.ev-tile{border-radius:18px;padding:32px 28px;display:flex;align-items:center;gap:22px;cursor:pointer;
+  border:2px solid;transition:transform .22s,box-shadow .22s;position:relative;overflow:hidden}
+.ev-tile:hover{transform:translateY(-5px)}
+.ev-tile.hack{background:linear-gradient(135deg,rgba(0,212,255,.07),rgba(0,80,160,.04));
+  border-color:rgba(0,212,255,.3);box-shadow:0 0 30px rgba(0,212,255,.08)}
+.ev-tile.hack:hover{box-shadow:0 0 50px rgba(0,212,255,.18)}
+.ev-tile.triv{background:linear-gradient(135deg,rgba(168,85,247,.08),rgba(80,0,160,.04));
+  border-color:rgba(168,85,247,.3);box-shadow:0 0 30px rgba(168,85,247,.08)}
+.ev-tile.triv:hover{box-shadow:0 0 50px rgba(168,85,247,.18)}
+.ev-icon{font-size:3rem;flex-shrink:0;filter:drop-shadow(0 0 12px currentColor)}
+.ev-info{flex:1}
+.ev-title{font-size:1.5rem;font-weight:800;letter-spacing:.5px;margin-bottom:4px}
+.ev-tile.hack .ev-title{color:#00d4ff}
+.ev-tile.triv .ev-title{color:#c084fc}
+.ev-desc{font-size:.72rem;color:#64748b;letter-spacing:1.5px;text-transform:uppercase}
+.ev-badge{display:inline-block;margin-top:10px;padding:5px 14px;border-radius:10px;font-size:.7rem;font-weight:700}
+.ev-tile.hack .ev-badge{background:rgba(0,212,255,.12);color:#00d4ff;border:1px solid rgba(0,212,255,.3)}
+.ev-tile.triv .ev-badge{background:rgba(192,132,252,.12);color:#c084fc;border:1px solid rgba(192,132,252,.3)}
+
+/* ── Hackathon modal ────────────────────────────────────── */
+.hk-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:200;
+  align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.hk-overlay.open{display:flex}
+.hk-modal{background:#0d0d1a;border:1px solid rgba(0,212,255,.2);border-radius:20px;
+  width:min(1100px,96vw);max-height:90vh;overflow-y:auto;padding:32px 36px}
+.hk-modal h2{font-size:1.5rem;font-weight:800;color:#00d4ff;margin-bottom:6px;letter-spacing:1px}
+.hk-modal .hk-sub{font-size:.72rem;color:#475569;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:28px}
+.hk-houses{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+@media(max-width:900px){.hk-houses{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:500px){.hk-houses{grid-template-columns:1fr}}
+.hk-house{border-radius:14px;padding:20px 18px;border:1px solid}
+.hk-house.orion{background:rgba(96,165,250,.06);border-color:rgba(96,165,250,.25)}
+.hk-house.aquilla{background:rgba(167,139,250,.06);border-color:rgba(167,139,250,.25)}
+.hk-house.cygnus{background:rgba(248,113,113,.06);border-color:rgba(248,113,113,.25)}
+.hk-house.draco{background:rgba(74,222,128,.06);border-color:rgba(74,222,128,.25)}
+.hk-house-name{font-size:.95rem;font-weight:800;letter-spacing:1px;text-transform:uppercase;margin-bottom:16px}
+.hk-house.orion .hk-house-name{color:#60a5fa}
+.hk-house.aquilla .hk-house-name{color:#a78bfa}
+.hk-house.cygnus .hk-house-name{color:#f87171}
+.hk-house.draco .hk-house-name{color:#4ade80}
+.hk-field{margin-bottom:14px}
+.hk-label{font-size:.68rem;color:#64748b;letter-spacing:1px;text-transform:uppercase;margin-bottom:5px}
+.hk-input{width:100%;background:#0f172a;border:1px solid #334155;border-radius:8px;
+  color:#e2e8f0;font-size:.9rem;font-weight:600;padding:8px 12px;outline:none;
+  font-family:inherit;transition:.2s}
+.hk-input:focus{border-color:#00d4ff44}
+.hk-pts-box{margin-top:16px;padding:12px;border-radius:10px;background:#06010f;text-align:center}
+.hk-pts-total{font-size:2rem;font-weight:900;line-height:1}
+.hk-pts-break{font-size:.68rem;color:#475569;margin-top:4px}
+.hk-house.orion .hk-pts-total{color:#60a5fa}
+.hk-house.aquilla .hk-pts-total{color:#a78bfa}
+.hk-house.cygnus .hk-pts-total{color:#f87171}
+.hk-house.draco .hk-pts-total{color:#4ade80}
+.hk-leaderboard{margin-top:28px;background:#06010f;border-radius:12px;padding:16px 20px}
+.hk-lb-title{font-size:.72rem;color:#475569;letter-spacing:2px;text-transform:uppercase;margin-bottom:12px}
+.hk-lb-row{display:flex;align-items:center;gap:12px;padding:6px 0;border-bottom:1px solid #0d0d1a}
+.hk-lb-row:last-child{border-bottom:none}
+.hk-lb-rank{font-size:.85rem;font-weight:800;color:#64748b;min-width:24px}
+.hk-lb-name{flex:1;font-weight:600;font-size:.88rem}
+.hk-lb-bar-wrap{flex:2;background:#1e293b;border-radius:6px;height:8px;overflow:hidden}
+.hk-lb-bar{height:100%;border-radius:6px;transition:width .4s}
+.hk-lb-pts{font-size:.9rem;font-weight:800;min-width:50px;text-align:right}
+.hk-close-btn{margin-top:24px;width:100%;padding:12px;border-radius:10px;background:rgba(0,212,255,.1);
+  color:#00d4ff;border:1px solid rgba(0,212,255,.3);font-size:.85rem;font-weight:700;
+  cursor:pointer;font-family:inherit;letter-spacing:1px;transition:.2s}
+.hk-close-btn:hover{background:rgba(0,212,255,.2)}
+.hk-rules{font-size:.68rem;color:#334155;margin-top:16px;line-height:1.6;text-align:center}
+
 /* ── Funny toast ────────────────────────────────────────── */
 #funny-toast{
   position:fixed;bottom:60px;left:50%;transform:translateX(-50%) translateY(30px);
@@ -176,6 +247,26 @@ footer{position:relative;z-index:5;text-align:center;padding:20px;
 
 <!-- ═══════ MAIN ═════════════════════════════════════════════ -->
 <main>
+<!-- ═══ TOP EVENTS ════════════════════════════════════════ -->
+<div class="events-row">
+  <div class="ev-tile hack" onclick="openHackathon()">
+    <span class="ev-icon">🤖</span>
+    <div class="ev-info">
+      <div class="ev-title">AI Hackathon</div>
+      <div class="ev-desc">House Points · All 4 Houses</div>
+      <span class="ev-badge">▶ View Scores</span>
+    </div>
+  </div>
+  <div class="ev-tile triv" onclick="window.location.href='gap_trivia.html'">
+    <span class="ev-icon">🧠</span>
+    <div class="ev-info">
+      <div class="ev-title">Trivia Night</div>
+      <div class="ev-desc">6 Segments · 8 Teams · 4 Houses</div>
+      <span class="ev-badge">▶ Enter Scoring</span>
+    </div>
+  </div>
+</div>
+
 <div class="sections-row">
 
   <!-- ── POOL SECTION ───────────────────────────────────────── -->
@@ -383,6 +474,88 @@ footer{position:relative;z-index:5;text-align:center;padding:20px;
 
 <footer>Hosted by Stargazers &nbsp;·&nbsp; Gapstars Grand Table Clash 2026</footer>
 
+<!-- ═══ HACKATHON MODAL ═══════════════════════════════════ -->
+<div class="hk-overlay" id="hk-overlay">
+  <div class="hk-modal">
+    <h2>🤖 AI Hackathon</h2>
+    <div class="hk-sub">Enter teams & supporters per house — points update live</div>
+    <div class="hk-houses">
+      <!-- Orion -->
+      <div class="hk-house orion">
+        <div class="hk-house-name">⭐ Orion</div>
+        <div class="hk-field">
+          <div class="hk-label">Teams Participated</div>
+          <input class="hk-input" id="hk-orion-teams" type="number" min="0" max="10" value="0" oninput="calcHK()">
+        </div>
+        <div class="hk-field">
+          <div class="hk-label">Supporters</div>
+          <input class="hk-input" id="hk-orion-sup" type="number" min="0" max="20" value="0" oninput="calcHK()">
+        </div>
+        <div class="hk-pts-box">
+          <div class="hk-pts-total" id="hk-orion-total">0</div>
+          <div class="hk-pts-break" id="hk-orion-break">—</div>
+        </div>
+      </div>
+      <!-- Aquilla -->
+      <div class="hk-house aquilla">
+        <div class="hk-house-name">🦅 Aquilla</div>
+        <div class="hk-field">
+          <div class="hk-label">Teams Participated</div>
+          <input class="hk-input" id="hk-aquilla-teams" type="number" min="0" max="10" value="0" oninput="calcHK()">
+        </div>
+        <div class="hk-field">
+          <div class="hk-label">Supporters</div>
+          <input class="hk-input" id="hk-aquilla-sup" type="number" min="0" max="20" value="0" oninput="calcHK()">
+        </div>
+        <div class="hk-pts-box">
+          <div class="hk-pts-total" id="hk-aquilla-total">0</div>
+          <div class="hk-pts-break" id="hk-aquilla-break">—</div>
+        </div>
+      </div>
+      <!-- Cygnus -->
+      <div class="hk-house cygnus">
+        <div class="hk-house-name">🦢 Cygnus</div>
+        <div class="hk-field">
+          <div class="hk-label">Teams Participated</div>
+          <input class="hk-input" id="hk-cygnus-teams" type="number" min="0" max="10" value="0" oninput="calcHK()">
+        </div>
+        <div class="hk-field">
+          <div class="hk-label">Supporters</div>
+          <input class="hk-input" id="hk-cygnus-sup" type="number" min="0" max="20" value="0" oninput="calcHK()">
+        </div>
+        <div class="hk-pts-box">
+          <div class="hk-pts-total" id="hk-cygnus-total">0</div>
+          <div class="hk-pts-break" id="hk-cygnus-break">—</div>
+        </div>
+      </div>
+      <!-- Draco -->
+      <div class="hk-house draco">
+        <div class="hk-house-name">🐉 Draco</div>
+        <div class="hk-field">
+          <div class="hk-label">Teams Participated</div>
+          <input class="hk-input" id="hk-draco-teams" type="number" min="0" max="10" value="0" oninput="calcHK()">
+        </div>
+        <div class="hk-field">
+          <div class="hk-label">Supporters</div>
+          <input class="hk-input" id="hk-draco-sup" type="number" min="0" max="20" value="0" oninput="calcHK()">
+        </div>
+        <div class="hk-pts-box">
+          <div class="hk-pts-total" id="hk-draco-total">0</div>
+          <div class="hk-pts-break" id="hk-draco-break">—</div>
+        </div>
+      </div>
+    </div>
+    <div class="hk-rules">
+      3 teams = 120 pts base · +15 per extra team (max 5 teams = 150) · Supporters: +5 each (max 10 = 50 pts) · Max per house: 200 pts
+    </div>
+    <div class="hk-leaderboard">
+      <div class="hk-lb-title">House Leaderboard</div>
+      <div id="hk-lb-rows"></div>
+    </div>
+    <button class="hk-close-btn" onclick="closeHackathon()">Close</button>
+  </div>
+</div>
+
 <!-- ── Funny toast ─────────────────────────────────────────── -->
 <div id="funny-toast">
   <span class="toast-emoji" id="toast-emoji"></span>
@@ -412,6 +585,66 @@ footer{position:relative;z-index:5;text-align:center;padding:20px;
     }
   });
 })();
+
+// ── Hackathon ─────────────────────────────────────────────────
+const HK_HOUSES=[
+  {key:'orion',  name:'Orion',  color:'#60a5fa', bar:'#1d4ed8'},
+  {key:'aquilla',name:'Aquilla',color:'#a78bfa', bar:'#6d28d9'},
+  {key:'cygnus', name:'Cygnus', color:'#f87171', bar:'#b91c1c'},
+  {key:'draco',  name:'Draco',  color:'#4ade80', bar:'#15803d'},
+];
+function hkPts(teams,sup){
+  teams=Math.max(0,+teams||0); sup=Math.max(0,+sup||0);
+  let tp=0;
+  if(teams>=3) tp=120+Math.min(teams-3,2)*15;
+  else tp=teams*40;
+  tp=Math.min(tp,150);
+  const sp=Math.min(sup,10)*5;
+  return{tp,sp,total:tp+sp};
+}
+function calcHK(){
+  const results=HK_HOUSES.map(h=>{
+    const t=document.getElementById(`hk-${h.key}-teams`).value;
+    const s=document.getElementById(`hk-${h.key}-sup`).value;
+    const r=hkPts(t,s);
+    document.getElementById(`hk-${h.key}-total`).textContent=r.total;
+    document.getElementById(`hk-${h.key}-break`).textContent=
+      `Teams: ${r.tp} pts  ·  Supporters: ${r.sp} pts`;
+    return{...h,total:r.total};
+  });
+  const max=Math.max(...results.map(r=>r.total),1);
+  const sorted=[...results].sort((a,b)=>b.total-a.total);
+  const ranks=['🥇','🥈','🥉','4️⃣'];
+  document.getElementById('hk-lb-rows').innerHTML=sorted.map((h,i)=>`
+    <div class="hk-lb-row">
+      <span class="hk-lb-rank">${ranks[i]}</span>
+      <span class="hk-lb-name" style="color:${h.color}">${h.name}</span>
+      <div class="hk-lb-bar-wrap"><div class="hk-lb-bar" style="width:${Math.round(h.total/max*100)}%;background:${h.bar}"></div></div>
+      <span class="hk-lb-pts" style="color:${h.color}">${h.total}</span>
+    </div>`).join('');
+  saveHK();
+}
+function saveHK(){
+  const d={};
+  HK_HOUSES.forEach(h=>{
+    d[h.key]={teams:document.getElementById(`hk-${h.key}-teams`).value,
+               sup:document.getElementById(`hk-${h.key}-sup`).value};
+  });
+  localStorage.setItem('gapstars_hackathon',JSON.stringify(d));
+}
+function loadHK(){
+  const d=JSON.parse(localStorage.getItem('gapstars_hackathon')||'{}');
+  HK_HOUSES.forEach(h=>{
+    if(d[h.key]){
+      document.getElementById(`hk-${h.key}-teams`).value=d[h.key].teams||0;
+      document.getElementById(`hk-${h.key}-sup`).value=d[h.key].sup||0;
+    }
+  });
+  calcHK();
+}
+function openHackathon(){document.getElementById('hk-overlay').classList.add('open');loadHK();}
+function closeHackathon(){document.getElementById('hk-overlay').classList.remove('open');}
+document.getElementById('hk-overlay').addEventListener('click',function(e){if(e.target===this)closeHackathon();});
 
 // ── Funny messages ────────────────────────────────────────────
 const FUNNY={
