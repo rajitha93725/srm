@@ -10,7 +10,7 @@ body{font-family:'Segoe UI',sans-serif;background:#06010f;color:#e2e8f0;min-heig
 
 /* ── Floating rocket particles ──────────────────────────── */
 #ptc{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
-.pt{position:absolute;opacity:0;animation:pf linear infinite;font-style:normal;line-height:1;user-select:none}
+.pt{position:absolute;opacity:0;animation:pf linear infinite;font-style:normal;line-height:1;user-select:none;will-change:transform,opacity}
 @keyframes pf{
   0%    {transform:translateY(112vh) rotate(-45deg) scale(.55);opacity:0}
   5%    {opacity:.95}
@@ -25,7 +25,7 @@ body{font-family:'Segoe UI',sans-serif;background:#06010f;color:#e2e8f0;min-heig
   color:#ff7a00;text-shadow:0 0 22px rgba(255,122,0,.6),0 0 44px rgba(255,80,0,.2)}
 
 /* ── Ambient blobs ──────────────────────────────────────── */
-.blob{position:fixed;border-radius:50%;filter:blur(120px);opacity:.07;pointer-events:none;z-index:0}
+.blob{position:fixed;border-radius:50%;filter:blur(120px);opacity:.07;pointer-events:none;z-index:0;will-change:transform;transform:translateZ(0)}
 
 /* ── Header ─────────────────────────────────────────────── */
 header{position:relative;z-index:10;padding:48px 24px 36px;text-align:center;
@@ -194,6 +194,8 @@ footer{position:relative;z-index:5;text-align:center;padding:20px;
   cursor:pointer;font-family:inherit;letter-spacing:1px;transition:.2s}
 .hk-close-btn:hover{background:rgba(0,212,255,.2)}
 .hk-rules{font-size:.68rem;color:#334155;margin-top:16px;line-height:1.6;text-align:center}
+.hk-note{margin-top:12px;padding:10px 16px;border-radius:10px;background:rgba(255,170,0,.06);
+  border:1px solid rgba(255,170,0,.2);font-size:.72rem;color:#f59e0b;line-height:1.6;text-align:center}
 
 /* ── Funny toast ────────────────────────────────────────── */
 #funny-toast{
@@ -546,7 +548,10 @@ footer{position:relative;z-index:5;text-align:center;padding:20px;
       </div>
     </div>
     <div class="hk-rules">
-      3 teams = 120 pts base · +15 per extra team (max 5 teams = 150) · Supporters: +5 each (max 10 = 50 pts) · Max per house: 200 pts
+      3+ teams = 120 pts base (less than 3 = 0) · +15 per extra team (max 5 teams = 150) · Supporters: +5 each (max 10 = 50 pts)
+    </div>
+    <div class="hk-note">
+      ⚠️ Registered teams shown above. To count for final points, your team must be <strong>present on the day</strong> and <strong>submit your project</strong>.
     </div>
     <div class="hk-leaderboard">
       <div class="hk-lb-title">House Leaderboard</div>
@@ -579,7 +584,6 @@ footer{position:relative;z-index:5;text-align:center;padding:20px;
         `font-size:${sz}px;`+
         `animation-duration:${CYCLE}s;`+
         `animation-delay:${wave.base+j*0.28}s;`+
-        `filter:drop-shadow(0 0 ${Math.round(sz*.38)}px rgba(255,110,0,.85));`+
         `opacity:0`;
       c.appendChild(p);
     }
@@ -597,7 +601,6 @@ function hkPts(teams,sup){
   teams=Math.max(0,+teams||0); sup=Math.max(0,+sup||0);
   let tp=0;
   if(teams>=3) tp=120+Math.min(teams-3,2)*15;
-  else tp=teams*40;
   tp=Math.min(tp,150);
   const sp=Math.min(sup,10)*5;
   return{tp,sp,total:tp+sp};
@@ -624,21 +627,23 @@ function calcHK(){
     </div>`).join('');
   saveHK();
 }
+const HK_SEED_V=2;
+const HK_DEF={orion:{teams:2,sup:0},aquilla:{teams:2,sup:0},cygnus:{teams:4,sup:0},draco:{teams:5,sup:0}};
 function saveHK(){
-  const d={};
+  const d={_v:HK_SEED_V};
   HK_HOUSES.forEach(h=>{
-    d[h.key]={teams:document.getElementById(`hk-${h.key}-teams`).value,
-               sup:document.getElementById(`hk-${h.key}-sup`).value};
+    d[h.key]={teams:+document.getElementById(`hk-${h.key}-teams`).value||0,
+               sup:+document.getElementById(`hk-${h.key}-sup`).value||0};
   });
   localStorage.setItem('gapstars_hackathon',JSON.stringify(d));
 }
 function loadHK(){
-  const d=JSON.parse(localStorage.getItem('gapstars_hackathon')||'{}');
+  const stored=JSON.parse(localStorage.getItem('gapstars_hackathon')||'{}');
+  const d=(stored._v||0)<HK_SEED_V ? HK_DEF : stored;
   HK_HOUSES.forEach(h=>{
-    if(d[h.key]){
-      document.getElementById(`hk-${h.key}-teams`).value=d[h.key].teams||0;
-      document.getElementById(`hk-${h.key}-sup`).value=d[h.key].sup||0;
-    }
+    const src=d[h.key]||HK_DEF[h.key];
+    document.getElementById(`hk-${h.key}-teams`).value=src.teams||0;
+    document.getElementById(`hk-${h.key}-sup`).value=src.sup||0;
   });
   calcHK();
 }
