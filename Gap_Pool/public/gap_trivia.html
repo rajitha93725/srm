@@ -118,6 +118,13 @@ header{background:linear-gradient(135deg,#12001f,#0a0014);border-bottom:1px soli
 .saved-msg{text-align:center;font-size:.68rem;color:#4ade80;margin-top:6px;
   opacity:0;transition:opacity .3s}
 .saved-msg.show{opacity:1}
+.io-row{display:flex;gap:8px;margin-top:8px}
+.io-btn{flex:1;padding:9px 6px;border-radius:9px;font-size:.72rem;font-weight:700;
+  cursor:pointer;font-family:inherit;letter-spacing:.5px;border:1px solid;transition:.2s}
+.io-btn.export{background:rgba(34,197,94,.08);color:#4ade80;border-color:rgba(34,197,94,.3)}
+.io-btn.export:hover{background:rgba(34,197,94,.18)}
+.io-btn.import{background:rgba(59,130,246,.08);color:#60a5fa;border-color:rgba(59,130,246,.3)}
+.io-btn.import:hover{background:rgba(59,130,246,.18)}
 </style>
 </head>
 <body>
@@ -281,6 +288,11 @@ header{background:linear-gradient(135deg,#12001f,#0a0014);border-bottom:1px soli
   <div id="lb-cards"></div>
   <button class="save-btn" onclick="saveData();showSaved()">💾 Save Progress</button>
   <div class="saved-msg" id="saved-msg">Saved ✓</div>
+  <div class="io-row">
+    <button class="io-btn export" onclick="exportTrivia()">⬇ Export</button>
+    <button class="io-btn import" onclick="importTrivia()">⬆ Import</button>
+  </div>
+  <input type="file" id="trivia-import-file" accept=".json" style="display:none" onchange="handleTriviaImport(event)">
 </div>
 
 </div><!-- end page-wrap -->
@@ -426,13 +438,43 @@ function loadData(){
       if(d.scores) SEGS.forEach(s=>{if(d.scores[s]) DATA.scores[s]={...DATA.scores[s],...d.scores[s]};});
     }catch(e){}
   }
-  // Populate team name inputs
   HOUSES.forEach(h=>{
     document.getElementById(`tn-${h.key}-a`).value=DATA.teamNames[`${h.key}_a`]||'';
     document.getElementById(`tn-${h.key}-b`).value=DATA.teamNames[`${h.key}_b`]||'';
   });
   buildAllRows();
   updateLeaderboard();
+}
+
+function exportTrivia(){
+  saveData();
+  const d=JSON.parse(localStorage.getItem('gapstars_trivia_2026')||'{}');
+  const b=new Blob([JSON.stringify(d,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(b);
+  a.download=`gapstars_trivia_${new Date().toISOString().slice(0,10)}.json`;
+  a.click();URL.revokeObjectURL(a.href);
+}
+function importTrivia(){document.getElementById('trivia-import-file').click();}
+function handleTriviaImport(e){
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=ev=>{
+    try{
+      const d=JSON.parse(ev.target.result);
+      if(d.teamNames) DATA.teamNames={...DATA.teamNames,...d.teamNames};
+      if(d.scores) SEGS.forEach(s=>{if(d.scores[s]) DATA.scores[s]={...DATA.scores[s],...d.scores[s]};});
+      saveData();
+      HOUSES.forEach(h=>{
+        document.getElementById(`tn-${h.key}-a`).value=DATA.teamNames[`${h.key}_a`]||'';
+        document.getElementById(`tn-${h.key}-b`).value=DATA.teamNames[`${h.key}_b`]||'';
+      });
+      buildAllRows();updateLeaderboard();showSaved();
+      alert('Trivia data imported!');
+    }catch(err){alert('Invalid file.');}
+    e.target.value='';
+  };
+  r.readAsText(f);
 }
 
 loadData();

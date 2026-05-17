@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Gapstars Grand Table Clash</title>
+<link rel="prefetch" href="gap_pool_mens.html">
+<link rel="prefetch" href="gap_pool_mixed.html">
+<link rel="prefetch" href="gap_trivia.html">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Segoe UI',sans-serif;background:#06010f;color:#e2e8f0;min-height:100vh;overflow-x:hidden}
@@ -120,9 +123,27 @@ main{position:relative;z-index:5;max-width:1840px;margin:0 auto;padding:44px 60p
 .arrow-pulse{display:inline-block;margin-left:4px;animation:ap 1.2s ease-in-out infinite}
 @keyframes ap{0%,100%{transform:translateX(0)}50%{transform:translateX(4px)}}
 
-footer{position:relative;z-index:5;text-align:center;padding:20px;
+footer{position:relative;z-index:5;text-align:center;padding:14px 20px 18px;
   font-size:.68rem;color:rgba(100,116,139,.4);letter-spacing:1.5px;text-transform:uppercase;
   border-top:1px solid rgba(255,255,255,.04)}
+.data-toolbar{display:flex;justify-content:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.dt-btn{padding:6px 16px;border-radius:8px;font-size:.68rem;font-weight:700;cursor:pointer;
+  font-family:inherit;letter-spacing:.5px;border:1px solid;transition:.2s}
+.dt-btn.export{background:rgba(34,197,94,.08);color:#4ade80;border-color:rgba(34,197,94,.3)}
+.dt-btn.export:hover{background:rgba(34,197,94,.18)}
+.dt-btn.import{background:rgba(59,130,246,.08);color:#60a5fa;border-color:rgba(59,130,246,.3)}
+.dt-btn.import:hover{background:rgba(59,130,246,.18)}
+
+@media(max-width:900px){main{padding:28px 20px 50px}}
+@media(max-width:600px){
+  main{padding:16px 12px 40px}
+  header{padding:28px 16px 22px}
+  .main-title{letter-spacing:2px}
+  .tile{padding:28px 16px 24px}
+  .hk-modal{padding:20px 16px}
+  .events-row{gap:10px}
+  .sections-row{gap:24px}
+}
 
 /* ── Event tiles (top row) ──────────────────────────────── */
 .events-row{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:28px}
@@ -189,7 +210,14 @@ footer{position:relative;z-index:5;text-align:center;padding:20px;
 .hk-lb-bar-wrap{flex:2;background:#1e293b;border-radius:6px;height:8px;overflow:hidden}
 .hk-lb-bar{height:100%;border-radius:6px;transition:width .4s}
 .hk-lb-pts{font-size:.9rem;font-weight:800;min-width:50px;text-align:right}
-.hk-close-btn{margin-top:24px;width:100%;padding:12px;border-radius:10px;background:rgba(0,212,255,.1);
+.hk-btn-row{display:flex;gap:10px;margin-top:16px}
+.hk-export-btn,.hk-import-btn{flex:1;padding:10px;border-radius:10px;font-size:.78rem;font-weight:700;
+  cursor:pointer;font-family:inherit;letter-spacing:.5px;transition:.2s}
+.hk-export-btn{background:rgba(34,197,94,.08);color:#4ade80;border:1px solid rgba(34,197,94,.3)}
+.hk-export-btn:hover{background:rgba(34,197,94,.18)}
+.hk-import-btn{background:rgba(59,130,246,.08);color:#60a5fa;border:1px solid rgba(59,130,246,.3)}
+.hk-import-btn:hover{background:rgba(59,130,246,.18)}
+.hk-close-btn{margin-top:10px;width:100%;padding:12px;border-radius:10px;background:rgba(0,212,255,.1);
   color:#00d4ff;border:1px solid rgba(0,212,255,.3);font-size:.85rem;font-weight:700;
   cursor:pointer;font-family:inherit;letter-spacing:1px;transition:.2s}
 .hk-close-btn:hover{background:rgba(0,212,255,.2)}
@@ -474,7 +502,14 @@ footer{position:relative;z-index:5;text-align:center;padding:20px;
 </div><!-- end sections-row -->
 </main>
 
-<footer>Hosted by Stargazers &nbsp;·&nbsp; Gapstars Grand Table Clash 2026</footer>
+<footer>
+  <div class="data-toolbar">
+    <button class="dt-btn export" onclick="exportAll()">⬇ Export All Data</button>
+    <button class="dt-btn import" onclick="importAll()">⬆ Import All Data</button>
+  </div>
+  Hosted by Stargazers &nbsp;·&nbsp; Gapstars Grand Table Clash 2026
+</footer>
+<input type="file" id="import-all-file" accept=".json" style="display:none" onchange="handleImportAll(event)">
 
 <!-- ═══ HACKATHON MODAL ═══════════════════════════════════ -->
 <div class="hk-overlay" id="hk-overlay">
@@ -557,9 +592,14 @@ footer{position:relative;z-index:5;text-align:center;padding:20px;
       <div class="hk-lb-title">House Leaderboard</div>
       <div id="hk-lb-rows"></div>
     </div>
+    <div class="hk-btn-row">
+      <button class="hk-export-btn" onclick="exportHK()">⬇ Export Hackathon</button>
+      <button class="hk-import-btn" onclick="importHK()">⬆ Import Hackathon</button>
+    </div>
     <button class="hk-close-btn" onclick="closeHackathon()">Close</button>
   </div>
 </div>
+<input type="file" id="hk-import-file" accept=".json" style="display:none" onchange="handleHKImport(event)">
 
 <!-- ── Funny toast ─────────────────────────────────────────── -->
 <div id="funny-toast">
@@ -569,8 +609,8 @@ footer{position:relative;z-index:5;text-align:center;padding:20px;
 </div>
 
 <script>
-// ── Rockets ──────────────────────────────────────────────────
-(function(){
+// ── Rockets (deferred so first paint is not blocked) ─────────
+setTimeout(function(){
   const c=document.getElementById('ptc');
   const CYCLE=24;
   const waves=[{base:0,count:5},{base:9,count:4},{base:17,count:4}];
@@ -588,7 +628,7 @@ footer{position:relative;z-index:5;text-align:center;padding:20px;
       c.appendChild(p);
     }
   });
-})();
+},80);
 
 // ── Hackathon ─────────────────────────────────────────────────
 const HK_HOUSES=[
@@ -650,6 +690,58 @@ function loadHK(){
 function openHackathon(){document.getElementById('hk-overlay').classList.add('open');loadHK();}
 function closeHackathon(){document.getElementById('hk-overlay').classList.remove('open');}
 document.getElementById('hk-overlay').addEventListener('click',function(e){if(e.target===this)closeHackathon();});
+function exportHK(){
+  saveHK();
+  const d=JSON.parse(localStorage.getItem('gapstars_hackathon')||'{}');
+  const b=new Blob([JSON.stringify(d,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(b);
+  a.download=`gapstars_hackathon_${new Date().toISOString().slice(0,10)}.json`;
+  a.click();URL.revokeObjectURL(a.href);
+}
+function importHK(){document.getElementById('hk-import-file').click();}
+function handleHKImport(e){
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=ev=>{
+    try{localStorage.setItem('gapstars_hackathon',ev.target.result);loadHK();alert('Hackathon data imported!');}
+    catch(err){alert('Invalid file.');}
+    e.target.value='';
+  };
+  r.readAsText(f);
+}
+// ── Export All / Import All ───────────────────────────────────
+function exportAll(){
+  const all={
+    mens:    JSON.parse(localStorage.getItem('gapstars_2026')||'null'),
+    mixed:   JSON.parse(localStorage.getItem('gapstars_mixed_2026')||'null'),
+    hackathon:JSON.parse(localStorage.getItem('gapstars_hackathon')||'null'),
+    trivia:  JSON.parse(localStorage.getItem('gapstars_trivia_2026')||'null'),
+    _exported:new Date().toISOString()
+  };
+  const b=new Blob([JSON.stringify(all,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(b);
+  a.download=`gapstars_all_${new Date().toISOString().slice(0,10)}.json`;
+  a.click();URL.revokeObjectURL(a.href);
+}
+function importAll(){document.getElementById('import-all-file').click();}
+function handleImportAll(e){
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=ev=>{
+    try{
+      const all=JSON.parse(ev.target.result);
+      if(all.mens)     localStorage.setItem('gapstars_2026',JSON.stringify(all.mens));
+      if(all.mixed)    localStorage.setItem('gapstars_mixed_2026',JSON.stringify(all.mixed));
+      if(all.hackathon)localStorage.setItem('gapstars_hackathon',JSON.stringify(all.hackathon));
+      if(all.trivia)   localStorage.setItem('gapstars_trivia_2026',JSON.stringify(all.trivia));
+      alert('All data imported! Reload event pages to see changes.');
+    }catch(err){alert('Invalid backup file.');}
+    e.target.value='';
+  };
+  r.readAsText(f);
+}
 
 // ── Funny messages ────────────────────────────────────────────
 const FUNNY={
