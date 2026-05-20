@@ -343,7 +343,23 @@ const QFS=[
 ];
 
 // ── State ─────────────────────────────────────────────────────────────────────
-let STATE=JSON.parse(localStorage.getItem('gapstars_mixed_2026')||'null')||{groupScores:{},knockout:{},customNames:{},matchDates:{},matchTimes:{}};
+const _SEED={
+  groupScores:{},
+  knockout:{},
+  customNames:{},
+  matchDates:{
+    "g2_m0":"2026-05-27","g2_m1":"2026-05-27","g2_m2":"2026-05-27",
+    "g4_m0":"2026-05-27","g4_m1":"2026-05-27","g4_m2":"2026-05-27",
+    "g6_m0":"2026-06-03","g6_m1":"2026-06-03","g6_m2":"2026-06-03",
+    "g8_m0":"2026-06-03","g8_m1":"2026-06-03","g8_m2":"2026-06-03",
+    "g1_m0":"2026-06-10","g1_m1":"2026-06-10","g1_m2":"2026-06-10",
+    "g5_m0":"2026-06-10","g5_m1":"2026-06-10","g5_m2":"2026-06-10",
+    "g3_m0":"2026-06-10","g3_m1":"2026-06-10","g3_m2":"2026-06-10",
+    "g7_m0":"2026-06-10","g7_m1":"2026-06-10","g7_m2":"2026-06-10"
+  },
+  matchTimes:{}
+};
+let STATE=JSON.parse(localStorage.getItem('gapstars_mixed_2026')||'null')||JSON.parse(JSON.stringify(_SEED));
 if(!STATE.customNames) STATE.customNames={};
 if(!STATE.matchDates)  STATE.matchDates={};
 if(!STATE.matchTimes)  STATE.matchTimes={};
