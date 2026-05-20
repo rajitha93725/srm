@@ -86,6 +86,19 @@ header{background:linear-gradient(135deg,#12001f,#0a0014);border-bottom:1px soli
 .house-avg{font-weight:700;font-size:.88rem;min-width:70px;text-align:right;padding-right:8px}
 .seg-total-row td{background:rgba(192,132,252,.04);font-weight:700}
 
+/* Score button groups */
+.score-btn-group{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.score-display{min-width:38px;text-align:center;font-size:.9rem;font-weight:700;
+  color:#e2e8f0;background:#0f172a;border:1px solid #334155;border-radius:6px;padding:5px 8px}
+.score-btn{padding:5px 9px;border-radius:6px;font-size:.72rem;font-weight:700;
+  cursor:pointer;font-family:inherit;border:1px solid;transition:.15s;white-space:nowrap}
+.score-btn.plus{background:rgba(74,222,128,.1);color:#4ade80;border-color:rgba(74,222,128,.3)}
+.score-btn.plus:hover{background:rgba(74,222,128,.22)}
+.score-btn.plus2{background:rgba(96,165,250,.1);color:#60a5fa;border-color:rgba(96,165,250,.3)}
+.score-btn.plus2:hover{background:rgba(96,165,250,.22)}
+.score-btn.minus{background:rgba(248,113,113,.1);color:#f87171;border-color:rgba(248,113,113,.3)}
+.score-btn.minus:hover{background:rgba(248,113,113,.22)}
+
 /* Bonus */
 .bonus-info{font-size:.75rem;color:#64748b;margin-bottom:4px}
 
@@ -125,6 +138,25 @@ header{background:linear-gradient(135deg,#12001f,#0a0014);border-bottom:1px soli
 .io-btn.export:hover{background:rgba(34,197,94,.18)}
 .io-btn.import{background:rgba(59,130,246,.08);color:#60a5fa;border-color:rgba(59,130,246,.3)}
 .io-btn.import:hover{background:rgba(59,130,246,.18)}
+
+/* Roster */
+.roster-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:4px}
+@media(max-width:1100px){.roster-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:500px){.roster-grid{grid-template-columns:1fr}}
+.roster-card{border-radius:12px;padding:14px;border:1px solid}
+.roster-card.orion{background:rgba(96,165,250,.04);border-color:rgba(96,165,250,.18)}
+.roster-card.aquilla{background:rgba(167,139,250,.04);border-color:rgba(167,139,250,.18)}
+.roster-card.cygnus{background:rgba(248,113,113,.04);border-color:rgba(248,113,113,.18)}
+.roster-card.draco{background:rgba(74,222,128,.04);border-color:rgba(74,222,128,.18)}
+.roster-team-lbl{font-size:.8rem;font-weight:800;letter-spacing:.5px;margin-bottom:10px}
+.roster-player-row{display:flex;align-items:center;gap:5px;margin-bottom:5px}
+.roster-name-input{flex:1;background:#0a0014;border:1px solid #1e293b;border-radius:6px;
+  color:#e2e8f0;font-size:.75rem;padding:5px 7px;outline:none;font-family:inherit;transition:.15s}
+.roster-name-input:focus{border-color:rgba(192,132,252,.35);background:#0f172a}
+.cap-btn{background:none;border:none;cursor:pointer;font-size:.82rem;padding:2px 3px;
+  border-radius:4px;transition:.15s;opacity:.2;line-height:1;title:'Captain'}
+.cap-btn.active{opacity:1}
+.cap-btn:hover{opacity:.6}
 </style>
 </head>
 <body>
@@ -204,12 +236,12 @@ header{background:linear-gradient(135deg,#12001f,#0a0014);border-bottom:1px soli
     <div class="rule-banner">
       <strong>Segment 2 — Dingbats</strong><br>
       10 picture puzzles. Buzzer to answer. <strong>+10</strong> correct · <strong>−5</strong> wrong (buzzer &amp; incorrect).
-      Second team gets the chance if first is wrong. Enter each team's final score.
+      Second team gets the chance if first is wrong.
     </div>
     <table class="score-table">
       <thead><tr>
-        <th>House</th><th>Team A</th><th>Score</th>
-        <th>Team B</th><th>Score</th><th style="text-align:right">House Total</th>
+        <th>House</th><th>Team A</th><th>+10 / −5</th>
+        <th>Team B</th><th>+10 / −5</th><th style="text-align:right">House Total</th>
       </tr></thead>
       <tbody id="dingbats-rows"></tbody>
     </table>
@@ -220,12 +252,11 @@ header{background:linear-gradient(135deg,#12001f,#0a0014);border-bottom:1px soli
     <div class="rule-banner">
       <strong>Segment 3 — Shots for Losers</strong><br>
       12 questions. Fastest buzzer answers. <strong>+10</strong> correct · <strong>−5</strong> wrong buzzer.
-      Enter each team's final score.
     </div>
     <table class="score-table">
       <thead><tr>
-        <th>House</th><th>Team A</th><th>Score</th>
-        <th>Team B</th><th>Score</th><th style="text-align:right">House Total</th>
+        <th>House</th><th>Team A</th><th>+10 / −5</th>
+        <th>Team B</th><th>+10 / −5</th><th style="text-align:right">House Total</th>
       </tr></thead>
       <tbody id="shots-rows"></tbody>
     </table>
@@ -235,14 +266,13 @@ header{background:linear-gradient(135deg,#12001f,#0a0014);border-bottom:1px soli
   <div class="seg-panel" id="panel-hangman">
     <div class="rule-banner">
       <strong>Segment 4 — Hangman</strong><br>
-      8 words, 1 per house first guess. <strong>+25</strong> if team guesses correctly first.
-      Buzzer available — <strong>+5</strong> for correct answer from another team.
-      Enter each team's total score.
+      8 words, 1 per house first guess. <strong>+25</strong> guesses correctly first.
+      Buzzer available — <strong>+5</strong> correct answer from another team. No minus.
     </div>
     <table class="score-table">
       <thead><tr>
-        <th>House</th><th>Team A</th><th>Score</th>
-        <th>Team B</th><th>Score</th><th style="text-align:right">House Total</th>
+        <th>House</th><th>Team A</th><th>+25 first · +5 buzzer</th>
+        <th>Team B</th><th>+25 first · +5 buzzer</th><th style="text-align:right">House Total</th>
       </tr></thead>
       <tbody id="hangman-rows"></tbody>
     </table>
@@ -253,12 +283,11 @@ header{background:linear-gradient(135deg,#12001f,#0a0014);border-bottom:1px soli
     <div class="rule-banner">
       <strong>Segment 5 — General Knowledge</strong><br>
       20 questions. Buzzer to answer. <strong>+10</strong> correct · <strong>−5</strong> wrong buzzer.
-      Enter each team's final score.
     </div>
     <table class="score-table">
       <thead><tr>
-        <th>House</th><th>Team A</th><th>Score</th>
-        <th>Team B</th><th>Score</th><th style="text-align:right">House Total</th>
+        <th>House</th><th>Team A</th><th>+10 / −5</th>
+        <th>Team B</th><th>+10 / −5</th><th style="text-align:right">House Total</th>
       </tr></thead>
       <tbody id="gk-rows"></tbody>
     </table>
@@ -278,6 +307,12 @@ header{background:linear-gradient(135deg,#12001f,#0a0014);border-bottom:1px soli
       </tr></thead>
       <tbody id="bonus-rows"></tbody>
     </table>
+  </div>
+
+  <!-- Team Rosters -->
+  <div style="margin-top:32px">
+    <div class="section-title">Team Rosters</div>
+    <div class="roster-grid" id="roster-grid"></div>
   </div>
 
 </div><!-- end main-col -->
@@ -307,13 +342,57 @@ const HOUSES=[
 const SEGS=['sprint','dingbats','shots','hangman','gk','bonus'];
 const SEG_LABELS={sprint:'Sprint',dingbats:'Dingbats',shots:'Shots',hangman:'Hangman',gk:'GK',bonus:'Bonus'};
 
+// Seed data
+const _TEAM_NAME_SEED={
+  'orion_a':'Peak Delulu','orion_b':'Logic Legends',
+  'aquilla_a':'Six Appeal','aquilla_b':'Quizaholics',
+  'cygnus_a':'Team Ka-Pow','cygnus_b':'Team Ka-Ching',
+  'draco_a':'','draco_b':''
+};
+const ROSTER_SEED={
+  'orion_a':[
+    {n:'Peumalee Chandrasiri',c:true},{n:'Harini Samarasinghe',c:false},
+    {n:'Ruvindya Perera',c:false},{n:'Raveen Sriskandarajah',c:false},
+    {n:'Mohamed Rizan',c:false},{n:'Imfaz Illyas',c:false}
+  ],
+  'orion_b':[
+    {n:'Thimal Kumarasinghe',c:true},{n:'Asanka Perera',c:false},
+    {n:'Shehan Ishanka',c:false},{n:'Nabil Noor',c:false},
+    {n:'Chanuka Chathuranga',c:false},{n:'Raveen Dissanayaka',c:false}
+  ],
+  'aquilla_a':[
+    {n:'Ryan',c:true},{n:'Dimantha Wijayakoon',c:false},
+    {n:'Hansani Malawana',c:false},{n:'Thilini Vithanage',c:false},
+    {n:'Dakshinee Rodrigo',c:false},{n:'Jayadith Costa',c:false}
+  ],
+  'aquilla_b':[
+    {n:'Tamara Perera',c:true},{n:'Rafath Zarosh',c:false},
+    {n:'Rasindu Wanigasinghe',c:false},{n:'Rishoni De Silva',c:false},
+    {n:'Milinda Gunawardana',c:false},{n:'Sanduni Thudugala',c:false}
+  ],
+  'cygnus_a':[
+    {n:'Madhushani',c:true},{n:'Shamila Abeysinghe',c:false},
+    {n:'Dulani Hewage',c:false},{n:'Natasha Gunatilleke',c:false},
+    {n:'Shavini Saparamadu',c:false},{n:'',c:false}
+  ],
+  'cygnus_b':[
+    {n:'Sulakshani',c:true},{n:'Aishwarya Bandara',c:false},
+    {n:'Janaka Poddalgoda',c:false},{n:'Abbimanue Satheeskumar',c:false},
+    {n:'Kanchana Shashi',c:false},{n:'',c:false}
+  ],
+  'draco_a':[{n:'',c:false},{n:'',c:false},{n:'',c:false},{n:'',c:false},{n:'',c:false},{n:'',c:false}],
+  'draco_b':[{n:'',c:false},{n:'',c:false},{n:'',c:false},{n:'',c:false},{n:'',c:false},{n:'',c:false}]
+};
+
 // STATE
-let DATA={teamNames:{},scores:{}};
+let DATA={teamNames:{},scores:{},rosters:{}};
 SEGS.forEach(s=>{DATA.scores[s]={};});
 HOUSES.forEach(h=>{
-  DATA.teamNames[`${h.key}_a`]=''; DATA.teamNames[`${h.key}_b`]='';
+  DATA.teamNames[`${h.key}_a`]=_TEAM_NAME_SEED[`${h.key}_a`]||'';
+  DATA.teamNames[`${h.key}_b`]=_TEAM_NAME_SEED[`${h.key}_b`]||'';
   SEGS.forEach(s=>{DATA.scores[s][`${h.key}_a`]=0; DATA.scores[s][`${h.key}_b`]=0;});
 });
+DATA.rosters=JSON.parse(JSON.stringify(ROSTER_SEED));
 
 function tname(key){return DATA.teamNames[key]||key.replace('_a',' A').replace('_b',' B');}
 
@@ -342,13 +421,106 @@ function buildRows(segId,isCorrect,isBonus){
   }).join('');
 }
 
+function buildBuzzerRows(segId,plus,minus){
+  const tbody=document.getElementById(`${segId}-rows`);
+  tbody.innerHTML=HOUSES.map(h=>{
+    const ka=`${h.key}_a`, kb=`${h.key}_b`;
+    const va=DATA.scores[segId][ka]||0, vb=DATA.scores[segId][kb]||0;
+    const total=(+va||0)+(+vb||0);
+    const cells=(k,v)=>`
+      <td class="team-name-cell" id="tnc-${segId}-${h.key}-${k.slice(-1)}">${tname(k)}</td>
+      <td><div class="score-btn-group">
+        <span class="score-display" id="sc-disp-${segId}-${k}">${v}</span>
+        <button class="score-btn plus" onclick="adjustScore('${segId}','${k}',${plus})">+${plus}</button>
+        <button class="score-btn minus" onclick="adjustScore('${segId}','${k}',${minus})">${minus}</button>
+      </div></td>`;
+    return`<tr>
+      <td class="house-cell ${h.clr}-clr">${h.emoji} ${h.label}</td>
+      ${cells(ka,va)}${cells(kb,vb)}
+      <td class="house-avg ${h.clr}-clr" id="hv-${segId}-${h.key}">${total}</td>
+    </tr>`;
+  }).join('');
+}
+
+function buildHangmanRows(){
+  const segId='hangman';
+  const tbody=document.getElementById(`${segId}-rows`);
+  tbody.innerHTML=HOUSES.map(h=>{
+    const ka=`${h.key}_a`, kb=`${h.key}_b`;
+    const va=DATA.scores[segId][ka]||0, vb=DATA.scores[segId][kb]||0;
+    const total=(+va||0)+(+vb||0);
+    const cells=(k,v)=>`
+      <td class="team-name-cell" id="tnc-${segId}-${h.key}-${k.slice(-1)}">${tname(k)}</td>
+      <td><div class="score-btn-group">
+        <span class="score-display" id="sc-disp-${segId}-${k}">${v}</span>
+        <button class="score-btn plus" onclick="adjustScore('${segId}','${k}',25)">+25</button>
+        <button class="score-btn plus2" onclick="adjustScore('${segId}','${k}',5)">+5</button>
+      </div></td>`;
+    return`<tr>
+      <td class="house-cell ${h.clr}-clr">${h.emoji} ${h.label}</td>
+      ${cells(ka,va)}${cells(kb,vb)}
+      <td class="house-avg ${h.clr}-clr" id="hv-${segId}-${h.key}">${total}</td>
+    </tr>`;
+  }).join('');
+}
+
+function adjustScore(seg,teamKey,delta){
+  DATA.scores[seg][teamKey]=(+DATA.scores[seg][teamKey]||0)+delta;
+  const disp=document.getElementById(`sc-disp-${seg}-${teamKey}`);
+  if(disp) disp.textContent=DATA.scores[seg][teamKey];
+  updateHouseVal(seg,teamKey.split('_')[0]);
+  updateLeaderboard();
+  saveData();
+}
+
 function buildAllRows(){
   buildRows('sprint',true,false);
-  buildRows('dingbats',false,false);
-  buildRows('shots',false,false);
-  buildRows('hangman',false,false);
-  buildRows('gk',false,false);
+  buildBuzzerRows('dingbats',10,-5);
+  buildBuzzerRows('shots',10,-5);
+  buildHangmanRows();
+  buildBuzzerRows('gk',10,-5);
   buildRows('bonus',false,true);
+}
+
+function buildRosters(){
+  const grid=document.getElementById('roster-grid');
+  if(!grid) return;
+  grid.innerHTML=HOUSES.flatMap(h=>['a','b'].map(side=>{
+    const key=`${h.key}_${side}`;
+    const players=DATA.rosters[key]||[];
+    const teamName=DATA.teamNames[key]||`${h.label} ${side.toUpperCase()}`;
+    const rows=Array.from({length:6},(_,i)=>{
+      const p=players[i]||{n:'',c:false};
+      return`<div class="roster-player-row">
+        <input class="roster-name-input" value="${(p.n||'').replace(/"/g,'&quot;')}"
+          placeholder="Player ${i+1}"
+          oninput="onRosterName('${key}',${i},this.value)">
+        <button class="cap-btn ${p.c?'active':''}" id="cap-btn-${key}-${i}"
+          onclick="toggleCaptain('${key}',${i})" title="Captain">👑</button>
+      </div>`;
+    }).join('');
+    return`<div class="roster-card ${h.clr}">
+      <div class="tc-house">${h.emoji} ${h.label}</div>
+      <div class="roster-team-lbl ${h.clr}-clr" id="rtn-${key}">${teamName}</div>
+      ${rows}
+    </div>`;
+  })).join('');
+}
+
+function onRosterName(key,idx,val){
+  if(!DATA.rosters[key]) DATA.rosters[key]=Array.from({length:6},()=>({n:'',c:false}));
+  while(DATA.rosters[key].length<=idx) DATA.rosters[key].push({n:'',c:false});
+  DATA.rosters[key][idx].n=val;
+  saveData();
+}
+
+function toggleCaptain(key,idx){
+  if(!DATA.rosters[key]) DATA.rosters[key]=Array.from({length:6},()=>({n:'',c:false}));
+  while(DATA.rosters[key].length<=idx) DATA.rosters[key].push({n:'',c:false});
+  DATA.rosters[key][idx].c=!DATA.rosters[key][idx].c;
+  const btn=document.getElementById(`cap-btn-${key}-${idx}`);
+  if(btn) btn.classList.toggle('active');
+  saveData();
 }
 
 function onScore(seg,teamKey,val){
@@ -406,6 +578,10 @@ function renderNames(){
       if(eb) eb.textContent=tname(`${h.key}_b`);
     });
   });
+  HOUSES.forEach(h=>{['a','b'].forEach(s=>{
+    const el=document.getElementById(`rtn-${h.key}_${s}`);
+    if(el) el.textContent=DATA.teamNames[`${h.key}_${s}`]||`${h.label} ${s.toUpperCase()}`;
+  });});
 }
 
 function switchSeg(seg,btn){
@@ -436,6 +612,7 @@ function loadData(){
       const d=JSON.parse(raw);
       if(d.teamNames) DATA.teamNames={...DATA.teamNames,...d.teamNames};
       if(d.scores) SEGS.forEach(s=>{if(d.scores[s]) DATA.scores[s]={...DATA.scores[s],...d.scores[s]};});
+      if(d.rosters) DATA.rosters={...DATA.rosters,...d.rosters};
     }catch(e){}
   }
   HOUSES.forEach(h=>{
@@ -443,6 +620,7 @@ function loadData(){
     document.getElementById(`tn-${h.key}-b`).value=DATA.teamNames[`${h.key}_b`]||'';
   });
   buildAllRows();
+  buildRosters();
   updateLeaderboard();
 }
 
@@ -464,12 +642,13 @@ function handleTriviaImport(e){
       const d=JSON.parse(ev.target.result);
       if(d.teamNames) DATA.teamNames={...DATA.teamNames,...d.teamNames};
       if(d.scores) SEGS.forEach(s=>{if(d.scores[s]) DATA.scores[s]={...DATA.scores[s],...d.scores[s]};});
+      if(d.rosters) DATA.rosters={...DATA.rosters,...d.rosters};
       saveData();
       HOUSES.forEach(h=>{
         document.getElementById(`tn-${h.key}-a`).value=DATA.teamNames[`${h.key}_a`]||'';
         document.getElementById(`tn-${h.key}-b`).value=DATA.teamNames[`${h.key}_b`]||'';
       });
-      buildAllRows();updateLeaderboard();showSaved();
+      buildAllRows();buildRosters();updateLeaderboard();showSaved();
       alert('Trivia data imported!');
     }catch(err){alert('Invalid file.');}
     e.target.value='';
