@@ -19,8 +19,11 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .blob1{width:520px;height:520px;background:radial-gradient(circle,rgba(191,0,255,.07),transparent 70%);top:-130px;left:-130px}
 .blob2{width:440px;height:440px;background:radial-gradient(circle,rgba(0,245,255,.05),transparent 70%);bottom:-90px;right:-90px}
 
-.app{position:relative;z-index:1;max-width:700px;margin:0 auto;padding:14px 10px 48px;
-  display:flex;flex-direction:column;align-items:center;gap:12px}
+.app-outer{position:relative;z-index:1;max-width:940px;margin:0 auto;padding:14px 10px 48px}
+.app-header{display:flex;flex-direction:column;align-items:center;gap:8px;margin-bottom:12px}
+.app-grid{display:grid;grid-template-columns:1fr 172px;gap:14px;align-items:start}
+@media(max-width:660px){.app-grid{grid-template-columns:1fr}}
+.game-col{display:flex;flex-direction:column;gap:12px}
 
 /* Header */
 .logo{font-size:clamp(2.2rem,7vw,4rem);font-weight:900;letter-spacing:10px;text-transform:uppercase;
@@ -101,8 +104,8 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
   opacity:0;transform:translateY(-8px) scale(.5);transition:all .36s cubic-bezier(.34,1.56,.64,1)}
 .lc.vis{opacity:1;transform:none}
 .ll{width:100%;min-width:24px;height:2px;background:linear-gradient(90deg,var(--purple),var(--cyan));border-radius:2px}
-.hint-row{font-size:.72rem;text-align:center;color:var(--dim);padding:5px 10px;
-  background:var(--surf);border:1px solid var(--border);border-radius:8px}
+.hint-row{font-size:.88rem;text-align:center;color:#cbd5e1;padding:10px 14px;
+  background:rgba(255,230,0,.04);border:1px solid rgba(255,230,0,.18);border-radius:10px;line-height:1.55}
 .hint-row span{color:var(--yellow);font-weight:600}
 .wrong-lbl{font-size:.72rem;min-height:18px;text-align:center}
 .kb-wrap{background:var(--surf);border:1px solid var(--border);border-radius:var(--r);padding:11px;backdrop-filter:blur(10px)}
@@ -145,27 +148,32 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .modal.lose .btn-again{background:linear-gradient(135deg,var(--red),#cc0022);color:#fff;box-shadow:0 4px 18px rgba(255,68,85,.4)}
 .modal.lose .btn-again:hover{transform:scale(1.07)}
 
-/* Word Picker */
-.wp-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.86);z-index:150;
-  align-items:center;justify-content:center;backdrop-filter:blur(8px)}
-.wp-overlay.open{display:flex}
-.wp-box{background:rgba(8,8,24,.98);border:1px solid rgba(0,245,255,.2);border-radius:22px;
-  padding:28px 24px;text-align:center;animation:popIn .36s cubic-bezier(.34,1.56,.64,1);
-  min-width:280px;max-width:350px;width:92%}
-.wp-title{font-size:1rem;font-weight:900;letter-spacing:4px;text-transform:uppercase;
-  background:linear-gradient(90deg,var(--cyan),var(--purple));
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:4px}
-.wp-sub{font-size:.66rem;color:var(--dim);letter-spacing:1px;margin-bottom:16px}
-.wp-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px}
-.wp-btn{height:58px;border-radius:13px;border:2px solid rgba(0,245,255,.22);
-  background:rgba(0,245,255,.05);color:var(--cyan);font-size:1.55rem;font-weight:900;
+/* Side panel */
+.side-panel{background:var(--surf);border:1px solid var(--border);border-radius:16px;
+  padding:14px 12px;display:flex;flex-direction:column;gap:8px;position:sticky;top:14px}
+@media(max-width:660px){.side-panel{position:static}}
+.sp-title{font-size:.62rem;color:var(--dim);letter-spacing:2px;text-transform:uppercase;
+  text-align:center;padding-bottom:6px;border-bottom:1px solid var(--border)}
+.sp-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:7px}
+.sp-btn{height:50px;border-radius:10px;border:2px solid rgba(0,245,255,.2);
+  background:rgba(0,245,255,.04);color:var(--cyan);font-size:1.4rem;font-weight:900;
   cursor:pointer;transition:all .17s;display:flex;align-items:center;justify-content:center}
-.wp-btn:hover{border-color:var(--cyan);background:rgba(0,245,255,.15);transform:scale(1.1);box-shadow:0 0 16px rgba(0,245,255,.3)}
-.wp-btn.wp-active{border-color:var(--yellow);color:var(--yellow);background:rgba(255,230,0,.1);box-shadow:0 0 12px rgba(255,230,0,.2)}
-.wp-random{width:100%;padding:10px;border-radius:10px;border:1px solid rgba(191,0,255,.35);
-  background:rgba(191,0,255,.08);color:var(--purple);font-size:.78rem;font-weight:700;
-  letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:all .2s}
-.wp-random:hover{background:rgba(191,0,255,.2);transform:translateY(-2px)}
+.sp-btn:hover{border-color:var(--cyan);background:rgba(0,245,255,.14);transform:scale(1.08)}
+.sp-btn.sp-active{border-color:var(--yellow);color:var(--yellow);background:rgba(255,230,0,.1);
+  box-shadow:0 0 10px rgba(255,230,0,.18)}
+.sp-divider{height:1px;background:var(--border)}
+.sp-hint-lbl{font-size:.6rem;color:var(--dim);letter-spacing:1px;text-transform:uppercase;text-align:center}
+.hint-btn{width:100%;padding:8px 6px;border-radius:9px;font-size:.7rem;font-weight:700;
+  cursor:pointer;font-family:inherit;letter-spacing:.3px;border:1px solid;transition:.2s}
+.hint-btn.h1{background:rgba(255,230,0,.07);color:var(--yellow);border-color:rgba(255,230,0,.3)}
+.hint-btn.h1:hover:not(:disabled){background:rgba(255,230,0,.16)}
+.hint-btn.h2{background:rgba(0,255,136,.07);color:var(--green);border-color:rgba(0,255,136,.3)}
+.hint-btn.h2:hover:not(:disabled){background:rgba(0,255,136,.16)}
+.hint-btn:disabled{opacity:.35;cursor:default}
+.hint-text-box{font-size:.82rem;color:#cbd5e1;line-height:1.6;padding:8px 9px;
+  background:rgba(255,230,0,.04);border:1px solid rgba(255,230,0,.14);border-radius:8px;
+  display:none;word-break:break-word}
+.hint-text-box.show{display:block}
 
 #cfx{position:fixed;inset:0;pointer-events:none;z-index:199;display:none}
 
@@ -184,7 +192,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
     <div class="modal-title">You Win!</div>
     <div class="modal-word" id="win-word"></div>
     <div class="modal-sub" id="win-sub"></div>
-    <button class="btn-again" onclick="openWordPicker()">▶ Next Word</button>
+    <button class="btn-again" onclick="sfx('click');closeModals();pickWord(-1)">▶ Next Word</button>
   </div>
 </div>
 
@@ -194,33 +202,27 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
     <span class="modal-emoji">💀</span>
     <div class="modal-title">Game Over!</div>
     <div class="modal-sub">Better luck next time!</div>
-    <button class="btn-again" onclick="openWordPicker()">↺ Try Again</button>
-  </div>
-</div>
-
-<!-- Word Picker -->
-<div class="wp-overlay" id="word-picker">
-  <div class="wp-box">
-    <div class="wp-title">⚡ Pick a Word</div>
-    <div class="wp-sub">Choose word 1 – 8 for this round</div>
-    <div class="wp-grid" id="wp-grid"></div>
-    <button class="wp-random" onclick="pickWord(-1)">🎲 Random</button>
+    <button class="btn-again" onclick="sfx('click');closeModals();startGame(G.wordIndex)">↺ Try Again</button>
   </div>
 </div>
 
 <!-- App -->
-<div class="app">
-  <div style="text-align:center">
-    <div class="logo">Hangman</div>
-    <div class="tagline">Gapstars Grand Table Clash 2026 · 3 strikes &amp; you're out</div>
-  </div>
+<div class="app-outer">
+  <div class="app-header">
+    <div style="text-align:center">
+      <div class="logo">Hangman</div>
+      <div class="tagline">Gapstars Grand Table Clash 2026 · 3 strikes &amp; you're out</div>
+    </div>
+    <div class="score-bar">
+      <div class="pill w"><span class="lbl">Wins</span><span class="val" id="s-wins">0</span></div>
+      <div class="pill l"><span class="lbl">Losses</span><span class="val" id="s-losses">0</span></div>
+      <div class="pill s"><span class="lbl">Streak</span><span class="val" id="s-streak">0</span></div>
+      <div class="pill b"><span class="lbl">Best</span><span class="val" id="s-best">0</span></div>
+    </div>
+  </div><!-- /app-header -->
 
-  <div class="score-bar">
-    <div class="pill w"><span class="lbl">Wins</span><span class="val" id="s-wins">0</span></div>
-    <div class="pill l"><span class="lbl">Losses</span><span class="val" id="s-losses">0</span></div>
-    <div class="pill s"><span class="lbl">Streak</span><span class="val" id="s-streak">0</span></div>
-    <div class="pill b"><span class="lbl">Best</span><span class="val" id="s-best">0</span></div>
-  </div>
+  <div class="app-grid">
+  <div class="game-col">
 
   <!-- ══ HANGMAN STAGE (top) ══ -->
   <div class="stage-wrap">
@@ -405,26 +407,41 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
     </div>
 
     <div class="actions">
-      <button class="btn btn-new"  onclick="sfx('click');openWordPicker()">↺ New Word</button>
-      <button class="btn btn-pick" onclick="sfx('click');openWordPicker()">🎯 Pick Word</button>
+      <button class="btn btn-new" onclick="sfx('click');pickWord(-1)">↺ Random Word</button>
+    </div>
+  </div><!-- /word-zone -->
+
+  </div><!-- /game-col -->
+
+  <!-- ══ SIDE PANEL ══ -->
+  <div class="side-panel">
+    <div class="sp-title">⚡ Pick a Word</div>
+    <div class="sp-grid" id="wp-grid"></div>
+    <div id="hint-section" style="display:none">
+      <div class="sp-divider"></div>
+      <div class="sp-hint-lbl">Hints</div>
+      <button class="hint-btn h1" id="hint1-btn" onclick="useHint1()">💡 Text Hint</button>
+      <button class="hint-btn h2" id="hint2-btn" onclick="useHint2()">🔤 Show Letters</button>
+      <div class="hint-text-box" id="hint-text-box"></div>
     </div>
   </div>
 
-</div><!-- /app -->
+  </div><!-- /app-grid -->
+</div><!-- /app-outer -->
 
 <script>
 /* ═══════════════════════════════════════════════
    8 TOURNAMENT WORDS  (update w: and h: here)
 ═══════════════════════════════════════════════ */
 const WORDS = [
-  { w:'CAPSICUM',  h:'' },
-  { w:'SCENARIO',  h:'' },
-  { w:'FRACTURE',  h:'' },
-  { w:'EXTERNAL',  h:'' },
-  { w:'POSTCARD',  h:'' },
-  { w:'REPUBLIC',  h:'' },
-  { w:'NIGHTLIFE', h:'' },
-  { w:'MEDIEVAL',  h:'' },
+  { w:'PHYSIQUE',  h:'The form, size, and development of a person\'s body.',          r:['S','U'] },
+  { w:'SYLLABUS',  h:'A planned outline of what will be covered.',                    r:['L','A'] },
+  { w:'TRANQUIL',  h:'Calm and peaceful.',                                            r:['R','L'] },
+  { w:'HYPNOTIC',  h:'A mesmerizing quality that captures the mind.',                 r:['P','I'] },
+  { w:'GLYCERIN',  h:'A polyol compound widely used in skincare, food and industry.', r:['L','I'] },
+  { w:'BLIZZARD',  h:'A severe snowstorm with low visibility.',                       r:['L','A'] },
+  { w:'SQUEAKED',  h:'Barely passed or escaped a situation.',                         r:['E']     },
+  { w:'CRYPTIC',   h:'Having a meaning that is mysterious, obscure, or hidden.',      r:['T','C'] },
 ];
 
 /* ═══════════════════════════════════════════════
@@ -477,9 +494,10 @@ function sfx(n){try{SFX[n]?.();}catch(e){}}
    GAME STATE
 ═══════════════════════════════════════════════ */
 const G={
-  word:'', hint:'', wordIndex:-1,
+  word:'', hint:'', reveal:[], wordIndex:-1,
   guessed:new Set(), wrong:0, maxWrong:3, over:false,
-  charX:0,   // current SVG X offset from base position
+  charX:0,
+  hint1Used:false, hint2Used:false,
   score:{wins:0,losses:0,streak:0,best:0},
 };
 
@@ -586,10 +604,10 @@ function init(){
   document.addEventListener('keydown', e => {
     const k = e.key.toUpperCase();
     if(/^[A-Z]$/.test(k) && !G.over && G.word){ sfx('click'); guess(k); }
-    if(e.key === 'Enter')  openWordPicker();
+    if(e.key === 'Enter')  pickWord(-1);
     if(e.key === 'Escape') closeAll();
   });
-  setTimeout(openWordPicker, 200);
+  // Side panel always visible — no auto-open needed
 }
 
 function buildKeyboard(){
@@ -606,7 +624,7 @@ function buildWordPicker(){
   const grid = document.getElementById('wp-grid'); grid.innerHTML = '';
   WORDS.forEach((_,i) => {
     const b = document.createElement('button');
-    b.className='wp-btn'; b.id=`wp-${i}`; b.textContent=i+1;
+    b.className='sp-btn'; b.id=`wp-${i}`; b.textContent=i+1;
     b.addEventListener('click', () => pickWord(i));
     grid.appendChild(b);
   });
@@ -615,17 +633,14 @@ function buildWordPicker(){
 /* ═══════════════════════════════════════════════
    WORD PICKER
 ═══════════════════════════════════════════════ */
-function openWordPicker(){
-  closeModals(); stopConfetti();
-  document.querySelectorAll('.wp-btn').forEach((b,i) =>
-    b.classList.toggle('wp-active', i === G.wordIndex));
-  document.getElementById('word-picker').classList.add('open');
-}
+function openWordPicker(){ /* side panel always visible — no-op */ }
 
 function pickWord(idx){
   sfx('click');
+  closeModals(); stopConfetti();
   const i = idx < 0 ? (Math.random() * WORDS.length | 0) : idx;
-  document.getElementById('word-picker').classList.remove('open');
+  document.querySelectorAll('.sp-btn').forEach((b,j) =>
+    b.classList.toggle('sp-active', j === i));
   startGame(i);
 }
 
@@ -636,8 +651,17 @@ function startGame(idx){
   if(_rafId){ cancelAnimationFrame(_rafId); _rafId = null; }
 
   const entry = WORDS[idx];
-  G.wordIndex = idx; G.word = entry.w.toUpperCase(); G.hint = entry.h;
+  G.wordIndex = idx; G.word = entry.w.toUpperCase(); G.hint = entry.h; G.reveal = entry.r || [];
   G.guessed = new Set(); G.wrong = 0; G.over = false;
+  G.hint1Used = false; G.hint2Used = false;
+  const hs = document.getElementById('hint-section');
+  if(hs) hs.style.display = '';
+  const h1b = document.getElementById('hint1-btn');
+  const h2b = document.getElementById('hint2-btn');
+  const htb = document.getElementById('hint-text-box');
+  if(h1b){ h1b.disabled=false; h1b.textContent='💡 Text Hint'; }
+  if(h2b){ h2b.disabled=false; h2b.textContent='🔤 Show Letters'; }
+  if(htb){ htb.classList.remove('show'); htb.textContent=''; }
 
   // Reset character position
   G.charX = 0;
@@ -734,8 +758,47 @@ function renderMeta(){
   document.getElementById('word-badge').textContent =
     G.wordIndex >= 0 ? `WORD ${G.wordIndex+1} / ${WORDS.length}` : '⚡ PICK A WORD';
   const hr = document.getElementById('hint-row');
-  if(G.hint){ hr.style.display=''; document.getElementById('hint-text').textContent=G.hint; }
-  else { hr.style.display='none'; }
+  if(hr) hr.style.display='none';
+}
+
+function useHint1(){
+  if(G.hint1Used || !G.word) return;
+  G.hint1Used = true;
+  const btn = document.getElementById('hint1-btn');
+  if(btn){ btn.disabled=true; btn.textContent='💡 Hint Shown'; }
+  // Side panel small box
+  const box = document.getElementById('hint-text-box');
+  if(box){ box.textContent=G.hint; box.classList.add('show'); }
+  // Main area hint row (between word and keyboard)
+  const hr = document.getElementById('hint-row');
+  const ht = document.getElementById('hint-text');
+  if(hr && ht){ ht.textContent=G.hint; hr.style.display=''; }
+}
+
+function useHint2(){
+  if(G.hint2Used || !G.word || G.over) return;
+  G.hint2Used = true;
+  const btn = document.getElementById('hint2-btn');
+  if(btn){ btn.disabled=true; btn.textContent='🔤 Letters Shown'; }
+  G.reveal.forEach((letter, i) => {
+    setTimeout(() => {
+      if(!G.guessed.has(letter)){
+        G.guessed.add(letter);
+        const kbBtn = document.getElementById(`k-${letter}`);
+        if(kbBtn){ kbBtn.disabled=true; kbBtn.classList.add('hit-correct'); }
+        revealLetter(letter);
+        sfx('correct');
+      }
+    }, i * 380);
+  });
+  setTimeout(() => {
+    if(!G.over && isComplete()){
+      G.over=true; G.score.wins++; G.score.streak++;
+      G.score.best=Math.max(G.score.best,G.score.streak);
+      updateScoreUI();
+      setTimeout(()=>{showWin();sfx('win');startConfetti();},300);
+    }
+  }, G.reveal.length * 380 + 150);
 }
 
 function renderStrikes(){
@@ -809,7 +872,6 @@ function closeModals(){
 
 function closeAll(){
   closeModals();
-  document.getElementById('word-picker').classList.remove('open');
 }
 
 /* ═══════════════════════════════════════════════
