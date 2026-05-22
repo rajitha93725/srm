@@ -658,6 +658,7 @@ function renderStandings(){
     hd[h].bonus=hd[h].completed>=4?100:0; // 4 pairs needed (not 7)
     hd[h].total=hd[h].pairs.reduce((s,p)=>s+p.res.pts,0)+hd[h].bonus;
   });
+  {const _t={};Object.keys(hd).forEach(h=>{_t[h]=hd[h].total;});localStorage.setItem('gapstars_house_pool_mixed',JSON.stringify(_t));}
   const sorted=Object.entries(hd).sort((a,b)=>b[1].total-a[1].total);
   const rankEmoji=['🥇','🥈','🥉','4️⃣'];
   document.getElementById('house-summary').innerHTML=sorted.map(([h,d],rank)=>`

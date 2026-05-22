@@ -808,6 +808,7 @@ function renderStandings(){
     hd[h].bonus=hd[h].completed>=7?100:0;
     hd[h].total=hd[h].pairs.reduce((s,p)=>s+p.res.pts,0)+hd[h].bonus;
   });
+  {const _t={};Object.keys(hd).forEach(h=>{_t[h]=hd[h].total;});localStorage.setItem('gapstars_house_pool_mens',JSON.stringify(_t));}
 
   const sorted=Object.entries(hd).sort((a,b)=>b[1].total-a[1].total);
   const rankEmoji=['🥇','🥈','🥉','4️⃣'];

@@ -8,6 +8,7 @@
 <link rel="prefetch" href="gap_pool_mixed.html">
 <link rel="prefetch" href="gap_trivia.html">
 <link rel="prefetch" href="gap_carrom_mens.html">
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700;900&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Segoe UI',sans-serif;background:#06010f;color:#e2e8f0;min-height:100vh;overflow-x:hidden}
@@ -226,6 +227,118 @@ footer{position:relative;z-index:5;text-align:center;padding:14px 20px 18px;
 .hk-note{margin-top:12px;padding:10px 16px;border-radius:10px;background:rgba(255,170,0,.06);
   border:1px solid rgba(255,170,0,.2);font-size:.72rem;color:#f59e0b;line-height:1.6;text-align:center}
 
+/* ── Tabs ───────────────────────────────────────────────── */
+.tab-bar{display:flex;gap:0;margin-bottom:28px;border-bottom:1px solid rgba(255,255,255,.07)}
+.tab-btn{padding:10px 32px 13px;background:none;border:none;border-bottom:3px solid transparent;
+  color:rgba(200,180,255,.4);font-family:inherit;font-size:.88rem;font-weight:700;
+  letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:.18s;margin-bottom:-1px}
+.tab-btn.active{color:#ffd700;border-bottom-color:#ffd700;text-shadow:0 0 20px rgba(255,215,0,.3)}
+.tab-btn:hover:not(.active){color:rgba(200,180,255,.7)}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+
+/* ── Pool standings widget ──────────────────────────────── */
+.pool-std-wrap{margin-top:20px;background:rgba(56,189,248,.035);
+  border:1px solid rgba(56,189,248,.13);border-radius:14px;padding:16px 20px}
+.pool-std-title{font-size:.65rem;color:#475569;letter-spacing:2px;text-transform:uppercase;
+  margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.pool-std-title span{flex:1;height:1px;background:linear-gradient(90deg,rgba(56,189,248,.2),transparent)}
+.pool-std-row{display:flex;align-items:center;gap:10px;padding:7px 0;
+  border-bottom:1px solid rgba(255,255,255,.04)}
+.pool-std-row:last-child{border-bottom:none}
+.pool-std-rank{font-size:.82rem;font-weight:800;color:#64748b;min-width:26px}
+.pool-std-name{flex:1;font-weight:700;font-size:.88rem}
+.pool-std-bar-wrap{flex:2;background:#1e293b;border-radius:6px;height:7px;overflow:hidden}
+.pool-std-bar{height:100%;border-radius:6px;transition:width .5s ease}
+.pool-std-pts{font-size:.9rem;font-weight:800;min-width:54px;text-align:right}
+.pool-std-sub{font-size:.6rem;color:#64748b;margin-left:3px;font-weight:400}
+
+/* ── Carrom standings placeholder ───────────────────────── */
+.carrom-std-wrap{margin-top:20px;background:rgba(245,158,11,.03);
+  border:1px solid rgba(245,158,11,.12);border-radius:14px;padding:16px 20px;text-align:center}
+.carrom-std-soon{font-size:.82rem;color:#64748b;line-height:1.8}
+.carrom-std-soon strong{color:#f59e0b}
+
+/* ── Overall House Standings tab ───────────────────────── */
+.ov-header{text-align:center;margin-bottom:30px;padding-top:4px}
+.ov-overall-word{
+  display:block;font-size:clamp(2rem,4vw,3.2rem);font-weight:900;letter-spacing:5px;
+  text-transform:uppercase;line-height:1.1;
+  background:linear-gradient(90deg,#ffd700 0%,#ffaa00 40%,#fff7b0 60%,#ffd700 100%);
+  background-size:250%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  animation:tsh 5s linear infinite;margin-bottom:5px}
+.ov-subtitle{font-size:.62rem;color:#64748b;letter-spacing:3.5px;text-transform:uppercase}
+
+.ov-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;margin-bottom:24px}
+@media(max-width:880px){.ov-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:440px){.ov-grid{grid-template-columns:1fr 1fr}}
+
+@keyframes ov-flow{0%,100%{background-position:0% 60%}50%{background-position:100% 40%}}
+
+.ov-card{border-radius:22px;padding:32px 18px 26px;text-align:center;border:2px solid;
+  position:relative;overflow:hidden;transition:transform .25s,box-shadow .25s;
+  background-size:220% 220%;animation:ov-flow 7s ease infinite}
+.ov-card:hover{transform:translateY(-7px)}
+
+.ov-card.h-orion{
+  border-color:rgba(96,165,250,.55);
+  background:linear-gradient(140deg,rgba(96,165,250,.16) 0%,rgba(29,78,216,.05) 50%,rgba(96,165,250,.12) 100%);
+  box-shadow:0 4px 28px rgba(96,165,250,.13),inset 0 1px 0 rgba(96,165,250,.15)}
+.ov-card.h-aquilla{
+  border-color:rgba(167,139,250,.55);
+  background:linear-gradient(140deg,rgba(167,139,250,.16) 0%,rgba(109,40,217,.05) 50%,rgba(167,139,250,.12) 100%);
+  box-shadow:0 4px 28px rgba(167,139,250,.13),inset 0 1px 0 rgba(167,139,250,.15)}
+.ov-card.h-cygnus{
+  border-color:rgba(248,113,113,.55);
+  background:linear-gradient(140deg,rgba(248,113,113,.16) 0%,rgba(185,28,28,.05) 50%,rgba(248,113,113,.12) 100%);
+  box-shadow:0 4px 28px rgba(248,113,113,.13),inset 0 1px 0 rgba(248,113,113,.15)}
+.ov-card.h-draco{
+  border-color:rgba(74,222,128,.55);
+  background:linear-gradient(140deg,rgba(74,222,128,.16) 0%,rgba(21,128,61,.05) 50%,rgba(74,222,128,.12) 100%);
+  box-shadow:0 4px 28px rgba(74,222,128,.13),inset 0 1px 0 rgba(74,222,128,.15)}
+
+.ov-card.rank-1{border-color:rgba(255,215,0,.8)!important;
+  box-shadow:0 0 65px rgba(255,215,0,.3),0 8px 36px rgba(0,0,0,.55)!important}
+.ov-card.rank-2{box-shadow:0 0 34px rgba(192,210,230,.13),0 6px 24px rgba(0,0,0,.4)!important}
+.ov-card.rank-3{box-shadow:0 0 30px rgba(210,130,50,.1),0 6px 24px rgba(0,0,0,.4)!important}
+.ov-card.rank-4{opacity:.8}
+
+/* Subtle shimmer strip inside card */
+.ov-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.15),transparent)}
+
+.ov-rank-badge{position:absolute;top:13px;left:15px;font-size:1.55rem;line-height:1;
+  filter:drop-shadow(0 2px 8px rgba(0,0,0,.6))}
+.ov-em{font-size:3rem;margin-bottom:6px;filter:drop-shadow(0 0 16px rgba(0,0,0,.3));display:block}
+
+.ov-hname{
+  font-family:'Dancing Script','Brush Script MT','Segoe Script',cursive;
+  font-size:1.85rem;font-weight:700;margin-bottom:14px;line-height:1.1;letter-spacing:.5px}
+.ov-hname.h-orion {color:#93c5fd;text-shadow:0 0 18px rgba(96,165,250,.3)}
+.ov-hname.h-aquilla{color:#c4b5fd;text-shadow:0 0 18px rgba(167,139,250,.3)}
+.ov-hname.h-cygnus {color:#fca5a5;text-shadow:0 0 18px rgba(248,113,113,.3)}
+.ov-hname.h-draco  {color:#86efac;text-shadow:0 0 18px rgba(74,222,128,.3)}
+
+.ov-pts-inp{background:transparent;border:none;border-bottom:2px solid;
+  font-size:3rem;font-weight:900;font-family:inherit;text-align:center;
+  width:100%;outline:none;line-height:1;padding:0 0 4px}
+.ov-pts-inp.h-orion {color:#60a5fa;border-bottom-color:rgba(96,165,250,.4);text-shadow:0 0 24px rgba(96,165,250,.4)}
+.ov-pts-inp.h-aquilla{color:#a78bfa;border-bottom-color:rgba(167,139,250,.4);text-shadow:0 0 24px rgba(167,139,250,.4)}
+.ov-pts-inp.h-cygnus {color:#f87171;border-bottom-color:rgba(248,113,113,.4);text-shadow:0 0 24px rgba(248,113,113,.4)}
+.ov-pts-inp.h-draco  {color:#4ade80;border-bottom-color:rgba(74,222,128,.4);text-shadow:0 0 24px rgba(74,222,128,.4)}
+.ov-pts-inp:focus{border-bottom-color:currentColor}
+.ov-pts-inp::-webkit-inner-spin-button,.ov-pts-inp::-webkit-outer-spin-button{display:none}
+.ov-pts-lbl{font-size:.64rem;letter-spacing:2px;text-transform:uppercase;
+  color:rgba(100,116,139,.55);margin-top:6px}
+
+.ov-foot{display:flex;gap:10px;justify-content:flex-end}
+.ov-act-btn{padding:8px 18px;border-radius:10px;font-size:.7rem;font-weight:700;
+  cursor:pointer;font-family:inherit;letter-spacing:.5px;transition:.2s}
+.ov-act-btn.exp{background:rgba(34,197,94,.08);color:#4ade80;border:1px solid rgba(34,197,94,.3)}
+.ov-act-btn.exp:hover{background:rgba(34,197,94,.18)}
+.ov-act-btn.imp{background:rgba(59,130,246,.08);color:#60a5fa;border:1px solid rgba(59,130,246,.3)}
+.ov-act-btn.imp:hover{background:rgba(59,130,246,.18)}
+
 /* ── Funny toast ────────────────────────────────────────── */
 #funny-toast{
   position:fixed;bottom:60px;left:50%;transform:translateX(-50%) translateY(30px);
@@ -278,6 +391,15 @@ footer{position:relative;z-index:5;text-align:center;padding:14px 20px 18px;
 
 <!-- ═══════ MAIN ═════════════════════════════════════════════ -->
 <main>
+<!-- ═══ TAB BAR ══════════════════════════════════════════ -->
+<div class="tab-bar">
+  <button class="tab-btn active" data-tab="sports" onclick="switchTab('sports')">🎱 Pool &amp; Carrom</button>
+  <button class="tab-btn" data-tab="overall" onclick="switchTab('overall')">🏆 Overall</button>
+  <button class="tab-btn" data-tab="events" onclick="switchTab('events')">🤖 AI &amp; Trivia</button>
+</div>
+
+<!-- ═══ EVENTS TAB ════════════════════════════════════════ -->
+<div class="tab-panel" id="tab-events">
 <!-- ═══ TOP EVENTS ════════════════════════════════════════ -->
 <div class="events-row">
   <div class="ev-tile hack" onclick="openHackathon()">
@@ -297,7 +419,10 @@ footer{position:relative;z-index:5;text-align:center;padding:14px 20px 18px;
     <span class="ev-badge">▶ Enter Scoring</span>
   </div>
 </div>
+</div><!-- end tab-events -->
 
+<!-- ═══ SPORTS TAB ═══════════════════════════════════════ -->
+<div class="tab-panel active" id="tab-sports">
 <div class="sections-row">
 
   <!-- ── POOL SECTION ───────────────────────────────────────── -->
@@ -400,6 +525,11 @@ footer{position:relative;z-index:5;text-align:center;padding:14px 20px 18px;
         <div class="tile-cat">Pool · Women</div>
         <span class="tile-badge badge-soon">⏳ Coming Soon</span>
       </div>
+    </div>
+    <!-- Pool House Standings -->
+    <div class="pool-std-wrap">
+      <div class="pool-std-title">House Standings · Mens + Mixed Combined <span></span></div>
+      <div id="pool-std-rows"></div>
     </div>
   </div>
 
@@ -505,9 +635,28 @@ footer{position:relative;z-index:5;text-align:center;padding:14px 20px 18px;
         <span class="tile-badge badge-soon">⏳ Coming Soon</span>
       </div>
     </div>
+    <!-- Carrom Standings Placeholder -->
+    <div class="carrom-std-wrap">
+      <div class="carrom-std-soon">🎯 <strong>Carrom Standings</strong><br>House totals will appear here once matches begin.</div>
+    </div>
   </div>
 
 </div><!-- end sections-row -->
+</div><!-- end tab-sports -->
+
+<!-- ═══ OVERALL TAB ════════════════════════════════════════ -->
+<div class="tab-panel" id="tab-overall">
+  <div class="ov-header">
+    <span class="ov-overall-word">Overall</span>
+    <div class="ov-subtitle">Grand House Standings</div>
+  </div>
+  <div class="ov-grid" id="ov-grid"></div>
+  <div class="ov-foot">
+    <button class="ov-act-btn exp" onclick="ovExport()">⬇ Export</button>
+    <button class="ov-act-btn imp" onclick="ovImport()">⬆ Import</button>
+  </div>
+</div>
+<input type="file" id="ov-import-file" accept=".json" style="display:none" onchange="handleOvImport(event)">
 </main>
 
 <footer>
@@ -725,6 +874,7 @@ function exportAll(){
     mixed:   JSON.parse(localStorage.getItem('gapstars_mixed_2026')||'null'),
     hackathon:JSON.parse(localStorage.getItem('gapstars_hackathon')||'null'),
     trivia:  JSON.parse(localStorage.getItem('gapstars_trivia_2026')||'null'),
+    overall: JSON.parse(localStorage.getItem('gapstars_overall_2026')||'null'),
     _exported:new Date().toISOString()
   };
   const b=new Blob([JSON.stringify(all,null,2)],{type:'application/json'});
@@ -744,6 +894,7 @@ function handleImportAll(e){
       if(all.mixed)    localStorage.setItem('gapstars_mixed_2026',JSON.stringify(all.mixed));
       if(all.hackathon)localStorage.setItem('gapstars_hackathon',JSON.stringify(all.hackathon));
       if(all.trivia)   localStorage.setItem('gapstars_trivia_2026',JSON.stringify(all.trivia));
+      if(all.overall)  localStorage.setItem('gapstars_overall_2026',JSON.stringify(all.overall));
       alert('All data imported! Reload event pages to see changes.');
     }catch(err){alert('Invalid backup file.');}
     e.target.value='';
@@ -783,6 +934,119 @@ function showFunny(key){
 }
 function hideToast(){
   document.getElementById('funny-toast').classList.remove('show');
+}
+
+// ── Tab switching ─────────────────────────────────────────────
+function switchTab(name){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active',b.dataset.tab===name));
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.toggle('active',p.id==='tab-'+name));
+  if(name==='overall') ovLoad();
+}
+
+// ── Pool standings (reads pre-computed values saved by pool pages) ────────────
+function renderPoolStandings(){
+  const HCOL={orion:'#60a5fa',aquilla:'#a78bfa',cygnus:'#f87171',draco:'#4ade80'};
+  const HBAR={orion:'#1d4ed8',aquilla:'#6d28d9',cygnus:'#b91c1c',draco:'#15803d'};
+  const HNAME={orion:'⭐ Orion',aquilla:'🦅 Aquilla',cygnus:'🦢 Cygnus',draco:'🐉 Draco'};
+  const mens=JSON.parse(localStorage.getItem('gapstars_house_pool_mens')||'{}');
+  const mixed=JSON.parse(localStorage.getItem('gapstars_house_pool_mixed')||'{}');
+  const totals={};
+  ['orion','aquilla','cygnus','draco'].forEach(h=>{totals[h]=(mens[h]||0)+(mixed[h]||0);});
+  const sorted=Object.entries(totals).sort((a,b)=>b[1]-a[1]);
+  const max=Math.max(...sorted.map(([,v])=>v),1);
+  const ranks=['🥇','🥈','🥉','4️⃣'];
+  document.getElementById('pool-std-rows').innerHTML=sorted.map(([h,pts],i)=>`
+    <div class="pool-std-row">
+      <span class="pool-std-rank">${ranks[i]}</span>
+      <span class="pool-std-name" style="color:${HCOL[h]}">${HNAME[h]}</span>
+      <div class="pool-std-bar-wrap"><div class="pool-std-bar" style="width:${Math.round(pts/max*100)}%;background:${HBAR[h]}"></div></div>
+      <span class="pool-std-pts" style="color:${HCOL[h]}">${pts}<span class="pool-std-sub">${mens[h]||0}+${mixed[h]||0}</span></span>
+    </div>`).join('');
+}
+renderPoolStandings();
+window.addEventListener('storage',e=>{
+  if(e.key==='gapstars_house_pool_mens'||e.key==='gapstars_house_pool_mixed') renderPoolStandings();
+  if(e.key==='gapstars_overall_2026'){OV_STATE=null;if(document.getElementById('tab-overall').classList.contains('active'))ovLoad();}
+});
+
+// ── Overall House Standings ───────────────────────────────────
+const OV_EM={orion:'⭐',aquilla:'🦅',cygnus:'🦢',draco:'🐉'};
+const OV_NM={orion:'Orion',aquilla:'Aquilla',cygnus:'Cygnus',draco:'Draco'};
+const OV_RNK=['🥇','🥈','🥉','4️⃣'];
+const OV_RCL=['rank-1','rank-2','rank-3','rank-4'];
+const OV_DEF={orion:910,aquilla:935,cygnus:1025,draco:975};
+
+let OV_STATE=null;
+
+function ovLoad(){
+  const stored=JSON.parse(localStorage.getItem('gapstars_overall_2026')||'null');
+  if(stored&&stored._v>=1){
+    OV_STATE={orion:stored.orion??OV_DEF.orion,aquilla:stored.aquilla??OV_DEF.aquilla,cygnus:stored.cygnus??OV_DEF.cygnus,draco:stored.draco??OV_DEF.draco};
+  }else{
+    OV_STATE={...OV_DEF};
+  }
+  ovRender();
+}
+
+function ovSave(){
+  if(!OV_STATE)return;
+  localStorage.setItem('gapstars_overall_2026',JSON.stringify({_v:1,...OV_STATE}));
+}
+
+function ovRender(){
+  const sorted=Object.entries(OV_STATE).sort((a,b)=>b[1]-a[1]);
+  document.getElementById('ov-grid').innerHTML=sorted.map(([h,pts],i)=>`
+    <div class="ov-card h-${h} ${OV_RCL[i]}">
+      <div class="ov-rank-badge">${OV_RNK[i]}</div>
+      <div class="ov-em">${OV_EM[h]}</div>
+      <div class="ov-hname h-${h}">${OV_NM[h]}</div>
+      <input class="ov-pts-inp h-${h}" type="number" value="${pts}"
+        oninput="ovOnInput('${h}',this.value)"
+        onblur="ovOnBlur('${h}',this.value)">
+      <div class="ov-pts-lbl">pts</div>
+    </div>`).join('');
+}
+
+function ovOnInput(h,val){
+  if(!OV_STATE)return;
+  OV_STATE[h]=parseInt(val)||0;
+  const sorted=Object.entries(OV_STATE).sort((a,b)=>b[1]-a[1]);
+  const cards=document.querySelectorAll('#ov-grid .ov-card');
+  cards.forEach(card=>{
+    sorted.forEach(([hh],i)=>{
+      if(card.classList.contains('h-'+hh)){
+        card.className='ov-card h-'+hh+' '+OV_RCL[i];
+        card.querySelector('.ov-rank-badge').textContent=OV_RNK[i];
+      }
+    });
+  });
+}
+
+function ovOnBlur(h,val){
+  if(!OV_STATE)return;
+  OV_STATE[h]=parseInt(val)||0;
+  ovSave();
+  ovRender();
+}
+
+function ovExport(){
+  ovSave();
+  const d=JSON.parse(localStorage.getItem('gapstars_overall_2026')||'{}');
+  const b=new Blob([JSON.stringify(d,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(b);
+  a.download=`gapstars_overall_${new Date().toISOString().slice(0,10)}.json`;
+  a.click();URL.revokeObjectURL(a.href);
+}
+function ovImport(){document.getElementById('ov-import-file').click();}
+function handleOvImport(e){
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=ev=>{
+    try{localStorage.setItem('gapstars_overall_2026',ev.target.result);OV_STATE=null;ovLoad();alert('Overall standings imported!');}
+    catch{alert('Invalid file.');}
+    e.target.value='';
+  };
+  r.readAsText(f);
 }
 </script>
 </body>
