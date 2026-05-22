@@ -343,11 +343,20 @@ const SEGS=['sprint','dingbats','shots','hangman','gk','bonus'];
 const SEG_LABELS={sprint:'Sprint',dingbats:'Dingbats',shots:'Shots',hangman:'Hangman',gk:'GK',bonus:'Bonus'};
 
 // Seed data
+const _TRIVIA_SEED_V=2;
 const _TEAM_NAME_SEED={
   'orion_a':'Peak Delulu','orion_b':'Logic Legends',
   'aquilla_a':'Six Appeal','aquilla_b':'Quizaholics',
   'cygnus_a':'Team Ka-Pow','cygnus_b':'Team Ka-Ching',
-  'draco_a':'Backbenchers','draco_b':'Snacks'
+  'draco_a':'Backbenches','draco_b':'Snacks'
+};
+const _SCORE_SEED={
+  sprint:  {orion_a:13,orion_b:17,aquilla_a:9, aquilla_b:7, cygnus_a:9, cygnus_b:15,draco_a:15,draco_b:10},
+  dingbats:{orion_a:-5,orion_b:10,aquilla_a:5, aquilla_b:10,cygnus_a:5, cygnus_b:0, draco_a:-5,draco_b:20},
+  shots:   {orion_a:0, orion_b:0, aquilla_a:0, aquilla_b:0, cygnus_a:30,cygnus_b:0, draco_a:10,draco_b:60},
+  hangman: {orion_a:25,orion_b:25,aquilla_a:25,aquilla_b:25,cygnus_a:0, cygnus_b:25,draco_a:0, draco_b:25},
+  gk:      {orion_a:10,orion_b:15,aquilla_a:-5,aquilla_b:60,cygnus_a:15,cygnus_b:0, draco_a:10,draco_b:15},
+  bonus:   {orion_a:120,orion_b:80,aquilla_a:10,aquilla_b:0,cygnus_a:200,cygnus_b:0,draco_a:120,draco_b:60}
 };
 const ROSTER_SEED={
   'orion_a':[
@@ -361,7 +370,7 @@ const ROSTER_SEED={
     {n:'Chanuka Chathuranga',c:false},{n:'Raveen Dissanayaka',c:false}
   ],
   'aquilla_a':[
-    {n:'Ryan Wijesekera',c:true},{n:'Dimantha Wijayakoon',c:false},
+    {n:'Ryan',c:true},{n:'Dimantha Wijayakoon',c:false},
     {n:'Hansani Malawana',c:false},{n:'Thilini Vithanage',c:false},
     {n:'Dakshinee Rodrigo',c:false},{n:'Jayadith Costa',c:false}
   ],
@@ -371,24 +380,24 @@ const ROSTER_SEED={
     {n:'Milinda Gunawardana',c:false},{n:'Sanduni Thudugala',c:false}
   ],
   'cygnus_a':[
-    {n:'Madhushani Wickramasinghe',c:true},{n:'Shamila Abeysinghe',c:false},
+    {n:'Madhushani',c:true},{n:'Shamila Abeysinghe',c:false},
     {n:'Dulani Hewage',c:false},{n:'Natasha Gunatilleke',c:false},
     {n:'Shavini Saparamadu',c:false},{n:'',c:false}
   ],
   'cygnus_b':[
-    {n:'Sulakshani Perera',c:true},{n:'Aishwarya Bandara',c:false},
+    {n:'Sulakshani',c:true},{n:'Aishwarya Bandara',c:false},
     {n:'Janaka Poddalgoda',c:false},{n:'Abbimanue Satheeskumar',c:false},
     {n:'Kanchana Shashi',c:false},{n:'',c:false}
   ],
   'draco_a':[
-    {n:'Harshani Santiago',c:true},{n:'Adrian Marcus',c:false},
-    {n:'Amani Neemullah',c:false},{n:'Leonard',c:false},
-    {n:'Himashi Naurunna',c:false},{n:'',c:false}
+    {n:'Harshani',c:true},{n:'Adrian',c:false},
+    {n:'Amani',c:false},{n:'Leonard',c:false},
+    {n:'Himashi',c:false},{n:'',c:false}
   ],
   'draco_b':[
-    {n:'Oshadi Hewawasam',c:true},{n:'Ashen',c:false},
-    {n:'Sanara Rathunga',c:false},{n:'Sanjula Punchihewa',c:false},
-    {n:'Thifya Sivaputhiran',c:false},{n:'',c:false}
+    {n:'Oshadi',c:true},{n:'Ashen',c:false},
+    {n:'Sanara',c:false},{n:'Sanjula',c:false},
+    {n:'Thifya',c:false},{n:'',c:false}
   ]
 };
 
@@ -398,7 +407,7 @@ SEGS.forEach(s=>{DATA.scores[s]={};});
 HOUSES.forEach(h=>{
   DATA.teamNames[`${h.key}_a`]=_TEAM_NAME_SEED[`${h.key}_a`]||'';
   DATA.teamNames[`${h.key}_b`]=_TEAM_NAME_SEED[`${h.key}_b`]||'';
-  SEGS.forEach(s=>{DATA.scores[s][`${h.key}_a`]=0; DATA.scores[s][`${h.key}_b`]=0;});
+  SEGS.forEach(s=>{DATA.scores[s][`${h.key}_a`]=(_SCORE_SEED[s]&&_SCORE_SEED[s][`${h.key}_a`])??0; DATA.scores[s][`${h.key}_b`]=(_SCORE_SEED[s]&&_SCORE_SEED[s][`${h.key}_b`])??0;});
 });
 DATA.rosters=JSON.parse(JSON.stringify(ROSTER_SEED));
 
@@ -604,7 +613,7 @@ function saveData(){
     DATA.teamNames[`${h.key}_a`]=document.getElementById(`tn-${h.key}-a`).value;
     DATA.teamNames[`${h.key}_b`]=document.getElementById(`tn-${h.key}-b`).value;
   });
-  localStorage.setItem('gapstars_trivia_2026',JSON.stringify(DATA));
+  localStorage.setItem('gapstars_trivia_2026',JSON.stringify({...DATA,_v:_TRIVIA_SEED_V}));
 }
 
 function showSaved(){
@@ -618,9 +627,11 @@ function loadData(){
   if(raw){
     try{
       const d=JSON.parse(raw);
-      if(d.teamNames) DATA.teamNames={...DATA.teamNames,...d.teamNames};
-      if(d.scores) SEGS.forEach(s=>{if(d.scores[s]) DATA.scores[s]={...DATA.scores[s],...d.scores[s]};});
-      if(d.rosters) DATA.rosters={...DATA.rosters,...d.rosters};
+      if((d._v||0)>=_TRIVIA_SEED_V){
+        if(d.teamNames) DATA.teamNames={...DATA.teamNames,...d.teamNames};
+        if(d.scores) SEGS.forEach(s=>{if(d.scores[s]) DATA.scores[s]={...DATA.scores[s],...d.scores[s]};});
+        if(d.rosters) DATA.rosters={...DATA.rosters,...d.rosters};
+      }
     }catch(e){}
   }
   HOUSES.forEach(h=>{
