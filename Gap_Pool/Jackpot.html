@@ -194,6 +194,7 @@ hr.hd{border:none;border-top:1px solid rgba(191,95,255,.12)}
   letter-spacing:1px;text-transform:uppercase;border:2px solid;transition:all .2s}
 .btn-rv:hover:not(:disabled){transform:scale(1.06);filter:brightness(1.22)}
 .btn-rv:disabled{opacity:.2;cursor:default;transform:none}
+.btn-spd.spd-on{background:rgba(255,215,0,.18)!important;color:var(--gold)!important;border-color:rgba(255,215,0,.5)!important}
 .rva{background:rgba(0,170,255,.07);color:#00d4ff;border-color:rgba(0,212,255,.35)}
 .rvb{background:rgba(191,95,255,.07);color:#bf5fff;border-color:rgba(191,95,255,.35)}
 .rvc{background:rgba(255,155,0,.07);color:#ffaa20;border-color:rgba(255,155,0,.35)}
@@ -426,6 +427,11 @@ hr.hd{border:none;border-top:1px solid rgba(191,95,255,.12)}
     <button class="btn-rv rva" id="hb0" onclick="revealCorrect(0)" disabled>Bucket A</button>
     <button class="btn-rv rvb" id="hb1" onclick="revealCorrect(1)" disabled>Bucket B</button>
     <button class="btn-rv rvc" id="hb2" onclick="revealCorrect(2)" disabled>Bucket C</button>
+    <div class="hp-sep"></div>
+    <span class="hp-lbl">Drop Speed:</span>
+    <button class="btn-hc btn-spd spd-on" id="spd1" onclick="setSpeed(1,'spd1')">Normal</button>
+    <button class="btn-hc btn-spd" id="spd2" onclick="setSpeed(0.35,'spd2')">Fast</button>
+    <button class="btn-hc btn-spd" id="spd3" onclick="setSpeed(0,'spd3')">Instant</button>
   </div>
 </div>
 
@@ -442,6 +448,15 @@ const N = 20;
 // ── State ─────────────────────────────────────────────────────
 let S  = { round:1, blocks:[], phase:'placing', dragId:null };
 let _td = null; // active touch-drag descriptor
+let SPEED = 1;  // 1=Normal, 0.35=Fast, 0=Instant
+
+function spd(ms) { return SPEED === 0 ? 0 : Math.round(ms * SPEED); }
+
+function setSpeed(val, btnId) {
+  SPEED = val;
+  document.querySelectorAll('.btn-spd').forEach(b => b.classList.remove('spd-on'));
+  document.getElementById(btnId).classList.add('spd-on');
+}
 
 // ── Boot ──────────────────────────────────────────────────────
 function init(keepBlocks) {
@@ -559,8 +574,32 @@ function mkBlock(b) {
 
 function moveBlock(id, loc) {
   const b = S.blocks.find(x => x.id === id);
-  if (b) b.loc = loc;
-  renderAll();
+  if (!b) return;
+  b.loc = loc;
+
+  // Move the existing DOM element — no full re-render
+  const el = document.getElementById(`blk${id}`);
+  if (el) {
+    el.classList.remove('dragging');
+    el.style.opacity = '';
+    const dest = loc === 'tray'
+      ? document.getElementById('tray')
+      : document.getElementById(`bkt${loc}`);
+    if (dest) dest.appendChild(el);
+  }
+
+  // Refresh just the count badge + points total for each bucket
+  LABELS.forEach((_, i) => {
+    const cnt   = S.blocks.filter(b => b.loc === i).length;
+    const bktEl = document.getElementById(`bkt${i}`);
+    if (!bktEl) return;
+    const cntEl = bktEl.querySelector('.bkt-cnt');
+    if (cntEl) cntEl.textContent = cnt ? `${cnt}×` : '';
+    const sumEl = bktEl.closest('.bw')?.querySelector('.bkt-sum');
+    if (sumEl) { sumEl.textContent = cnt ? `${cnt * 10} pts` : ''; sumEl.style.color = COLORS[i]; }
+  });
+
+  updateUI();
   snd.drop();
 }
 
@@ -598,7 +637,7 @@ function lockAnswer() {
     setTimeout(() => {
       const orig = document.getElementById(`blk${b.id}`);
       if (orig) dropAnimate(orig, b.id);
-    }, i * 80);
+    }, spd(i * 80));
   });
   // Remove tray blocks from state after animation
   setTimeout(() => {
@@ -606,7 +645,7 @@ function lockAnswer() {
     S.phase  = 'locked';
     renderAll();
     stopMusic();
-  }, trayBlocks.length * 80 + 600);
+  }, spd(trayBlocks.length * 80) + spd(600) + 30);
 }
 
 // ── Host reveal ───────────────────────────────────────────────
@@ -621,18 +660,20 @@ function revealCorrect(ci) {
   [0,1,2].filter(i => i !== ci).forEach((wi, seq) => {
     setTimeout(() => {
       document.getElementById(`bkt${wi}`).classList.add('bkt-bad');
-      document.getElementById(`door${wi}`).classList.add('d-bad');
+      const door = document.getElementById(`door${wi}`);
+      door.classList.add('d-bad');
       snd.buzz();
       setTimeout(() => {
-        document.getElementById(`door${wi}`).classList.add('d-open');
+        door.style.transition = SPEED === 0 ? 'none' : `transform ${spd(600)/1000}s cubic-bezier(.4,0,.2,1),border-color .3s,background .3s`;
+        door.classList.add('d-open');
         snd.doorOpen();
         dropBlocks(wi);
-      }, 580);
-    }, seq * 680);
+      }, spd(580));
+    }, spd(seq * 680));
   });
 
   const kept = S.blocks.filter(b => b.loc === ci).length;
-  setTimeout(() => showResult(kept), 3200);
+  setTimeout(() => showResult(kept), spd(3200) + 200);
 }
 
 // Animate a block falling with gravity (uses fixed-position clone)
@@ -643,14 +684,18 @@ function dropAnimate(orig, id) {
   clone.style.cssText = `position:fixed;left:${r.left}px;top:${r.top}px;width:${r.width}px;height:${r.height}px;margin:0;z-index:500;pointer-events:none;transition:none`;
   document.body.appendChild(clone);
   orig.style.visibility = 'hidden';
+  if (SPEED === 0) {
+    clone.remove(); S.blocks = S.blocks.filter(x => x.id !== id); updateUI(); return;
+  }
   requestAnimationFrame(() => {
     const dy  = window.innerHeight - r.top + 80;
     const rot = (Math.random() - .5) * 100;
-    clone.style.transition = 'transform .88s ease-in, opacity .82s ease-in';
+    const dur = spd(880), opDur = spd(820), done = spd(940);
+    clone.style.transition = `transform ${dur/1000}s ease-in, opacity ${opDur/1000}s ease-in`;
     clone.style.transform  = `translateY(${dy}px) rotate(${rot}deg)`;
     clone.style.opacity    = '0';
     snd.fall();
-    setTimeout(() => { clone.remove(); S.blocks = S.blocks.filter(x => x.id !== id); updateUI(); }, 940);
+    setTimeout(() => { clone.remove(); S.blocks = S.blocks.filter(x => x.id !== id); updateUI(); }, done);
   });
 }
 
@@ -658,7 +703,7 @@ function dropBlocks(bucketIdx) {
   S.blocks.filter(b => b.loc === bucketIdx).forEach((b, i) => {
     setTimeout(() => {
       dropAnimate(document.getElementById(`blk${b.id}`), b.id);
-    }, i * 110);
+    }, spd(i * 110));
   });
 }
 
