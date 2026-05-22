@@ -211,7 +211,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
   <div class="app-header">
     <div style="text-align:center">
       <div class="logo">Hangman</div>
-      <div class="tagline">Gapstars Grand Table Clash 2026 · 3 strikes &amp; you're out</div>
+      <div class="tagline">Gapstars Grand Table Clash 2026 · 4 strikes &amp; you're out</div>
     </div>
     <div class="score-bar">
       <div class="pill w"><span class="lbl">Wins</span><span class="val" id="s-wins">0</span></div>
@@ -381,6 +381,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
       <div class="dot" id="d0"></div>
       <div class="dot" id="d1"></div>
       <div class="dot" id="d2"></div>
+      <div class="dot" id="d3"></div>
     </div>
   </div><!-- /stage-wrap -->
 
@@ -495,14 +496,14 @@ function sfx(n){try{SFX[n]?.();}catch(e){}}
 ═══════════════════════════════════════════════ */
 const G={
   word:'', hint:'', reveal:[], wordIndex:-1,
-  guessed:new Set(), wrong:0, maxWrong:3, over:false,
+  guessed:new Set(), wrong:0, maxWrong:4, over:false,
   charX:0,
   hint1Used:false, hint2Used:false,
   score:{wins:0,losses:0,streak:0,best:0},
 };
 
 /* Walk target positions (SVG units from character base x=88) */
-const WALK_POS = [0, 135, 270, 392];  // 0=start, then 3 steps toward edge
+const WALK_POS = [0, 98, 196, 294, 392];  // 0=start, then 4 steps toward edge
 
 /* ═══════════════════════════════════════════════
    ANIMATION — walk & fall using rAF + SVG transform attr
@@ -706,7 +707,7 @@ function guess(letter){
     const fromX = G.charX;
     const toX   = WALK_POS[step];
 
-    if(step < 3){
+    if(step < 4){
       // Walk toward edge
       animWalk(fromX, toX, 1100, null);
     } else {
@@ -802,7 +803,7 @@ function useHint2(){
 }
 
 function renderStrikes(){
-  for(let i=0;i<3;i++) document.getElementById(`d${i}`).classList.toggle('hit', i < G.wrong);
+  for(let i=0;i<4;i++) document.getElementById(`d${i}`).classList.toggle('hit', i < G.wrong);
 }
 
 function renderAttempts(){
