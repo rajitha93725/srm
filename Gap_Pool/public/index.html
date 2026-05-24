@@ -59,7 +59,7 @@ header{position:relative;z-index:10;padding:48px 24px 36px;text-align:center;
 main{position:relative;z-index:5;max-width:1840px;margin:0 auto;padding:44px 60px 70px}
 
 /* ── Two-section side-by-side ───────────────────────────── */
-.sections-row{display:grid;grid-template-columns:1fr 1fr;gap:44px}
+.sections-row{display:grid;grid-template-columns:3fr 2fr;gap:36px;align-items:start}
 @media(max-width:1200px){.sections-row{grid-template-columns:1fr}}
 .sport-section{margin-bottom:0}
 
@@ -85,6 +85,14 @@ main{position:relative;z-index:5;max-width:1840px;margin:0 auto;padding:44px 60p
 /* ── Tiles grid ─────────────────────────────────────────── */
 .tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
 @media(max-width:640px){.tiles{grid-template-columns:1fr;gap:12px}}
+
+/* ── Pool tiles — bigger & bolder ───────────────────────── */
+.pool-section .tile{padding:60px 28px 52px}
+.pool-section .tile-icon-wrap{margin-bottom:22px}
+.pool-section .tile-icon-wrap svg{width:84px;height:84px}
+.pool-section .tile-name{font-size:1.28rem;letter-spacing:.5px}
+.pool-section .tile-cat{font-size:.72rem;margin-bottom:20px}
+.pool-section .tile-badge{padding:8px 20px;font-size:.76rem}
 
 /* ── Tile ───────────────────────────────────────────────── */
 .tile{border-radius:18px;padding:44px 24px 38px;position:relative;
@@ -259,6 +267,43 @@ footer{position:relative;z-index:5;text-align:center;padding:14px 20px 18px;
 .pool-std-bar{height:100%;border-radius:8px;transition:width .5s ease}
 .pool-std-pts{font-size:1rem;font-weight:800;min-width:58px;text-align:right;line-height:1.1}
 .pool-std-sub{font-size:.58rem;color:#475569;display:block;letter-spacing:.3px;font-weight:400}
+
+/* ── Carrom compact entry card ──────────────────────────── */
+.carrom-feat{
+  display:flex;align-items:center;gap:18px;
+  padding:18px 20px;border-radius:16px;
+  border:2px solid rgba(255,215,0,.38);cursor:pointer;
+  background:linear-gradient(135deg,rgba(255,215,0,.07),rgba(160,100,0,.04));
+  box-shadow:0 0 22px rgba(255,215,0,.09),0 4px 18px rgba(0,0,0,.42);
+  text-decoration:none;color:inherit;transition:transform .22s,box-shadow .22s;
+  position:relative;overflow:hidden}
+.carrom-feat:not(.disabled):hover{transform:translateY(-4px) scale(1.018);
+  box-shadow:0 0 42px rgba(255,215,0,.22),0 12px 30px rgba(0,0,0,.5)}
+.carrom-feat.disabled{
+  border-color:rgba(255,255,255,.08);
+  background:rgba(255,255,255,.015);
+  opacity:.6;cursor:pointer;box-shadow:none}
+.carrom-feat.disabled:hover{transform:scale(1.008);opacity:.72}
+.carrom-feat.disabled .carrom-feat-icon{
+  background:rgba(100,116,139,.08);border-color:rgba(100,116,139,.15);filter:none}
+.carrom-feat.disabled .carrom-feat-name{color:#94a3b8}
+.carrom-feat.disabled .carrom-feat-badge{
+  background:rgba(100,116,139,.14);border-color:rgba(100,116,139,.22);color:#64748b}
+.carrom-feat::before{content:'';position:absolute;inset:0;
+  background:linear-gradient(110deg,rgba(255,255,255,.06) 0%,transparent 55%);
+  pointer-events:none}
+.carrom-feat-icon{flex-shrink:0;width:80px;height:80px;display:flex;align-items:center;justify-content:center;
+  background:rgba(245,158,11,.08);border-radius:14px;border:1px solid rgba(245,158,11,.2);
+  filter:drop-shadow(0 2px 10px rgba(245,158,11,.18))}
+.carrom-feat-body{flex:1;min-width:0}
+.carrom-feat-name{font-size:1rem;font-weight:800;letter-spacing:.4px;color:#ffd700;line-height:1.2}
+.carrom-feat-sub{font-size:.65rem;letter-spacing:1.5px;text-transform:uppercase;
+  color:rgba(200,175,90,.45);margin-top:4px}
+.carrom-feat-badge{
+  flex-shrink:0;font-size:.7rem;font-weight:800;letter-spacing:1.1px;text-transform:uppercase;
+  padding:6px 13px;border-radius:18px;white-space:nowrap;
+  background:linear-gradient(90deg,rgba(255,215,0,.2),rgba(200,120,0,.12));
+  border:1px solid rgba(255,215,0,.32);color:#ffd700}
 
 /* ── Carrom standings widget ─────────────────────────────── */
 .carrom-std-wrap{
@@ -578,33 +623,41 @@ footer{position:relative;z-index:5;text-align:center;padding:14px 20px 18px;
       <div class="sport-divider"></div>
     </div>
 
-    <div class="tiles" style="grid-template-columns:1fr">
-      <!-- Carrom Open Double -->
-      <div class="tile active" onclick="window.location.href='gap_carrom_mens.html'">
-        <div class="tile-shine"></div>
-        <div class="tile-icon-wrap">
-          <svg width="68" height="68" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
-            <rect x="2" y="2" width="44" height="44" rx="4" fill="#92400e" stroke="#78350f" stroke-width="1"/>
-            <rect x="5" y="5" width="38" height="38" rx="2" fill="#d97706"/>
-            <circle cx="7" cy="7" r="3.2" fill="#1c0a00"/>
-            <circle cx="41" cy="7" r="3.2" fill="#1c0a00"/>
-            <circle cx="7" cy="41" r="3.2" fill="#1c0a00"/>
-            <circle cx="41" cy="41" r="3.2" fill="#1c0a00"/>
-            <circle cx="24" cy="24" r="8" fill="none" stroke="#92400e" stroke-width="1.2"/>
-            <circle cx="24" cy="24" r="2" fill="none" stroke="#92400e" stroke-width="1"/>
-            <circle cx="20" cy="20" r="2.8" fill="#f8fafc" stroke="#e2e8f0" stroke-width=".5"/>
-            <circle cx="28" cy="20" r="2.8" fill="#f8fafc" stroke="#e2e8f0" stroke-width=".5"/>
-            <circle cx="20" cy="28" r="2.8" fill="#1e1e2e" stroke="#333" stroke-width=".5"/>
-            <circle cx="28" cy="28" r="2.8" fill="#1e1e2e" stroke="#333" stroke-width=".5"/>
-            <circle cx="24" cy="24" r="2.5" fill="#ef4444" stroke="#dc2626" stroke-width=".6"/>
-            <circle cx="24" cy="38" r="3.5" fill="#fbbf24" stroke="#f59e0b" stroke-width=".8"/>
-          </svg>
-        </div>
-        <div class="tile-name">Open Double</div>
-        <div class="tile-cat">Carrom · Open</div>
-        <span class="tile-badge badge-go">▶ Enter<span class="arrow-pulse"> →</span></span>
+    <div class="carrom-feat disabled" onclick="showFunny('carrom-mens')">
+      <div class="carrom-feat-icon">
+        <svg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg" opacity=".45">
+          <rect x="0" y="0" width="60" height="60" rx="6" fill="#7a4e1e"/>
+          <rect x="1.5" y="1.5" width="57" height="57" rx="5" fill="none" stroke="#a0702a" stroke-width="1"/>
+          <rect x="5" y="5" width="50" height="50" rx="3" fill="#d4a55a" stroke="#b8862e" stroke-width=".8"/>
+          <rect x="9" y="9" width="42" height="42" rx="2" fill="none" stroke="#b07828" stroke-width=".9"/>
+          <line x1="9" y1="9"  x2="51" y2="51" stroke="#b07828" stroke-width=".5" opacity=".4"/>
+          <line x1="51" y1="9" x2="9"  y2="51" stroke="#b07828" stroke-width=".5" opacity=".4"/>
+          <circle cx="9"  cy="9"  r="4.5" fill="#5a3010" stroke="#3a1800" stroke-width=".6"/>
+          <circle cx="51" cy="9"  r="4.5" fill="#5a3010" stroke="#3a1800" stroke-width=".6"/>
+          <circle cx="9"  cy="51" r="4.5" fill="#5a3010" stroke="#3a1800" stroke-width=".6"/>
+          <circle cx="51" cy="51" r="4.5" fill="#5a3010" stroke="#3a1800" stroke-width=".6"/>
+          <circle cx="30" cy="30" r="10" fill="none" stroke="#c0892a" stroke-width="1.2"/>
+          <circle cx="30" cy="30" r="4"  fill="none" stroke="#c0892a" stroke-width=".9"/>
+          <circle cx="30" cy="30" r="2.6" fill="#ef4444" stroke="#cc2222" stroke-width=".5"/>
+          <circle cx="30" cy="20" r="2.6" fill="#1e1e1e" stroke="#555" stroke-width=".6"/>
+          <circle cx="40" cy="30" r="2.6" fill="#1e1e1e" stroke="#555" stroke-width=".6"/>
+          <circle cx="30" cy="40" r="2.6" fill="#1e1e1e" stroke="#555" stroke-width=".6"/>
+          <circle cx="20" cy="30" r="2.6" fill="#1e1e1e" stroke="#555" stroke-width=".6"/>
+          <circle cx="35" cy="25" r="2.6" fill="#f8fafc" stroke="#ccc" stroke-width=".6"/>
+          <circle cx="25" cy="25" r="2.6" fill="#f8fafc" stroke="#ccc" stroke-width=".6"/>
+          <circle cx="25" cy="35" r="2.6" fill="#f8fafc" stroke="#ccc" stroke-width=".6"/>
+          <circle cx="35" cy="35" r="2.6" fill="#f8fafc" stroke="#ccc" stroke-width=".6"/>
+          <circle cx="30" cy="48" r="3.8" fill="#d4a0ff" stroke="#9b59b6" stroke-width=".9"/>
+          <circle cx="30" cy="48" r="1.5" fill="rgba(180,120,255,.4)"/>
+          <line x1="18" y1="48" x2="26" y2="48" stroke="#b07828" stroke-width=".7"/>
+          <line x1="34" y1="48" x2="42" y2="48" stroke="#b07828" stroke-width=".7"/>
+        </svg>
       </div>
-
+      <div class="carrom-feat-body">
+        <div class="carrom-feat-name">Open Double</div>
+        <div class="carrom-feat-sub">16 Groups · 48 Pairs · Best of 3</div>
+      </div>
+      <span class="carrom-feat-badge">⏳ Coming Soon</span>
     </div>
     <!-- Carrom Standings -->
     <div class="carrom-std-wrap">
