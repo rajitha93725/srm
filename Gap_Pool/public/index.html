@@ -578,8 +578,8 @@ footer{position:relative;z-index:5;text-align:center;padding:14px 20px 18px;
       <div class="sport-divider"></div>
     </div>
 
-    <div class="tiles">
-      <!-- Carrom Mens Double -->
+    <div class="tiles" style="grid-template-columns:1fr">
+      <!-- Carrom Open Double -->
       <div class="tile active" onclick="window.location.href='gap_carrom_mens.html'">
         <div class="tile-shine"></div>
         <div class="tile-icon-wrap">
@@ -605,43 +605,6 @@ footer{position:relative;z-index:5;text-align:center;padding:14px 20px 18px;
         <span class="tile-badge badge-go">▶ Enter<span class="arrow-pulse"> →</span></span>
       </div>
 
-      <!-- DISABLED: Carrom Mixed Double -->
-      <div class="tile disabled" onclick="showFunny('carrom-mixed')">
-        <div class="tile-icon-wrap">
-          <svg width="68" height="68" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" opacity=".5">
-            <rect x="2" y="2" width="44" height="44" rx="6" fill="#2a1a08"/>
-            <rect x="6" y="6" width="36" height="36" rx="4" fill="#4a3018"/>
-            <circle cx="24" cy="24" r="7" fill="none" stroke="#5a4028" stroke-width="1.2"/>
-            <circle cx="24" cy="24" r="2" fill="#5a4028"/>
-            <circle cx="24" cy="16" r="2.5" fill="#3a2810"/>
-            <circle cx="32" cy="24" r="2.5" fill="#3a2810"/>
-            <circle cx="24" cy="32" r="2.5" fill="#3a2810"/>
-            <circle cx="16" cy="24" r="2.5" fill="#3a2810"/>
-          </svg>
-        </div>
-        <div class="tile-name">Mixed Double</div>
-        <div class="tile-cat">Carrom · Mixed</div>
-        <span class="tile-badge badge-soon">⏳ Coming Soon</span>
-      </div>
-
-      <!-- DISABLED: Carrom Womens Double -->
-      <div class="tile disabled" onclick="showFunny('carrom-womens')">
-        <div class="tile-icon-wrap">
-          <svg width="68" height="68" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" opacity=".5">
-            <rect x="2" y="2" width="44" height="44" rx="6" fill="#2a1a08"/>
-            <rect x="6" y="6" width="36" height="36" rx="4" fill="#4a3018"/>
-            <circle cx="24" cy="24" r="7" fill="none" stroke="#5a4028" stroke-width="1.2"/>
-            <circle cx="24" cy="24" r="2" fill="#5a4028"/>
-            <circle cx="24" cy="16" r="2.5" fill="#3a2810"/>
-            <circle cx="32" cy="24" r="2.5" fill="#3a2810"/>
-            <circle cx="24" cy="32" r="2.5" fill="#3a2810"/>
-            <circle cx="16" cy="24" r="2.5" fill="#3a2810"/>
-          </svg>
-        </div>
-        <div class="tile-name">Womens Double</div>
-        <div class="tile-cat">Carrom · Women</div>
-        <span class="tile-badge badge-soon">⏳ Coming Soon</span>
-      </div>
     </div>
     <!-- Carrom Standings -->
     <div class="carrom-std-wrap">
@@ -921,15 +884,7 @@ const FUNNY={
   },
   'carrom-mens':{
     emoji:'🪙',
-    msg:"Carrom Men's Double is coming. The board is ready; we're just waiting on the players."
-  },
-  'carrom-mixed':{
-    emoji:'🎯',
-    msg:"Carrom Mixed Double is on the way. Coordination takes a little longer — ask any team."
-  },
-  'carrom-womens':{
-    emoji:'👑',
-    msg:"Carrom Women's Double is being set up. Patience — greatness doesn't rush."
+    msg:"Carrom Open Double is coming. The board is ready; we're just waiting on the players."
   }
 };
 
