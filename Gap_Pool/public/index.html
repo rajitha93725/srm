@@ -238,26 +238,34 @@ footer{position:relative;z-index:5;text-align:center;padding:14px 20px 18px;
 .tab-panel.active{display:block}
 
 /* ── Pool standings widget ──────────────────────────────── */
-.pool-std-wrap{margin-top:20px;background:rgba(56,189,248,.035);
-  border:1px solid rgba(56,189,248,.13);border-radius:14px;padding:16px 20px}
-.pool-std-title{font-size:.65rem;color:#475569;letter-spacing:2px;text-transform:uppercase;
-  margin-bottom:12px;display:flex;align-items:center;gap:8px}
-.pool-std-title span{flex:1;height:1px;background:linear-gradient(90deg,rgba(56,189,248,.2),transparent)}
-.pool-std-row{display:flex;align-items:center;gap:10px;padding:7px 0;
+.pool-std-wrap{
+  margin-top:20px;
+  background:linear-gradient(135deg,rgba(56,189,248,.055),rgba(14,116,144,.03));
+  border:1px solid rgba(56,189,248,.2);border-radius:16px;padding:18px 22px;
+  box-shadow:0 2px 24px rgba(56,189,248,.06)}
+.pool-std-title{
+  font-size:.6rem;color:#38bdf8;letter-spacing:2.5px;text-transform:uppercase;
+  margin-bottom:14px;display:flex;align-items:center;gap:10px;font-weight:700;
+  border-bottom:1px solid rgba(56,189,248,.12);padding-bottom:10px}
+.pool-std-title span{flex:1;height:1px;background:linear-gradient(90deg,rgba(56,189,248,.25),transparent)}
+.pool-std-row{display:flex;align-items:center;gap:10px;padding:8px 0;
   border-bottom:1px solid rgba(255,255,255,.04)}
 .pool-std-row:last-child{border-bottom:none}
-.pool-std-rank{font-size:.82rem;font-weight:800;color:#64748b;min-width:26px}
-.pool-std-name{flex:1;font-weight:700;font-size:.88rem}
-.pool-std-bar-wrap{flex:2;background:#1e293b;border-radius:6px;height:7px;overflow:hidden}
-.pool-std-bar{height:100%;border-radius:6px;transition:width .5s ease}
-.pool-std-pts{font-size:.9rem;font-weight:800;min-width:54px;text-align:right}
-.pool-std-sub{font-size:.6rem;color:#64748b;margin-left:3px;font-weight:400}
+.pool-std-rank{font-size:1.1rem;min-width:28px;text-align:center;
+  filter:drop-shadow(0 1px 4px rgba(0,0,0,.5));flex-shrink:0}
+.pool-std-name{flex:1;font-weight:700;font-size:.9rem;letter-spacing:.2px}
+.pool-std-bar-wrap{flex:2;background:rgba(30,41,59,.9);border-radius:8px;height:8px;
+  overflow:hidden;min-width:48px}
+.pool-std-bar{height:100%;border-radius:8px;transition:width .5s ease}
+.pool-std-pts{font-size:1rem;font-weight:800;min-width:58px;text-align:right;line-height:1.1}
+.pool-std-sub{font-size:.58rem;color:#475569;display:block;letter-spacing:.3px;font-weight:400}
 
-/* ── Carrom standings placeholder ───────────────────────── */
-.carrom-std-wrap{margin-top:20px;background:rgba(245,158,11,.03);
-  border:1px solid rgba(245,158,11,.12);border-radius:14px;padding:16px 20px;text-align:center}
-.carrom-std-soon{font-size:.82rem;color:#64748b;line-height:1.8}
-.carrom-std-soon strong{color:#f59e0b}
+/* ── Carrom standings widget ─────────────────────────────── */
+.carrom-std-wrap{
+  margin-top:20px;
+  background:linear-gradient(135deg,rgba(245,158,11,.055),rgba(120,60,0,.03));
+  border:1px solid rgba(245,158,11,.2);border-radius:16px;padding:18px 22px;
+  box-shadow:0 2px 24px rgba(245,158,11,.06)}
 
 /* ── Overall House Standings tab ───────────────────────── */
 .ov-header{text-align:center;margin-bottom:30px;padding-top:4px}
@@ -565,7 +573,7 @@ footer{position:relative;z-index:5;text-align:center;padding:14px 20px 18px;
       </svg>
       <div class="sport-text">
         <div class="sport-name">Carrom Tournament</div>
-        <div class="sport-sub">Gapstars 2026 · Mens · Mixed · Womens</div>
+        <div class="sport-sub">Gapstars 2026 · Open Double · 48 Pairs</div>
       </div>
       <div class="sport-divider"></div>
     </div>
@@ -592,8 +600,8 @@ footer{position:relative;z-index:5;text-align:center;padding:14px 20px 18px;
             <circle cx="24" cy="38" r="3.5" fill="#fbbf24" stroke="#f59e0b" stroke-width=".8"/>
           </svg>
         </div>
-        <div class="tile-name">Mens Double</div>
-        <div class="tile-cat">Carrom · Men</div>
+        <div class="tile-name">Open Double</div>
+        <div class="tile-cat">Carrom · Open</div>
         <span class="tile-badge badge-go">▶ Enter<span class="arrow-pulse"> →</span></span>
       </div>
 
@@ -635,9 +643,10 @@ footer{position:relative;z-index:5;text-align:center;padding:14px 20px 18px;
         <span class="tile-badge badge-soon">⏳ Coming Soon</span>
       </div>
     </div>
-    <!-- Carrom Standings Placeholder -->
+    <!-- Carrom Standings -->
     <div class="carrom-std-wrap">
-      <div class="carrom-std-soon">🎯 <strong>Carrom Standings</strong><br>House totals will appear here once matches begin.</div>
+      <div class="pool-std-title" style="color:#f59e0b;border-bottom-color:rgba(245,158,11,.12)">House Standings · Open Double <span style="background:linear-gradient(90deg,rgba(245,158,11,.25),transparent)"></span></div>
+      <div id="carrom-std-rows"></div>
     </div>
   </div>
 
@@ -875,6 +884,7 @@ function exportAll(){
     hackathon:JSON.parse(localStorage.getItem('gapstars_hackathon')||'null'),
     trivia:  JSON.parse(localStorage.getItem('gapstars_trivia_2026')||'null'),
     overall: JSON.parse(localStorage.getItem('gapstars_overall_2026')||'null'),
+    carrom:  JSON.parse(localStorage.getItem('gapstars_carrom_open_2026')||'null'),
     _exported:new Date().toISOString()
   };
   const b=new Blob([JSON.stringify(all,null,2)],{type:'application/json'});
@@ -895,6 +905,7 @@ function handleImportAll(e){
       if(all.hackathon)localStorage.setItem('gapstars_hackathon',JSON.stringify(all.hackathon));
       if(all.trivia)   localStorage.setItem('gapstars_trivia_2026',JSON.stringify(all.trivia));
       if(all.overall)  localStorage.setItem('gapstars_overall_2026',JSON.stringify(all.overall));
+      if(all.carrom)   localStorage.setItem('gapstars_carrom_open_2026',JSON.stringify(all.carrom));
       alert('All data imported! Reload event pages to see changes.');
     }catch(err){alert('Invalid backup file.');}
     e.target.value='';
@@ -960,12 +971,37 @@ function renderPoolStandings(){
       <span class="pool-std-rank">${ranks[i]}</span>
       <span class="pool-std-name" style="color:${HCOL[h]}">${HNAME[h]}</span>
       <div class="pool-std-bar-wrap"><div class="pool-std-bar" style="width:${Math.round(pts/max*100)}%;background:${HBAR[h]}"></div></div>
-      <span class="pool-std-pts" style="color:${HCOL[h]}">${pts}<span class="pool-std-sub">${mens[h]||0}+${mixed[h]||0}</span></span>
+      <span class="pool-std-pts" style="color:${HCOL[h]}">${pts}<span class="pool-std-sub">${mens[h]||0} + ${mixed[h]||0}</span></span>
     </div>`).join('');
 }
 renderPoolStandings();
+
+// ── Carrom standings (reads totals saved by gap_carrom_mens.html) ─────────────
+function renderCarromStandings(){
+  const HCOL={orion:'#60a5fa',aquilla:'#a78bfa',cygnus:'#f87171',draco:'#4ade80'};
+  const HBAR={orion:'#1d4ed8',aquilla:'#6d28d9',cygnus:'#b91c1c',draco:'#15803d'};
+  const HNAME={orion:'⭐ Orion',aquilla:'🦅 Aquilla',cygnus:'🦢 Cygnus',draco:'🐉 Draco'};
+  const data=JSON.parse(localStorage.getItem('gapstars_house_carrom')||'{}');
+  const totals={orion:data.orion||0,aquilla:data.aquilla||0,cygnus:data.cygnus||0,draco:data.draco||0};
+  const sorted=Object.entries(totals).sort((a,b)=>b[1]-a[1]);
+  const max=Math.max(...sorted.map(([,v])=>v),1);
+  const hasData=sorted.some(([,v])=>v>0);
+  const ranks=['🥇','🥈','🥉','4️⃣'];
+  document.getElementById('carrom-std-rows').innerHTML=hasData
+    ?sorted.map(([h,pts],i)=>`
+      <div class="pool-std-row">
+        <span class="pool-std-rank">${ranks[i]}</span>
+        <span class="pool-std-name" style="color:${HCOL[h]}">${HNAME[h]}</span>
+        <div class="pool-std-bar-wrap"><div class="pool-std-bar" style="width:${Math.round(pts/max*100)}%;background:${HBAR[h]}"></div></div>
+        <span class="pool-std-pts" style="color:${HCOL[h]}">${pts}</span>
+      </div>`).join('')
+    :'<div style="text-align:center;color:#64748b;font-size:.78rem;padding:8px 0">No data yet — matches begin soon 🎯</div>';
+}
+renderCarromStandings();
+
 window.addEventListener('storage',e=>{
   if(e.key==='gapstars_house_pool_mens'||e.key==='gapstars_house_pool_mixed') renderPoolStandings();
+  if(e.key==='gapstars_house_carrom') renderCarromStandings();
   if(e.key==='gapstars_overall_2026'){OV_STATE=null;if(document.getElementById('tab-overall').classList.contains('active'))ovLoad();}
 });
 
