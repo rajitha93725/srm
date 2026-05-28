@@ -278,9 +278,14 @@ footer{position:relative;z-index:5;text-align:center;padding:14px 20px 18px;
 .pool-std-bar-wrap{flex:2;background:rgba(30,41,59,.9);border-radius:8px;height:10px;
   overflow:hidden;min-width:48px}
 .pool-std-bar{height:100%;border-radius:8px;transition:width .5s ease}
-.pool-std-pts{font-size:1.05rem;font-weight:800;min-width:62px;text-align:right;line-height:1.1}
+.pool-std-pts-wrap{text-align:right;min-width:80px}
+.pool-std-pts{font-size:1.05rem;font-weight:800;line-height:1.1;display:block}
 .pool-std-pts.r1{font-size:1.25rem}
-.pool-std-sub{font-size:.58rem;color:#475569;display:block;letter-spacing:.3px;font-weight:400}
+.pool-std-breakdown{display:flex;gap:5px;justify-content:flex-end;margin-top:4px;flex-wrap:wrap}
+.psb-pill{font-size:.58rem;font-weight:700;letter-spacing:.8px;padding:2px 7px;
+  border-radius:6px;white-space:nowrap}
+.psb-mens{background:rgba(56,189,248,.12);color:#38bdf8;border:1px solid rgba(56,189,248,.25)}
+.psb-mixed{background:rgba(167,139,250,.12);color:#c4b5fd;border:1px solid rgba(167,139,250,.25)}
 
 /* ── Pool feature tiles (horizontal, matches carrom-feat) ───── */
 .pool-feat{
@@ -649,7 +654,7 @@ footer{position:relative;z-index:5;text-align:center;padding:14px 20px 18px;
         <span class="pool-std-trophy">🏆</span>
         <div class="pool-std-hdr-text">
           <span class="pool-std-title">House Standings</span>
-          <span class="pool-std-final-badge">Pool · Mens + Mixed · Final</span>
+          <span class="pool-std-final-badge">Pool · Mens + Mixed · Womens</span>
         </div>
       </div>
       <div id="pool-std-rows"></div>
@@ -1050,7 +1055,13 @@ function renderPoolStandings(){
       <span class="pool-std-rank">${ranks[i]}</span>
       <span class="pool-std-name" style="color:${HCOL[h]}">${HNAME[h]}</span>
       <div class="pool-std-bar-wrap"><div class="pool-std-bar" style="width:${Math.round(pts/max*100)}%;background:${HBAR[h]}"></div></div>
-      <span class="pool-std-pts ${RCLASS[i]}" style="color:${HCOL[h]}">${pts}<span class="pool-std-sub">${mens[h]||0} mens + ${mixed[h]||0} mixed</span></span>
+      <div class="pool-std-pts-wrap">
+        <span class="pool-std-pts ${RCLASS[i]}" style="color:${HCOL[h]}">${pts} pts</span>
+        <div class="pool-std-breakdown">
+          <span class="psb-pill psb-mens">M ${mens[h]||0}</span>
+          <span class="psb-pill psb-mixed">Mx ${mixed[h]||0}</span>
+        </div>
+      </div>
     </div>`).join('');
 }
 renderPoolStandings();
