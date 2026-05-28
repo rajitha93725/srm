@@ -265,27 +265,52 @@ footer{position:relative;z-index:5;text-align:center;padding:14px 20px 18px;
   text-transform:uppercase;padding:3px 9px;border-radius:6px;
   background:rgba(255,215,0,.12);border:1px solid rgba(255,215,0,.28);
   color:rgba(255,215,0,.65)}
-.pool-std-row{display:flex;align-items:center;gap:12px;padding:11px 13px;margin:6px 0;
-  border-radius:12px;transition:transform .2s}
-.pool-std-row.r1{background:linear-gradient(135deg,rgba(255,215,0,.11),rgba(180,100,0,.06));
-  border:1px solid rgba(255,215,0,.28);box-shadow:0 0 22px rgba(255,215,0,.09)}
-.pool-std-row.r2{background:rgba(192,210,230,.04);border:1px solid rgba(192,210,230,.1)}
-.pool-std-row.r3{background:rgba(210,130,50,.04);border:1px solid rgba(210,130,50,.1)}
-.pool-std-row.r4{border:1px solid rgba(255,255,255,.05)}
-.pool-std-rank{font-size:1.35rem;min-width:34px;text-align:center;
-  filter:drop-shadow(0 1px 6px rgba(0,0,0,.5));flex-shrink:0}
-.pool-std-name{flex:1;font-weight:700;font-size:.92rem;letter-spacing:.2px}
-.pool-std-bar-wrap{flex:2;background:rgba(30,41,59,.9);border-radius:8px;height:10px;
-  overflow:hidden;min-width:48px}
-.pool-std-bar{height:100%;border-radius:8px;transition:width .5s ease}
-.pool-std-pts-wrap{text-align:right;min-width:80px}
-.pool-std-pts{font-size:1.05rem;font-weight:800;line-height:1.1;display:block}
-.pool-std-pts.r1{font-size:1.25rem}
-.pool-std-breakdown{display:flex;gap:5px;justify-content:flex-end;margin-top:4px;flex-wrap:wrap}
-.psb-pill{font-size:.58rem;font-weight:700;letter-spacing:.8px;padding:2px 7px;
-  border-radius:6px;white-space:nowrap}
-.psb-mens{background:rgba(56,189,248,.12);color:#38bdf8;border:1px solid rgba(56,189,248,.25)}
-.psb-mixed{background:rgba(167,139,250,.12);color:#c4b5fd;border:1px solid rgba(167,139,250,.25)}
+/* ── Pool house standings cards ─────────────────────────────── */
+.pstd-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:4px}
+@media(max-width:720px){.pstd-grid{grid-template-columns:repeat(2,1fr)}}
+.pstd-card{border-radius:18px;padding:18px 12px 16px;text-align:center;border:2px solid;
+  position:relative;overflow:hidden;transition:transform .22s,box-shadow .22s;
+  background-size:220% 220%;animation:ov-flow 7s ease infinite}
+.pstd-card:hover{transform:translateY(-5px)}
+.pstd-card.h-orion {border-color:rgba(96,165,250,.5);
+  background:linear-gradient(140deg,rgba(96,165,250,.14) 0%,rgba(29,78,216,.04) 50%,rgba(96,165,250,.1) 100%);
+  box-shadow:0 4px 22px rgba(96,165,250,.12)}
+.pstd-card.h-aquilla{border-color:rgba(167,139,250,.5);
+  background:linear-gradient(140deg,rgba(167,139,250,.14) 0%,rgba(109,40,217,.04) 50%,rgba(167,139,250,.1) 100%);
+  box-shadow:0 4px 22px rgba(167,139,250,.12)}
+.pstd-card.h-cygnus {border-color:rgba(248,113,113,.5);
+  background:linear-gradient(140deg,rgba(248,113,113,.14) 0%,rgba(185,28,28,.04) 50%,rgba(248,113,113,.1) 100%);
+  box-shadow:0 4px 22px rgba(248,113,113,.12)}
+.pstd-card.h-draco  {border-color:rgba(74,222,128,.5);
+  background:linear-gradient(140deg,rgba(74,222,128,.14) 0%,rgba(21,128,61,.04) 50%,rgba(74,222,128,.1) 100%);
+  box-shadow:0 4px 22px rgba(74,222,128,.12)}
+.pstd-card.rank-1{border-color:rgba(255,215,0,.8)!important;
+  box-shadow:0 0 55px rgba(255,215,0,.25),0 6px 28px rgba(0,0,0,.5)!important}
+.pstd-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.15),transparent)}
+.pstd-rank{position:absolute;top:10px;left:12px;font-size:1.3rem;line-height:1;
+  filter:drop-shadow(0 2px 6px rgba(0,0,0,.5))}
+.pstd-em{font-size:2rem;margin-bottom:3px;display:block;
+  filter:drop-shadow(0 0 10px rgba(0,0,0,.3))}
+.pstd-name{font-family:'Dancing Script','Brush Script MT',cursive;
+  font-size:1.4rem;font-weight:700;margin-bottom:8px;line-height:1.1}
+.pstd-name.h-orion {color:#93c5fd;text-shadow:0 0 14px rgba(96,165,250,.3)}
+.pstd-name.h-aquilla{color:#c4b5fd;text-shadow:0 0 14px rgba(167,139,250,.3)}
+.pstd-name.h-cygnus {color:#fca5a5;text-shadow:0 0 14px rgba(248,113,113,.3)}
+.pstd-name.h-draco  {color:#86efac;text-shadow:0 0 14px rgba(74,222,128,.3)}
+.pstd-total{font-size:2rem;font-weight:900;line-height:1;margin-bottom:10px}
+.pstd-divider{height:1px;background:rgba(255,255,255,.08);margin:8px 0 10px}
+.pstd-breakdown{display:flex;flex-direction:column;gap:5px}
+.pstd-brow{display:flex;justify-content:space-between;align-items:center;
+  padding:5px 9px;border-radius:8px}
+.pstd-brow.md{background:rgba(56,189,248,.09);border:1px solid rgba(56,189,248,.2)}
+.pstd-brow.xd{background:rgba(167,139,250,.09);border:1px solid rgba(167,139,250,.2)}
+.pstd-lbl{font-size:.62rem;font-weight:900;letter-spacing:1.5px;text-transform:uppercase}
+.pstd-brow.md .pstd-lbl{color:#38bdf8}
+.pstd-brow.xd .pstd-lbl{color:#c4b5fd}
+.pstd-val{font-size:.9rem;font-weight:800}
+.pstd-brow.md .pstd-val{color:#38bdf8}
+.pstd-brow.xd .pstd-val{color:#c4b5fd}
 
 /* ── Pool feature tiles (horizontal, matches carrom-feat) ───── */
 .pool-feat{
@@ -1040,29 +1065,35 @@ function switchTab(name){
 // ── Pool standings (reads pre-computed values saved by pool pages) ────────────
 function renderPoolStandings(){
   const HCOL={orion:'#60a5fa',aquilla:'#a78bfa',cygnus:'#f87171',draco:'#4ade80'};
-  const HBAR={orion:'rgba(29,78,216,.85)',aquilla:'rgba(109,40,217,.85)',cygnus:'rgba(185,28,28,.85)',draco:'rgba(21,128,61,.85)'};
-  const HNAME={orion:'⭐ Orion',aquilla:'🦅 Aquilla',cygnus:'🦢 Cygnus',draco:'🐉 Draco'};
-  const RCLASS=['r1','r2','r3','r4'];
+  const HEM ={orion:'⭐',aquilla:'🦅',cygnus:'🦢',draco:'🐉'};
+  const HNME={orion:'Orion',aquilla:'Aquilla',cygnus:'Cygnus',draco:'Draco'};
+  const ranks=['🥇','🥈','🥉','4️⃣'];
   const mens=JSON.parse(localStorage.getItem('gapstars_house_pool_mens')||'{}');
   const mixed=JSON.parse(localStorage.getItem('gapstars_house_pool_mixed')||'{}');
   const totals={};
   ['orion','aquilla','cygnus','draco'].forEach(h=>{totals[h]=(mens[h]||0)+(mixed[h]||0);});
   const sorted=Object.entries(totals).sort((a,b)=>b[1]-a[1]);
-  const max=Math.max(...sorted.map(([,v])=>v),1);
-  const ranks=['🥇','🥈','🥉','4️⃣'];
-  document.getElementById('pool-std-rows').innerHTML=sorted.map(([h,pts],i)=>`
-    <div class="pool-std-row ${RCLASS[i]}">
-      <span class="pool-std-rank">${ranks[i]}</span>
-      <span class="pool-std-name" style="color:${HCOL[h]}">${HNAME[h]}</span>
-      <div class="pool-std-bar-wrap"><div class="pool-std-bar" style="width:${Math.round(pts/max*100)}%;background:${HBAR[h]}"></div></div>
-      <div class="pool-std-pts-wrap">
-        <span class="pool-std-pts ${RCLASS[i]}" style="color:${HCOL[h]}">${pts} pts</span>
-        <div class="pool-std-breakdown">
-          <span class="psb-pill psb-mens">M ${mens[h]||0}</span>
-          <span class="psb-pill psb-mixed">Mx ${mixed[h]||0}</span>
+  document.getElementById('pool-std-rows').innerHTML=
+    `<div class="pstd-grid">`+
+    sorted.map(([h,pts],i)=>`
+      <div class="pstd-card h-${h}${i===0?' rank-1':''}">
+        <div class="pstd-rank">${ranks[i]}</div>
+        <span class="pstd-em">${HEM[h]}</span>
+        <div class="pstd-name h-${h}">${HNME[h]}</div>
+        <div class="pstd-total" style="color:${HCOL[h]}">${pts}</div>
+        <div class="pstd-divider"></div>
+        <div class="pstd-breakdown">
+          <div class="pstd-brow md">
+            <span class="pstd-lbl">MD</span>
+            <span class="pstd-val">${mens[h]||0} pts</span>
+          </div>
+          <div class="pstd-brow xd">
+            <span class="pstd-lbl">XD</span>
+            <span class="pstd-val">${mixed[h]||0} pts</span>
+          </div>
         </div>
-      </div>
-    </div>`).join('');
+      </div>`).join('')+
+    `</div>`;
 }
 renderPoolStandings();
 
