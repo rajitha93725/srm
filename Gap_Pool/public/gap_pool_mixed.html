@@ -182,8 +182,8 @@ h2{font-size:1rem;font-weight:600;margin-bottom:14px;color:#f1f5f9}
       <circle cx="13" cy="30" r="4" fill="#f8fafc" stroke="#166534" stroke-width=".5"/>
     </svg>
     <div class="header-titles">
-      <h1>Gapstars Pool — Mixed Double <span style="font-size:.9rem;font-weight:600;-webkit-text-fill-color:#a78bfa;color:#a78bfa">· Singles Match</span></h1>
-      <p>hosted by stargazers &nbsp;·&nbsp; 8 groups &nbsp;·&nbsp; 4 houses &nbsp;·&nbsp; 1 match per pair</p>
+      <h1>Gapstars Pool — Mixed Double <span style="font-size:.9rem;font-weight:600;-webkit-text-fill-color:#a78bfa;color:#a78bfa">· Two Matches</span></h1>
+      <p>hosted by stargazers &nbsp;·&nbsp; 8 groups &nbsp;·&nbsp; 4 houses &nbsp;·&nbsp; 2 matches per pair</p>
     </div>
   </div>
   <div class="house-pills">
@@ -345,22 +345,32 @@ const QFS=[
 // ── State ─────────────────────────────────────────────────────────────────────
 const _SEED={
   groupScores:{
-    "g2_m2":{"t1":[1.3],"t2":[0],"winner":0,"score":"1-0"}
+    "g2_m2":{"t1":[1.3],"t2":[0],"winner":0,"score":"1-0"},
+    "g5_m1":{"t1":[1.4,0],"t2":[0,1],"winner":null,"score":"1-1"},
+    "g7_m0":{"t1":[1,0],"t2":[0,1.3],"winner":1,"score":"1-1"},
+    "g7_m1":{"t1":[0,1.4],"t2":[1,0],"winner":0,"score":"1-1"},
+    "g7_m2":{"t1":[1,0],"t2":[0,1],"winner":null,"score":"1-1"}
   },
   knockout:{},
-  customNames:{},
+  customNames:{
+    "g2_p1":{"n":"Janath & Ruvindya","h":"orion"}
+  },
   matchDates:{
     "g2_m0":"2026-05-27","g2_m1":"2026-05-27","g2_m2":"2026-05-28",
     "g4_m0":"2026-05-27","g4_m1":"2026-05-27","g4_m2":"2026-05-27",
     "g6_m0":"2026-06-03","g6_m1":"2026-06-03","g6_m2":"2026-06-03",
     "g8_m0":"2026-06-03","g8_m1":"2026-06-03","g8_m2":"2026-06-03",
     "g1_m0":"2026-06-10","g1_m1":"2026-06-10","g1_m2":"2026-06-10",
-    "g5_m0":"2026-06-10","g5_m1":"2026-06-10","g5_m2":"2026-06-10",
+    "g5_m0":"2026-06-10","g5_m1":"2026-06-29","g5_m2":"2026-06-10",
     "g3_m0":"2026-06-10","g3_m1":"2026-06-10","g3_m2":"2026-06-10",
-    "g7_m0":"2026-06-10","g7_m1":"2026-06-10","g7_m2":"2026-06-10"
+    "g7_m0":"2026-06-08","g7_m1":"2026-06-08","g7_m2":"2026-06-08"
   },
   matchTimes:{
-    "g2_m2":"11:00"
+    "g2_m2":"11:00",
+    "g5_m1":"15:30",
+    "g7_m0":"11:00",
+    "g7_m1":"16:00",
+    "g7_m2":"10:00"
   }
 };
 let STATE=JSON.parse(localStorage.getItem('gapstars_mixed_2026')||'null')||JSON.parse(JSON.stringify(_SEED));
@@ -377,7 +387,7 @@ function getPair(gId,pIdx){
 }
 function getGroup(gId){return {id:gId, pairs:[0,1,2].map(i=>getPair(gId,i))};}
 
-// ── Scoring: single match per matchup ─────────────────────────────────────────
+// ── Scoring: point-wise winner (Mixed Double uses total pts, not match wins) ───
 function calcMatchup(sc){
   if(!sc||!sc.t1||!sc.t1.length) return null;
   let t1pts=0,t2pts=0,t1w=0,t2w=0;
@@ -386,8 +396,9 @@ function calcMatchup(sc){
     t1pts+=s1; t2pts+=s2;
     if(s1>s2) t1w++; else if(s2>s1) t2w++;
   });
-  const winner=t1w>t2w?0:t2w>t1w?1:null;
-  return{t1pts:Math.round(t1pts*10)/10, t2pts:Math.round(t2pts*10)/10, t1w, t2w, winner};
+  t1pts=Math.round(t1pts*10)/10; t2pts=Math.round(t2pts*10)/10;
+  const winner=t1pts>t2pts?0:t2pts>t1pts?1:null;
+  return{t1pts, t2pts, t1w, t2w, winner};
 }
 
 // ── Group standings ───────────────────────────────────────────────────────────
@@ -456,7 +467,7 @@ function renderGroups(){
   const totalM=BASE_GROUPS.length*GROUP_MATCHES.length;
   const playedM=BASE_GROUPS.reduce((n,bg)=>n+GROUP_MATCHES.filter((_,mi)=>{
     const r=calcMatchup(STATE.groupScores[`g${bg.id}_m${mi}`]);
-    return r&&r.winner!==null;
+    return r!==null;
   }).length,0);
   const el=document.getElementById('match-count-display');
   if(el) el.textContent=`${playedM} / ${totalM} matches played`;
@@ -471,8 +482,8 @@ function renderGroups(){
       </div>`).join('');
     const matchHtml=GROUP_MATCHES.map((m,mi)=>{
       const p1=grp.pairs[m[0]],p2=grp.pairs[m[1]], key=`g${bg.id}_m${mi}`;
-      const res=calcMatchup(STATE.groupScores[key]), done=res&&res.winner!==null;
-      const winHex=done?(res.winner===0?hc(p1.h):hc(p2.h)):null;
+      const res=calcMatchup(STATE.groupScores[key]), done=res!==null;
+      const winHex=done?(res.winner===0?hc(p1.h):res.winner===1?hc(p2.h):'#475569'):null;
       const summary=done
         ?`<span style="color:${hc(p1.h)};font-weight:700">${res.t1pts.toFixed(1)}</span> - <span style="color:${hc(p2.h)};font-weight:700">${res.t2pts.toFixed(1)}</span> <span style="font-size:.72rem;padding:1px 5px;border-radius:8px;background:${winHex}22;color:${winHex};font-weight:700;margin-left:4px">✓</span>`
         :'<span style="font-size:.62rem;padding:1px 6px;border-radius:8px;background:rgba(100,116,139,.15);color:#64748b;font-weight:700">!Played</span>';
@@ -626,7 +637,7 @@ function getPairTotalPoints(pairName){
 
 // ── House Standings ───────────────────────────────────────────────────────────
 function isGroupComplete(gId){
-  return GROUP_MATCHES.every((_,mi)=>{const r=calcMatchup(STATE.groupScores[`g${gId}_m${mi}`]);return r&&r.winner!==null;});
+  return GROUP_MATCHES.every((_,mi)=>{const r=calcMatchup(STATE.groupScores[`g${gId}_m${mi}`]);return r!==null;});
 }
 function countHouseCompletedPairs(house){
   let n=0;
@@ -636,7 +647,7 @@ function countHouseCompletedPairs(house){
       const done=GROUP_MATCHES.every((m,mi)=>{
         if(!m.includes(pi)) return true;
         const r=calcMatchup(STATE.groupScores[`g${bg.id}_m${mi}`]);
-        return r&&r.winner!==null;
+        return r!==null;
       });
       if(done) n++;
     }
@@ -764,8 +775,8 @@ function livePreview(pfx,p1,p2){
   const sumEl=document.getElementById(`${pfx}sum`);
   if(!sumEl||!played) return;
   const p1pts=Math.round(t1b*10)/10, p2pts=Math.round(t2b*10)/10;
-  const wlabel=t1w>t2w?`<span style="color:${hc(lp1.h)}">${lp1.n}</span> wins (${t1w}-${t2w})`:
-               t2w>t1w?`<span style="color:${hc(lp2.h)}">${lp2.n}</span> wins (${t2w}-${t1w})`:'Tied';
+  const wlabel=p1pts>p2pts?`<span style="color:${hc(lp1.h)}">${lp1.n}</span> wins (${p1pts} pts)`:
+               p2pts>p1pts?`<span style="color:${hc(lp2.h)}">${lp2.n}</span> wins (${p2pts} pts)`:'Tied';
   sumEl.innerHTML=`
     <div class="sum-row"><span style="color:${hc(lp1.h)};font-weight:600">${lp1.n}</span><span style="font-weight:700;color:${hc(lp1.h)}">${p1pts.toFixed(1)} pts</span></div>
     <div class="sum-row"><span style="color:${hc(lp2.h)};font-weight:600">${lp2.n}</span><span style="font-weight:700;color:${hc(lp2.h)}">${p2pts.toFixed(1)} pts</span></div>
