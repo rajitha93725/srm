@@ -349,7 +349,9 @@ const _SEED={
     "g5_m1":{"t1":[1.4,0],"t2":[0,1],"winner":null,"score":"1-1"},
     "g7_m0":{"t1":[1,0],"t2":[0,1.3],"winner":1,"score":"1-1"},
     "g7_m1":{"t1":[0,1.4],"t2":[1,0],"winner":0,"score":"1-1"},
-    "g7_m2":{"t1":[1,0],"t2":[0,1],"winner":null,"score":"1-1"}
+    "g7_m2":{"t1":[1,0],"t2":[0,1],"winner":null,"score":"1-1"},
+    "g8_m1":{"t1":[1.3,1.1],"t2":[0,0],"winner":0,"score":"2-0"},
+    "g6_m2":{"t1":[0,1],"t2":[1.3,0],"winner":1,"score":"1-1"}
   },
   knockout:{},
   customNames:{
@@ -358,8 +360,8 @@ const _SEED={
   matchDates:{
     "g2_m0":"2026-05-27","g2_m1":"2026-05-27","g2_m2":"2026-05-28",
     "g4_m0":"2026-05-27","g4_m1":"2026-05-27","g4_m2":"2026-05-27",
-    "g6_m0":"2026-06-03","g6_m1":"2026-06-03","g6_m2":"2026-06-03",
-    "g8_m0":"2026-06-03","g8_m1":"2026-06-03","g8_m2":"2026-06-03",
+    "g6_m0":"2026-06-03","g6_m1":"2026-06-03","g6_m2":"2026-06-10",
+    "g8_m0":"2026-06-03","g8_m1":"2026-06-10","g8_m2":"2026-06-03",
     "g1_m0":"2026-06-10","g1_m1":"2026-06-10","g1_m2":"2026-06-10",
     "g5_m0":"2026-06-10","g5_m1":"2026-06-29","g5_m2":"2026-06-10",
     "g3_m0":"2026-06-10","g3_m1":"2026-06-10","g3_m2":"2026-06-10",
@@ -370,14 +372,22 @@ const _SEED={
     "g5_m1":"15:30",
     "g7_m0":"11:00",
     "g7_m1":"16:00",
-    "g7_m2":"10:00"
-  }
+    "g7_m2":"10:00",
+    "g8_m1":"11:00",
+    "g6_m2":"13:30"
+  },
+  withdrawnPairs:["g6_p0"]
 };
 let STATE=JSON.parse(localStorage.getItem('gapstars_mixed_2026')||'null')||JSON.parse(JSON.stringify(_SEED));
-if(!STATE.customNames) STATE.customNames={};
-if(!STATE.matchDates)  STATE.matchDates={};
-if(!STATE.matchTimes)  STATE.matchTimes={};
+if(!STATE.customNames)    STATE.customNames={};
+if(!STATE.matchDates)     STATE.matchDates={};
+if(!STATE.matchTimes)     STATE.matchTimes={};
+if(!STATE.withdrawnPairs) STATE.withdrawnPairs=[];
 function save(){localStorage.setItem('gapstars_mixed_2026',JSON.stringify(STATE));}
+
+// ── Withdrawn / void helpers ──────────────────────────────────────────────────
+function isWithdrawnPair(gId,pIdx){return(STATE.withdrawnPairs||[]).includes(`g${gId}_p${pIdx}`);}
+function isVoidMatch(gId,mi){return GROUP_MATCHES[mi].some(pi=>isWithdrawnPair(gId,pi));}
 
 // ── Pair helpers ──────────────────────────────────────────────────────────────
 function getPair(gId,pIdx){
@@ -405,6 +415,7 @@ function calcMatchup(sc){
 function getGroupStandings(gId){
   const grp=getGroup(gId), pts=[0,0,0], mwon=[0,0,0];
   GROUP_MATCHES.forEach((m,mi)=>{
+    if(isVoidMatch(gId,mi)) return;
     const res=calcMatchup(STATE.groupScores[`g${gId}_m${mi}`]);
     if(res){
       pts[m[0]]+=res.t1pts; pts[m[1]]+=res.t2pts;
@@ -413,6 +424,7 @@ function getGroupStandings(gId){
     }
   });
   return grp.pairs.map((p,i)=>({...p,pts:pts[i],mwon:mwon[i],idx:i,gId}))
+    .filter(p=>!isWithdrawnPair(gId,p.idx))
     .sort((a,b)=>b.pts-a.pts||b.mwon-a.mwon);
 }
 function getGroupWinner(gId){
@@ -466,6 +478,7 @@ function genTimeOpts(selected){
 function renderGroups(){
   const totalM=BASE_GROUPS.length*GROUP_MATCHES.length;
   const playedM=BASE_GROUPS.reduce((n,bg)=>n+GROUP_MATCHES.filter((_,mi)=>{
+    if(isVoidMatch(bg.id,mi)) return true;
     const r=calcMatchup(STATE.groupScores[`g${bg.id}_m${mi}`]);
     return r!==null;
   }).length,0);
@@ -482,6 +495,16 @@ function renderGroups(){
       </div>`).join('');
     const matchHtml=GROUP_MATCHES.map((m,mi)=>{
       const p1=grp.pairs[m[0]],p2=grp.pairs[m[1]], key=`g${bg.id}_m${mi}`;
+      if(isVoidMatch(bg.id,mi)){
+        return`<div class="match-row" style="opacity:0.38;border-style:dashed;background:#0f172a">
+          <div class="match-names">
+            <span style="color:${hc(p1.h)};font-weight:700;text-decoration:line-through">${p1.n}</span>
+            <span class="vs">vs</span>
+            <span style="color:${hc(p2.h)};font-weight:700;text-decoration:line-through">${p2.n}</span>
+            <span style="margin-left:auto;font-size:.62rem;background:rgba(100,116,139,.15);color:#475569;padding:1px 8px;border-radius:8px;font-weight:700">Void · Withdrawn</span>
+          </div>
+        </div>`;
+      }
       const res=calcMatchup(STATE.groupScores[key]), done=res!==null;
       const winHex=done?(res.winner===0?hc(p1.h):res.winner===1?hc(p2.h):'#475569'):null;
       const summary=done
@@ -508,8 +531,9 @@ function renderGroups(){
         </div>
       </div>`;
     }).join('');
+    const activePairs=grp.pairs.filter((_,i)=>!isWithdrawnPair(bg.id,i)).length;
     return`<div class="group-card">
-      <div class="group-header"><span>Group ${bg.id}</span><span style="font-size:.68rem;color:#64748b">3 pairs</span></div>
+      <div class="group-header"><span>Group ${bg.id}</span><span style="font-size:.68rem;color:#64748b">${activePairs} pair${activePairs!==1?'s':''}</span></div>
       <div class="group-body">
         <div class="group-standings">${standHtml}</div>
         <div class="matches-section"><div class="sec-label">Matches</div>${matchHtml}</div>
@@ -632,20 +656,30 @@ function getGroupPairPoints(pairName){
 }
 
 function getPairTotalPoints(pairName){
+  for(const bg of BASE_GROUPS){
+    for(let pi=0;pi<3;pi++){
+      if(getPair(bg.id,pi).n===pairName&&isWithdrawnPair(bg.id,pi)) return{pts:0,stage:'Withdrawn'};
+    }
+  }
   return getKnockoutPoints(pairName)||getGroupPairPoints(pairName);
 }
 
 // ── House Standings ───────────────────────────────────────────────────────────
 function isGroupComplete(gId){
-  return GROUP_MATCHES.every((_,mi)=>{const r=calcMatchup(STATE.groupScores[`g${gId}_m${mi}`]);return r!==null;});
+  return GROUP_MATCHES.every((_,mi)=>{
+    if(isVoidMatch(gId,mi)) return true;
+    const r=calcMatchup(STATE.groupScores[`g${gId}_m${mi}`]);return r!==null;
+  });
 }
 function countHouseCompletedPairs(house){
   let n=0;
   BASE_GROUPS.forEach(bg=>{
     for(let pi=0;pi<3;pi++){
       if(getPair(bg.id,pi).h!==house) continue;
+      if(isWithdrawnPair(bg.id,pi)) continue;
       const done=GROUP_MATCHES.every((m,mi)=>{
         if(!m.includes(pi)) return true;
+        if(isVoidMatch(bg.id,mi)) return true;
         const r=calcMatchup(STATE.groupScores[`g${bg.id}_m${mi}`]);
         return r!==null;
       });
@@ -658,7 +692,7 @@ function countHouseCompletedPairs(house){
 function renderStandings(){
   const STAGE_CLS={'Champion':'s200','Finalist':'s100','3rd Place':'s75','4th Place':'s50',
     'Semifinals':'s50','Quarterfinals':'s25','QF Entry':'s25','QF Loser':'s25',
-    'Group 1st':'s25','Group 2nd':'s15','Group 3rd':'s10','Not Started':'s5','No Data':'s5'};
+    'Group 1st':'s25','Group 2nd':'s15','Group 3rd':'s10','Not Started':'s5','No Data':'s5','Withdrawn':'s5'};
   const hd={};
   Object.keys(HOUSES).forEach(h=>{hd[h]={pairs:[],total:0,bonus:0,completed:0};});
   BASE_GROUPS.forEach(bg=>{
