@@ -885,7 +885,7 @@ function openKOModal(id,ll,rl){
   koState={id,t1,t2};
   _lp_p1={n:t1.name,h:t1.house}; _lp_p2={n:t2.name,h:t2.house};
   document.getElementById('ko-title').textContent=`${t1.name} vs ${t2.name}`;
-  buildScoreTable('ko-content',{n:t1.name,h:t1.house},{n:t2.name,h:t2.house},sv,'ko');
+  buildScoreTable('ko-content',{n:t1.name,h:t1.house},{n:t2.name,h:t2.house},{t1:sv.t1s||[],t2:sv.t2s||[]},'ko');
   document.getElementById('ko-modal').classList.add('open');
   livePreview('ko',{n:t1.name,h:t1.house},{n:t2.name,h:t2.house});
 }
@@ -900,7 +900,7 @@ function saveKO(){
   if(!t1.length){alert('Enter at least Match 1 scores.');return;}
   requirePwd(()=>{
     const res=calcMatchup({t1,t2});
-    STATE.knockout[koState.id]={t1:koState.t1,t2:koState.t2,winner:res?res.winner:null,score:res?`${res.t1w}-${res.t2w}`:''};
+    STATE.knockout[koState.id]={t1:koState.t1,t2:koState.t2,t1s:t1,t2s:t2,winner:res?res.winner:null,score:res?`${res.t1w}-${res.t2w}`:''};
     save();closeKOModal();renderAll();
   });
 }
