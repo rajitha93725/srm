@@ -779,7 +779,7 @@ function closeModal(){document.getElementById('modal').classList.remove('open');
 function saveMatch(){
   if(!currentModal) return;
   const t1=[],t2=[];
-  for(let i=0;i<3;i++){
+  for(let i=0;i<1;i++){
     const v1=document.getElementById(`lpm${i}t1`).value, v2=document.getElementById(`lpm${i}t2`).value;
     if(v1!==''&&v2!==''){t1.push(parseFloat(v1)||0);t2.push(parseFloat(v2)||0);}
   }
@@ -846,7 +846,7 @@ function closeKOModal(){document.getElementById('ko-modal').classList.remove('op
 function saveKO(){
   if(!koState) return;
   const t1=[],t2=[];
-  for(let i=0;i<3;i++){
+  for(let i=0;i<1;i++){
     const v1=document.getElementById(`kom${i}t1`).value, v2=document.getElementById(`kom${i}t2`).value;
     if(v1!==''&&v2!==''){t1.push(parseFloat(v1)||0);t2.push(parseFloat(v2)||0);}
   }
