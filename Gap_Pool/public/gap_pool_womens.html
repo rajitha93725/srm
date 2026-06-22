@@ -338,11 +338,17 @@ const SFS=[
 
 // ── State ─────────────────────────────────────────────────────────────────────
 const _SEED={
-  groupScores:{},
+  groupScores:{
+    "g2_m0":{"t1":[0.7],"t2":[0.5],"winner":0,"score":"1-0"}
+  },
   knockout:{},
   customNames:{},
-  matchDates:{},
-  matchTimes:{},
+  matchDates:{
+    "g2_m0":"2026-06-22"
+  },
+  matchTimes:{
+    "g2_m0":"15:00"
+  },
   withdrawnPairs:["g4_p2"]
 };
 let STATE=JSON.parse(localStorage.getItem('gapstars_womens_2026')||'null')||JSON.parse(JSON.stringify(_SEED));
