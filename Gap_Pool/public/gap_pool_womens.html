@@ -183,7 +183,7 @@ h2{font-size:1rem;font-weight:600;margin-bottom:14px;color:#f1f5f9}
     </svg>
     <div class="header-titles">
       <h1>Gapstars Pool — Womens Double <span style="font-size:.9rem;font-weight:600;-webkit-text-fill-color:#f9a8d4;color:#f9a8d4">· Only 1 Match</span></h1>
-      <p>hosted by stargazers &nbsp;·&nbsp; 4 groups &nbsp;·&nbsp; 4 houses &nbsp;·&nbsp; 2 matches per pair &nbsp;·&nbsp; 30 mins &nbsp;·&nbsp; 40 sec per strike</p>
+      <p>hosted by stargazers &nbsp;·&nbsp; 4 groups &nbsp;·&nbsp; 4 houses &nbsp;·&nbsp; 2 matches per pair &nbsp;·&nbsp; 30 mins &nbsp;·&nbsp; 1 min per strike</p>
     </div>
   </div>
   <div class="house-pills">
@@ -240,7 +240,7 @@ h2{font-size:1rem;font-weight:600;margin-bottom:14px;color:#f1f5f9}
 <div class="modal-bg" id="modal">
   <div class="modal">
     <div class="modal-title" id="modal-title">Match Score Entry</div>
-    <div class="modal-sub">1 Match · 30 mins · 40 sec per strike · Higher total wins · Decimals allowed</div>
+    <div class="modal-sub">1 Match · 30 mins · 1 min per strike · Higher total wins · Decimals allowed</div>
     <div id="modal-content"></div>
     <div class="btn-row">
       <button class="btn btn-danger" onclick="clearMatch()">Clear</button>
@@ -612,8 +612,8 @@ function getGroupPairPoints(pairName){
       const anyPlayed=GROUP_MATCHES.some((_,mi)=>calcMatchup(STATE.groupScores[`g${bg.id}_m${mi}`])!==null);
       if(!anyPlayed)return{pts:0,stage:'Not Started'};
       if(rank===0)return{pts:25,stage:'Group 1st'};
-      if(rank===1)return{pts:15,stage:'Group 2nd'};
-      return{pts:10,stage:'Group 3rd'};
+      if(rank===1)return{pts:20,stage:'Group 2nd'};
+      return{pts:15,stage:'Group 3rd'};
     }
   }
   return{pts:0,stage:'No Data'};
