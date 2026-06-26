@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stars Cricket Battle 2026 — Auction</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',sans-serif;background:#0f172a;color:#e2e8f0;min-height:100vh}
+:root{
+  --duck:#eab308;--duck-d:#713f12;
+  --injuries:#f97316;--injuries-d:#7c2d12;
+  --wide:#06b6d4;--wide-d:#164e63;
+  --sledge:#d946ef;--sledge-d:#701a75;
+}
+header{background:linear-gradient(135deg,#1e293b,#0f172a);border-bottom:2px solid #334155;padding:14px 24px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.back-btn{padding:4px 12px;border-radius:7px;font-size:.72rem;font-weight:600;cursor:pointer;border:1px solid rgba(100,116,139,.35);background:rgba(100,116,139,.1);color:#94a3b8;text-decoration:none;white-space:nowrap;transition:.2s;flex-shrink:0}
+.back-btn:hover{background:rgba(100,116,139,.22);color:#e2e8f0}
+.header-titles h1{font-size:1.4rem;font-weight:800;background:linear-gradient(90deg,#fef3c7,#d97706);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.header-titles p{font-size:.73rem;color:#64748b;margin-top:2px;letter-spacing:.5px}
+.tpills{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap}
+.tpill{padding:3px 10px;border-radius:20px;font-size:.72rem;font-weight:700;border:1px solid}
+nav{display:flex;gap:4px;padding:11px 24px;background:#1e293b;border-bottom:1px solid #334155;overflow-x:auto;align-items:center}
+.tab{padding:7px 16px;border-radius:8px;cursor:pointer;font-size:.82rem;font-weight:500;color:#94a3b8;border:none;background:transparent;white-space:nowrap;transition:.2s}
+.tab:hover{background:#334155;color:#e2e8f0}
+.tab.active{background:#f59e0b;color:#000}
+.nav-sep{flex:1}
+.nav-btn{padding:5px 12px;border-radius:7px;font-size:.75rem;font-weight:500;cursor:pointer;border:1px solid;white-space:nowrap;transition:.2s}
+.nav-btn-export{background:rgba(34,197,94,.1);color:#4ade80;border-color:rgba(34,197,94,.4)}
+.nav-btn-export:hover{background:rgba(34,197,94,.2)}
+.nav-btn-import{background:rgba(59,130,246,.1);color:#60a5fa;border-color:rgba(59,130,246,.4)}
+.nav-btn-import:hover{background:rgba(59,130,246,.2)}
+.nav-btn-reset{background:rgba(239,68,68,.1);color:#f87171;border-color:rgba(239,68,68,.4)}
+.nav-btn-reset:hover{background:rgba(239,68,68,.2)}
+.nav-btn-undo{background:rgba(234,179,8,.1);color:#eab308;border-color:rgba(234,179,8,.4)}
+.nav-btn-undo:hover{background:rgba(234,179,8,.2)}
+.pc-undo{position:absolute;bottom:5px;right:5px;padding:2px 7px;font-size:.62rem;background:rgba(234,179,8,.12);color:#eab308;border:1px solid rgba(234,179,8,.3);border-radius:5px;cursor:pointer;opacity:0;transition:.15s;font-weight:700;line-height:1.5}
+.pc-sold:hover .pc-undo{opacity:1}
+.pc-undo:hover{background:rgba(234,179,8,.28)!important;color:#fef3c7!important}
+.section{display:none;padding:16px 18px}
+.section.active{display:block}
+h2{font-size:1rem;font-weight:600;margin-bottom:14px;color:#f1f5f9}
+
+/* Team overview cards */
+.teams-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+@media(max-width:960px){.teams-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:500px){.teams-grid{grid-template-columns:1fr}}
+.team-card{border-radius:12px;padding:16px;border:2px solid}
+.team-card.duck{background:linear-gradient(135deg,#713f12,#92400e);border-color:var(--duck)}
+.team-card.injuries{background:linear-gradient(135deg,#7c2d12,#9a3412);border-color:var(--injuries)}
+.team-card.wide{background:linear-gradient(135deg,#164e63,#155e75);border-color:var(--wide)}
+.team-card.sledge{background:linear-gradient(135deg,#701a75,#86198f);border-color:var(--sledge)}
+.tc-name{font-size:.95rem;font-weight:800;margin-bottom:8px}
+.budget-bar-wrap{background:rgba(0,0,0,.35);border-radius:6px;height:6px;margin:6px 0 10px}
+.budget-bar{height:6px;border-radius:6px;transition:.4s}
+.tc-stats{display:flex;gap:12px;flex-wrap:wrap}
+.tc-stat{font-size:.7rem;color:rgba(255,255,255,.7);line-height:1.5}
+.tc-stat strong{display:block;font-size:.88rem;color:#fff}
+.tc-mini{margin-top:8px;font-size:.65rem;color:rgba(255,255,255,.5);line-height:1.7;min-height:20px}
+
+/* Quick stats row */
+.stats-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px}
+.stat-box{flex:1;min-width:100px;background:#1e293b;border:1px solid #334155;border-radius:10px;padding:12px 14px;text-align:center}
+.stat-val{font-size:1.7rem;font-weight:900;line-height:1}
+.stat-lbl{font-size:.68rem;color:#64748b;margin-top:4px}
+
+/* Players section */
+.filter-bar{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:12px;align-items:center}
+.filter-btn{padding:4px 12px;border-radius:8px;font-size:.75rem;font-weight:500;cursor:pointer;border:1px solid #334155;background:#1e293b;color:#94a3b8;transition:.2s}
+.filter-btn:hover{background:#334155;color:#e2e8f0}
+.filter-btn.active{background:#f59e0b;color:#000;border-color:#f59e0b}
+.search-inp{padding:5px 10px;background:#1e293b;border:1px solid #334155;border-radius:8px;color:#e2e8f0;font-size:.8rem;flex:1;min-width:140px;outline:none}
+.search-inp:focus{border-color:#f59e0b}
+.players-count{font-size:.75rem;color:#475569;font-weight:600;white-space:nowrap}
+.players-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:7px}
+.pc{background:#1e293b;border:1px solid #334155;border-radius:9px;padding:9px 10px;cursor:pointer;transition:.15s;position:relative}
+.pc:hover:not(.pc-sold){border-color:#f59e0b;background:#2a2010}
+.pc.pc-sold{opacity:.6;cursor:default}
+.pc.pc-active{border-color:#f59e0b!important;background:rgba(234,179,8,.08)!important;cursor:default}
+.pc-house{display:flex;align-items:center;gap:4px;margin-bottom:3px}
+.pc-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.pc-hlabel{font-size:.6rem;color:#475569;font-weight:600}
+.pc-name{font-size:.78rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:5px}
+.pc-tag{display:inline-block;padding:1px 7px;border-radius:8px;font-size:.63rem;font-weight:700}
+.pc-tag-avail{background:rgba(100,116,139,.15);color:#64748b}
+.pc-team{font-size:.65rem;margin-top:3px;font-weight:600}
+.pc-amount{font-size:.65rem;color:#4ade80;font-weight:700}
+.pc-edit{position:absolute;top:5px;right:5px;padding:1px 5px;font-size:.6rem;background:#334155;color:#94a3b8;border:none;border-radius:4px;cursor:pointer;opacity:0;transition:.15s}
+.pc:hover .pc-edit{opacity:1}
+.pc-edit:hover{background:#475569;color:#e2e8f0}
+.pc-passed{font-size:.63rem;color:#475569;font-style:italic;margin-top:3px}
+
+/* Auction panel */
+.auction-panel{display:none;background:#1e293b;border:2px solid #f59e0b;border-radius:14px;padding:18px;margin-bottom:16px}
+.auction-panel.open{display:block}
+.ap-top{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.ap-dot{width:14px;height:14px;border-radius:50%;flex-shrink:0}
+.ap-hlabel{font-size:.62rem;color:#64748b;text-transform:uppercase;letter-spacing:.5px}
+.ap-name{font-size:1.3rem;font-weight:900;color:#fef3c7}
+.ap-bid-row{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;margin-bottom:14px}
+.ap-bid-label{font-size:.68rem;color:#64748b;margin-bottom:4px}
+.bid-input{padding:8px 12px;background:#0f172a;border:2px solid #f59e0b;border-radius:8px;color:#fef3c7;font-size:1.1rem;font-weight:700;width:175px;outline:none}
+.bid-input:focus{border-color:#fbbf24}
+.ap-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.btn-pass{padding:7px 14px;background:rgba(239,68,68,.1);color:#f87171;border:1px solid rgba(239,68,68,.35);border-radius:8px;cursor:pointer;font-size:.78rem;font-weight:600;transition:.2s}
+.btn-pass:hover{background:rgba(239,68,68,.2)}
+.btn-cancel-ap{padding:7px 14px;background:#334155;color:#94a3b8;border:none;border-radius:8px;cursor:pointer;font-size:.78rem;font-weight:500;transition:.2s}
+.btn-cancel-ap:hover{background:#475569;color:#e2e8f0}
+.ap-teams-label{font-size:.72rem;color:#64748b;font-weight:700;margin-bottom:8px}
+.ap-teams{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+@media(max-width:500px){.ap-teams{grid-template-columns:1fr}}
+.ap-team-btn{padding:11px 14px;border:2px solid;border-radius:10px;cursor:pointer;background:transparent;color:#e2e8f0;text-align:left;transition:.2s;width:100%}
+.ap-team-btn:hover:not(:disabled){transform:translateY(-1px);filter:brightness(1.15)}
+.ap-team-btn:disabled{opacity:.3;cursor:not-allowed}
+.atb-name{font-size:.88rem;font-weight:800}
+.atb-budget{font-size:.7rem;opacity:.8;margin-top:2px}
+.atb-count{font-size:.67rem;opacity:.65;margin-top:1px}
+
+/* Teams roster */
+.roster-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(420px,1fr));gap:14px}
+.roster-card{background:#1e293b;border:1px solid #334155;border-radius:12px;overflow:hidden}
+.rc-head{padding:12px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #334155}
+.rc-head h3{font-size:.95rem;font-weight:800}
+.rc-budget{font-size:1.1rem;font-weight:800}
+.rc-subhead{font-size:.68rem;color:#64748b;margin-top:2px}
+.rc-bar-wrap{padding:6px 16px;background:#0f172a}
+.rc-bar-bg{background:#1e293b;border-radius:4px;height:5px}
+.rc-bar{height:5px;border-radius:4px;transition:.4s}
+.rc-bar-pct{font-size:.62rem;color:#475569;text-align:right;margin-top:3px}
+.rc-table{width:100%;border-collapse:collapse;font-size:.78rem}
+.rc-table th{padding:6px 12px;background:#0a0f1e;color:#475569;font-size:.67rem;font-weight:600;text-align:left}
+.rc-table td{padding:6px 12px;border-bottom:1px solid #0f172a}
+.rc-table tr:last-child td{border-bottom:none}
+.rc-foot{padding:8px 14px;background:#0a0f1e;display:flex;gap:14px;flex-wrap:wrap;border-top:1px solid #1e293b;font-size:.73rem;color:#64748b}
+.rc-foot strong{color:#e2e8f0}
+.rc-empty-row td{font-style:italic;color:#334155;text-align:center;font-size:.7rem;padding:5px}
+
+/* Log */
+.log-table{width:100%;border-collapse:collapse;font-size:.8rem}
+.log-table th{background:#1e3050;padding:8px 12px;text-align:left;color:#64748b;font-size:.73rem;font-weight:600}
+.log-table td{padding:8px 12px;border-bottom:1px solid #1e293b;vertical-align:middle}
+.log-table tr:hover td{background:rgba(255,255,255,.02)}
+.hbadge{padding:2px 8px;border-radius:8px;font-size:.67rem;font-weight:700}
+
+/* Modal */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:100;align-items:center;justify-content:center}
+.modal-bg.open{display:flex}
+.modal{background:#1e293b;border:1px solid #475569;border-radius:14px;padding:22px;width:380px;max-width:96vw}
+.modal-title{font-size:.95rem;font-weight:700;margin-bottom:12px;color:#f1f5f9}
+.ne-field{margin-bottom:12px}
+.ne-label{font-size:.72rem;color:#64748b;margin-bottom:4px;display:block}
+.ne-input{width:100%;padding:8px 10px;background:#0f172a;border:1px solid #475569;border-radius:7px;color:#e2e8f0;font-size:.85rem;outline:none}
+.ne-input:focus{border-color:#f59e0b}
+.btn-row{display:flex;gap:8px;justify-content:flex-end;margin-top:14px}
+.btn{padding:7px 16px;border:none;border-radius:7px;cursor:pointer;font-size:.8rem;font-weight:500}
+.btn-primary{background:#f59e0b;color:#000}.btn-primary:hover{background:#fbbf24}
+.btn-secondary{background:#334155;color:#e2e8f0}.btn-secondary:hover{background:#475569}
+.btn-danger{background:#ef4444;color:#fff}.btn-danger:hover{background:#dc2626}
+
+/* Instruction banner */
+.tip-banner{background:rgba(234,179,8,.07);border:1px solid rgba(234,179,8,.25);border-radius:10px;padding:10px 14px;font-size:.75rem;color:#d97706;margin-bottom:16px;line-height:1.6}
+.tip-banner strong{color:#fbbf24}
+</style>
+</head>
+<body>
+
+<header>
+  <a class="back-btn" href="index.html">← Hub</a>
+  <div style="display:flex;align-items:center;gap:12px">
+    <svg width="42" height="42" viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0">
+      <rect x="1" y="1" width="42" height="42" rx="7" fill="#1c1204" stroke="#d97706" stroke-width="1.5"/>
+      <line x1="9" y1="38" x2="32" y2="8" stroke="#d4a855" stroke-width="4.5" stroke-linecap="round"/>
+      <ellipse cx="32.5" cy="7.5" rx="6" ry="3.5" fill="#b8892a" transform="rotate(-50 32.5 7.5)"/>
+      <ellipse cx="32.5" cy="7.5" rx="4" ry="2" fill="#e8b84b" transform="rotate(-50 32.5 7.5)"/>
+      <circle cx="10" cy="35" r="4.5" fill="#dc2626" stroke="#7f1d1d" stroke-width=".8"/>
+      <path d="M8 33.5 Q10 31.5 12 33.5" stroke="#fca5a5" stroke-width=".7" fill="none"/>
+      <path d="M8 35.5 Q10 37.5 12 35.5" stroke="#fca5a5" stroke-width=".7" fill="none"/>
+      <circle cx="25" cy="34" r="3" fill="#f59e0b" stroke="#713f12" stroke-width=".5"/>
+      <circle cx="35" cy="26" r="2.5" fill="#06b6d4" stroke="#164e63" stroke-width=".5"/>
+      <circle cx="38" cy="15" r="2.5" fill="#d946ef" stroke="#701a75" stroke-width=".5"/>
+    </svg>
+    <div class="header-titles">
+      <h1>Stars Cricket Battle 2026</h1>
+      <p>Player Auction &nbsp;·&nbsp; 96 players &nbsp;·&nbsp; 4 teams &nbsp;·&nbsp; €500,000 per team</p>
+    </div>
+  </div>
+  <div class="tpills">
+    <span class="tpill" style="background:#713f12;color:#eab308;border-color:#eab308">Duck</span>
+    <span class="tpill" style="background:#7c2d12;color:#f97316;border-color:#f97316">Injuries</span>
+    <span class="tpill" style="background:#164e63;color:#06b6d4;border-color:#06b6d4">Wide</span>
+    <span class="tpill" style="background:#701a75;color:#d946ef;border-color:#d946ef">Sledge</span>
+  </div>
+</header>
+
+<nav>
+  <button class="tab active" onclick="showTab('overview')">Overview</button>
+  <button class="tab" onclick="showTab('players')">Players</button>
+  <button class="tab" onclick="showTab('teams')">Rosters</button>
+  <button class="tab" onclick="showTab('log')">Auction Log</button>
+  <div class="nav-sep"></div>
+  <button class="nav-btn nav-btn-undo" onclick="undoLast()">↩ Undo Last</button>
+  <button class="nav-btn nav-btn-export" onclick="exportData()">⬇ Export</button>
+  <button class="nav-btn nav-btn-import" onclick="document.getElementById('import-file').click()">⬆ Import</button>
+  <button class="nav-btn nav-btn-reset" onclick="resetAll()">↺ Reset</button>
+</nav>
+<input type="file" id="import-file" accept=".json" style="display:none" onchange="handleImport(event)">
+
+<!-- Overview -->
+<div id="tab-overview" class="section active">
+  <div class="stats-row" id="quick-stats"></div>
+  <h2>Team Budgets</h2>
+  <div class="teams-grid" id="teams-overview"></div>
+</div>
+
+<!-- Players -->
+<div id="tab-players" class="section">
+  <div class="auction-panel" id="auction-panel">
+    <div class="ap-top">
+      <div class="ap-dot" id="ap-dot"></div>
+      <div>
+        <div class="ap-hlabel" id="ap-hlabel"></div>
+        <div class="ap-name" id="ap-name"></div>
+      </div>
+    </div>
+    <div class="ap-bid-row">
+      <div>
+        <div class="ap-bid-label">Bid Amount (€)</div>
+        <input type="number" class="bid-input" id="bid-amt" placeholder="e.g. 25000" min="1" max="500000"
+          onkeydown="if(event.key==='Enter'&&document.querySelector('.ap-team-btn:not(:disabled)')){}">
+      </div>
+      <div class="ap-actions">
+        <button class="btn-pass" onclick="passPlayer()">⊘ Pass / No Sale</button>
+        <button class="btn-cancel-ap" onclick="cancelAuction()">Cancel</button>
+      </div>
+    </div>
+    <div class="ap-teams-label">Assign to winning team:</div>
+    <div class="ap-teams" id="ap-teams"></div>
+  </div>
+  <div class="tip-banner">
+    <strong>How to auction:</strong> Click any available player card below to start their auction · Enter the bid amount · Click the winning team to confirm sale · Use <strong>Pass</strong> if no team bids
+  </div>
+  <div class="filter-bar">
+    <button class="filter-btn active" onclick="setFilter('all',this)">All</button>
+    <button class="filter-btn" onclick="setFilter('orion',this)" style="color:#60a5fa;border-color:#60a5fa40">Orion</button>
+    <button class="filter-btn" onclick="setFilter('cygnus',this)" style="color:#f87171;border-color:#f8717140">Cygnus</button>
+    <button class="filter-btn" onclick="setFilter('aquilla',this)" style="color:#a78bfa;border-color:#a78bfa40">Aquilla</button>
+    <button class="filter-btn" onclick="setFilter('draco',this)" style="color:#4ade80;border-color:#4ade8040">Draco</button>
+    <button class="filter-btn" onclick="setFilter('avail',this)">Available</button>
+    <button class="filter-btn" onclick="setFilter('sold',this)">Sold</button>
+    <button class="filter-btn" onclick="setFilter('passed',this)">Passed</button>
+    <input type="text" class="search-inp" id="search-inp" placeholder="Search name…" oninput="renderPlayers()">
+    <span class="players-count" id="players-count"></span>
+  </div>
+  <div class="players-grid" id="players-grid"></div>
+</div>
+
+<!-- Teams Roster -->
+<div id="tab-teams" class="section">
+  <h2>Team Rosters</h2>
+  <div class="roster-grid" id="roster-grid"></div>
+</div>
+
+<!-- Auction Log -->
+<div id="tab-log" class="section">
+  <h2>Auction Log</h2>
+  <div id="log-wrap"></div>
+</div>
+
+<!-- Name edit modal -->
+<div class="modal-bg" id="name-modal">
+  <div class="modal">
+    <div class="modal-title" id="nm-title">Edit Player Name</div>
+    <div class="ne-field">
+      <label class="ne-label">Display Name</label>
+      <input class="ne-input" id="nm-input" placeholder="e.g. Rajitha Fernando">
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-danger" id="nm-reset-btn" onclick="resetPlayerName()">Reset</button>
+      <button class="btn btn-secondary" onclick="closeNameModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveNameEdit()">Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Constants ────────────────────────────────────────────────────────────────
+const TEAM_DEFS=[
+  {id:'duck',     name:'Team Duck',     color:'#eab308', bg:'#713f12'},
+  {id:'injuries', name:'Team Injuries', color:'#f97316', bg:'#7c2d12'},
+  {id:'wide',     name:'Team Wide',     color:'#06b6d4', bg:'#164e63'},
+  {id:'sledge',   name:'Team Sledge',   color:'#d946ef', bg:'#701a75'},
+];
+const HOUSE_COLOR={orion:'#60a5fa',cygnus:'#f87171',aquilla:'#a78bfa',draco:'#4ade80'};
+const HOUSE_NAME={orion:'Orion',cygnus:'Cygnus',aquilla:'Aquilla',draco:'Draco'};
+const BUDGET=500000;
+const MAX_PLAYERS=24;
+
+// ── Base Players (96 total) ───────────────────────────────────────────────────
+const BASE_PLAYERS=[];
+['orion','cygnus','aquilla','draco'].forEach(h=>{
+  for(let i=1;i<=24;i++) BASE_PLAYERS.push({id:`${h}_${i}`,house:h,num:i});
+});
+
+function defaultName(p){return `${HOUSE_NAME[p.house]} ${p.num}`;}
+function playerName(id){
+  const p=BASE_PLAYERS.find(x=>x.id===id);
+  return STATE.customNames[id]||(p?defaultName(p):'Unknown');
+}
+function hc(h){return HOUSE_COLOR[h]||'#94a3b8';}
+
+// ── State ─────────────────────────────────────────────────────────────────────
+const _SEED={customNames:{},sold:{},passed:{},log:[]};
+let STATE=JSON.parse(localStorage.getItem('scb_auction_2026')||'null')||JSON.parse(JSON.stringify(_SEED));
+if(!STATE.customNames) STATE.customNames={};
+if(!STATE.sold)        STATE.sold={};
+if(!STATE.passed)      STATE.passed={};
+if(!STATE.log)         STATE.log=[];
+function save(){localStorage.setItem('scb_auction_2026',JSON.stringify(STATE));}
+
+// ── Team helpers ──────────────────────────────────────────────────────────────
+function teamData(tid){
+  const def=TEAM_DEFS.find(x=>x.id===tid);
+  const entries=Object.entries(STATE.sold).filter(([,v])=>v.teamId===tid);
+  const spent=entries.reduce((s,[,v])=>s+v.amount,0);
+  const players=entries.map(([pid,v])=>{
+    const bp=BASE_PLAYERS.find(p=>p.id===pid);
+    return{id:pid,name:playerName(pid),amount:v.amount,house:bp?.house||'orion'};
+  });
+  return{...def,spent,remaining:BUDGET-spent,players};
+}
+
+// ── Active auction ────────────────────────────────────────────────────────────
+let auctionPid=null;
+let activeFilter='all';
+
+function openAuction(pid){
+  if(STATE.sold[pid]||STATE.passed[pid]) return;
+  auctionPid=pid;
+  const p=BASE_PLAYERS.find(x=>x.id===pid);
+  document.getElementById('ap-dot').style.background=hc(p.house);
+  document.getElementById('ap-hlabel').textContent=HOUSE_NAME[p.house];
+  document.getElementById('ap-name').textContent=playerName(pid);
+  document.getElementById('bid-amt').value='';
+  document.getElementById('auction-panel').classList.add('open');
+  renderApTeams();
+  setTimeout(()=>document.getElementById('bid-amt').focus(),80);
+  document.getElementById('auction-panel').scrollIntoView({behavior:'smooth',block:'nearest'});
+  renderPlayers();
+}
+
+function renderApTeams(){
+  document.getElementById('ap-teams').innerHTML=TEAM_DEFS.map(t=>{
+    const td=teamData(t.id);
+    const full=td.players.length>=MAX_PLAYERS;
+    const broke=td.remaining<=0;
+    const dis=full||broke;
+    return`<button class="ap-team-btn" style="border-color:${t.color};background:${dis?'transparent':t.bg+'33'}"
+      onclick="confirmSell('${t.id}')" ${dis?'disabled':''}>
+      <div class="atb-name" style="color:${t.color}">${t.name}</div>
+      <div class="atb-budget" style="color:${t.color}">€${td.remaining.toLocaleString()} remaining</div>
+      <div class="atb-count">${td.players.length}/${MAX_PLAYERS} players${full?' · FULL':broke?' · NO BUDGET':''}</div>
+    </button>`;
+  }).join('');
+}
+
+function confirmSell(teamId){
+  if(!auctionPid) return;
+  const amt=parseInt(document.getElementById('bid-amt').value)||0;
+  if(amt<1){alert('Enter a bid amount (minimum €1).');document.getElementById('bid-amt').focus();return;}
+  const td=teamData(teamId);
+  if(amt>td.remaining){alert(`Over budget! ${td.name} only has €${td.remaining.toLocaleString()} left.`);return;}
+  if(td.players.length>=MAX_PLAYERS){alert(`${td.name} already has ${MAX_PLAYERS} players.`);return;}
+  const p=BASE_PLAYERS.find(x=>x.id===auctionPid);
+  STATE.sold[auctionPid]={teamId,amount:amt};
+  delete STATE.passed[auctionPid];
+  STATE.log.push({ts:Date.now(),pid:auctionPid,name:playerName(auctionPid),house:p?.house,teamId,amount:amt,passed:false});
+  save();cancelAuction();renderAll();
+}
+
+function passPlayer(){
+  if(!auctionPid) return;
+  const p=BASE_PLAYERS.find(x=>x.id===auctionPid);
+  STATE.passed[auctionPid]=true;
+  delete STATE.sold[auctionPid];
+  STATE.log.push({ts:Date.now(),pid:auctionPid,name:playerName(auctionPid),house:p?.house,teamId:null,amount:0,passed:true});
+  save();cancelAuction();renderAll();
+}
+
+function cancelAuction(){
+  auctionPid=null;
+  document.getElementById('auction-panel').classList.remove('open');
+  renderPlayers();
+}
+
+// ── Render: Overview ──────────────────────────────────────────────────────────
+function renderOverview(){
+  const soldCount=Object.keys(STATE.sold).length;
+  const passedCount=Object.keys(STATE.passed).length;
+  const avail=96-soldCount-passedCount;
+  const totalSpent=Object.values(STATE.sold).reduce((s,v)=>s+v.amount,0);
+  document.getElementById('quick-stats').innerHTML=`
+    <div class="stat-box"><div class="stat-val" style="color:#4ade80">${soldCount}</div><div class="stat-lbl">Players Sold</div></div>
+    <div class="stat-box"><div class="stat-val" style="color:#60a5fa">${avail}</div><div class="stat-lbl">Available</div></div>
+    <div class="stat-box"><div class="stat-val" style="color:#f87171">${passedCount}</div><div class="stat-lbl">Passed</div></div>
+    <div class="stat-box"><div class="stat-val" style="color:#eab308">€${(totalSpent/1000).toFixed(0)}k</div><div class="stat-lbl">Total Spent</div></div>
+    <div class="stat-box"><div class="stat-val" style="color:#a78bfa">${STATE.log.length}</div><div class="stat-lbl">Bids Made</div></div>`;
+
+  document.getElementById('teams-overview').innerHTML=TEAM_DEFS.map(t=>{
+    const td=teamData(t.id);
+    const pct=Math.max(0,Math.round((td.remaining/BUDGET)*100));
+    const mini=td.players.slice(-5).map(p=>`<span style="color:${hc(p.house)}">${p.name}</span>`).join(' · ');
+    return`<div class="team-card ${t.id}">
+      <div class="tc-name" style="color:${t.color}">${t.name}</div>
+      <div class="budget-bar-wrap"><div class="budget-bar" style="width:${pct}%;background:${t.color}"></div></div>
+      <div class="tc-stats">
+        <div class="tc-stat">Budget Left<strong style="color:${t.color}">€${td.remaining.toLocaleString()}</strong></div>
+        <div class="tc-stat">Spent<strong>€${td.spent.toLocaleString()}</strong></div>
+        <div class="tc-stat">Players<strong>${td.players.length} / ${MAX_PLAYERS}</strong></div>
+      </div>
+      <div class="tc-mini">${mini||'No players yet'}</div>
+    </div>`;
+  }).join('');
+}
+
+// ── Render: Players ───────────────────────────────────────────────────────────
+function renderPlayers(){
+  const search=(document.getElementById('search-inp')?.value||'').toLowerCase().trim();
+  let list=[...BASE_PLAYERS];
+  if(activeFilter==='orion'||activeFilter==='cygnus'||activeFilter==='aquilla'||activeFilter==='draco')
+    list=list.filter(p=>p.house===activeFilter);
+  else if(activeFilter==='sold')   list=list.filter(p=>STATE.sold[p.id]);
+  else if(activeFilter==='avail')  list=list.filter(p=>!STATE.sold[p.id]&&!STATE.passed[p.id]);
+  else if(activeFilter==='passed') list=list.filter(p=>STATE.passed[p.id]);
+  if(search) list=list.filter(p=>playerName(p.id).toLowerCase().includes(search));
+  document.getElementById('players-count').textContent=`${list.length} players`;
+
+  document.getElementById('players-grid').innerHTML=list.map(p=>{
+    const sold=STATE.sold[p.id];
+    const passed=STATE.passed[p.id];
+    const isActive=auctionPid===p.id;
+    const team=sold?TEAM_DEFS.find(t=>t.id===sold.teamId):null;
+    const cls=`pc${sold?' pc-sold':''}${passed?' pc-sold':''}${isActive?' pc-active':''}`;
+    return`<div class="${cls}" onclick="${sold||passed?'':'openAuction(\''+p.id+'\')'}">
+      <button class="pc-edit" onclick="event.stopPropagation();openNameEdit('${p.id}')" title="Edit name">✏</button>
+      <div class="pc-house">
+        <span class="pc-dot" style="background:${hc(p.house)}"></span>
+        <span class="pc-hlabel">${HOUSE_NAME[p.house]}</span>
+      </div>
+      <div class="pc-name" style="color:${hc(p.house)}">${playerName(p.id)}</div>
+      ${sold
+        ?`<div class="pc-team" style="color:${team?.color}">${team?.name}</div>
+          <div class="pc-amount">€${sold.amount.toLocaleString()}</div>`
+        :passed
+          ?`<span class="pc-tag" style="background:rgba(100,116,139,.15);color:#475569">Passed</span>`
+          :`<span class="pc-tag pc-tag-avail">Available</span>`
+      }
+      ${isActive?`<div style="font-size:.62rem;color:#f59e0b;margin-top:4px;font-weight:700">⚡ On Auction</div>`:''}
+      ${(sold||passed)?`<button class="pc-undo" onclick="event.stopPropagation();undoPlayer('${p.id}')" title="Undo this assignment">↩ Undo</button>`:''}
+    </div>`;
+  }).join('');
+}
+
+function setFilter(f,btn){
+  activeFilter=f;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderPlayers();
+}
+
+// ── Render: Rosters ───────────────────────────────────────────────────────────
+function renderRosters(){
+  document.getElementById('roster-grid').innerHTML=TEAM_DEFS.map(t=>{
+    const td=teamData(t.id);
+    const pct=Math.max(0,Math.round((td.remaining/BUDGET)*100));
+    const sorted=[...td.players].sort((a,b)=>b.amount-a.amount);
+    const rows=sorted.map(p=>`<tr>
+      <td><span style="color:${hc(p.house)};font-weight:600">${p.name}</span></td>
+      <td><span class="hbadge" style="background:${hc(p.house)}22;color:${hc(p.house)}">${HOUSE_NAME[p.house]}</span></td>
+      <td style="font-weight:700;color:${t.color};text-align:right">€${p.amount.toLocaleString()}</td>
+    </tr>`).join('');
+    const empty=MAX_PLAYERS-td.players.length;
+    const emptyRows=Array.from({length:Math.min(empty,3)},(_,i)=>`
+      <tr class="rc-empty-row"><td colspan="3">— slot ${td.players.length+i+1} —</td></tr>`).join('');
+    return`<div class="roster-card">
+      <div class="rc-head" style="border-left:3px solid ${t.color}">
+        <div>
+          <h3 style="color:${t.color}">${t.name}</h3>
+          <div class="rc-subhead">${td.players.length}/${MAX_PLAYERS} players &nbsp;·&nbsp; €${td.spent.toLocaleString()} spent</div>
+        </div>
+        <div class="rc-budget" style="color:${t.color}">€${td.remaining.toLocaleString()}</div>
+      </div>
+      <div class="rc-bar-wrap">
+        <div class="rc-bar-bg"><div class="rc-bar" style="width:${pct}%;background:${t.color}"></div></div>
+        <div class="rc-bar-pct">${pct}% budget remaining</div>
+      </div>
+      <table class="rc-table">
+        <thead><tr><th>Player</th><th>House</th><th style="text-align:right">Bid</th></tr></thead>
+        <tbody>${rows||'<tr class="rc-empty-row"><td colspan="3">No players acquired yet</td></tr>'}${empty>0?emptyRows:''}</tbody>
+      </table>
+      <div class="rc-foot">
+        <span>Slots left: <strong>${empty}</strong></span>
+        <span>Avg bid: <strong>€${td.players.length?Math.round(td.spent/td.players.length).toLocaleString():0}</strong></span>
+        <span>Top bid: <strong>€${td.players.length?Math.max(...td.players.map(p=>p.amount)).toLocaleString():0}</strong></span>
+        ${td.remaining<50000&&td.remaining>0?'<span style="color:#f97316;font-weight:700">⚠ Low budget</span>':''}
+        ${td.remaining<=0?'<span style="color:#ef4444;font-weight:700">✕ Budget exhausted</span>':''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── Render: Log ───────────────────────────────────────────────────────────────
+function renderLog(){
+  const wrap=document.getElementById('log-wrap');
+  if(!STATE.log.length){wrap.innerHTML='<p style="color:#475569;text-align:center;padding:30px;font-style:italic">No auction activity yet. Start by clicking a player in the Players tab.</p>';return;}
+  const rows=[...STATE.log].reverse().map((l,i)=>{
+    const team=TEAM_DEFS.find(t=>t.id===l.teamId);
+    const d=new Date(l.ts);
+    const time=d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+    const date=d.toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+    return`<tr>
+      <td style="color:#475569;font-size:.72rem">${STATE.log.length-i}</td>
+      <td><span style="font-weight:700;color:${hc(l.house)}">${l.name}</span></td>
+      <td><span class="hbadge" style="background:${hc(l.house)}22;color:${hc(l.house)}">${HOUSE_NAME[l.house]||''}</span></td>
+      <td>${l.passed
+        ?'<span style="color:#475569;font-style:italic;font-size:.75rem">— No Sale —</span>'
+        :`<span style="font-weight:700;color:${team?.color}">${team?.name}</span>`}</td>
+      <td style="font-weight:800;color:${l.passed?'#334155':'#4ade80'}">${l.passed?'—':'€'+l.amount.toLocaleString()}</td>
+      <td style="color:#475569;font-size:.72rem;white-space:nowrap">${date} ${time}</td>
+    </tr>`;
+  }).join('');
+  wrap.innerHTML=`<div style="overflow-x:auto"><table class="log-table">
+    <thead><tr><th>#</th><th>Player</th><th>House</th><th>Team</th><th>Amount</th><th>Time</th></tr></thead>
+    <tbody>${rows}</tbody>
+  </table></div>`;
+}
+
+// ── Name Edit ─────────────────────────────────────────────────────────────────
+let nameEditPid=null;
+function openNameEdit(pid){
+  nameEditPid=pid;
+  const p=BASE_PLAYERS.find(x=>x.id===pid);
+  document.getElementById('nm-title').textContent=`Edit: ${defaultName(p)}`;
+  document.getElementById('nm-input').value=STATE.customNames[pid]||'';
+  document.getElementById('nm-reset-btn').style.display=STATE.customNames[pid]?'block':'none';
+  document.getElementById('name-modal').classList.add('open');
+  setTimeout(()=>document.getElementById('nm-input').focus(),80);
+}
+function closeNameModal(){document.getElementById('name-modal').classList.remove('open');nameEditPid=null;}
+function saveNameEdit(){
+  const v=document.getElementById('nm-input').value.trim();
+  if(!v){alert('Name cannot be empty.');return;}
+  if(nameEditPid) STATE.customNames[nameEditPid]=v;
+  save();closeNameModal();renderAll();
+}
+function resetPlayerName(){
+  if(nameEditPid) delete STATE.customNames[nameEditPid];
+  save();closeNameModal();renderAll();
+}
+
+// ── Undo ─────────────────────────────────────────────────────────────────────
+function undoPlayer(pid){
+  const wasSold=STATE.sold[pid];
+  const wasPassed=STATE.passed[pid];
+  if(!wasSold&&!wasPassed) return;
+  const name=playerName(pid);
+  const teamName=wasSold?TEAM_DEFS.find(t=>t.id===wasSold.teamId)?.name:'Passed';
+  if(!confirm(`Undo "${name}" → ${teamName}?`)) return;
+  delete STATE.sold[pid];
+  delete STATE.passed[pid];
+  const idx=STATE.log.map(l=>l.pid).lastIndexOf(pid);
+  if(idx>=0) STATE.log.splice(idx,1);
+  save();renderAll();
+}
+function undoLast(){
+  if(!STATE.log.length){alert('Nothing to undo.');return;}
+  const last=STATE.log[STATE.log.length-1];
+  const teamName=last.passed?'Passed':TEAM_DEFS.find(t=>t.id===last.teamId)?.name;
+  if(!confirm(`Undo last action?\n"${last.name}" → ${teamName}`)) return;
+  delete STATE.sold[last.pid];
+  delete STATE.passed[last.pid];
+  STATE.log.pop();
+  save();renderAll();
+}
+
+// ── Export / Import / Reset ───────────────────────────────────────────────────
+function exportData(){
+  const a=Object.assign(document.createElement('a'),{
+    href:URL.createObjectURL(new Blob([JSON.stringify(STATE,null,2)],{type:'application/json'})),
+    download:`scb_auction_${new Date().toISOString().slice(0,10)}.json`
+  });
+  a.click();URL.revokeObjectURL(a.href);
+}
+function handleImport(e){
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=ev=>{
+    try{
+      STATE=JSON.parse(ev.target.result);
+      if(!STATE.customNames)STATE.customNames={};
+      if(!STATE.sold)STATE.sold={};
+      if(!STATE.passed)STATE.passed={};
+      if(!STATE.log)STATE.log=[];
+      save();cancelAuction();renderAll();alert('Data imported successfully!');
+    }catch{alert('Invalid JSON file.');}
+    e.target.value='';
+  };
+  r.readAsText(f);
+}
+function resetAll(){
+  if(!confirm('Reset ALL auction data? Team budgets, player sales, and log will be cleared. This cannot be undone.'))return;
+  STATE=JSON.parse(JSON.stringify(_SEED));
+  save();cancelAuction();renderAll();
+}
+
+// ── Tabs ──────────────────────────────────────────────────────────────────────
+function showTab(n){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-'+n).classList.add('active');
+  document.querySelector(`[onclick="showTab('${n}')"]`).classList.add('active');
+  if(n==='players')renderPlayers();
+}
+document.getElementById('name-modal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeNameModal();});
+document.getElementById('nm-input').addEventListener('keydown',e=>{if(e.key==='Enter')saveNameEdit();});
+
+function renderAll(){renderOverview();renderPlayers();renderRosters();renderLog();}
+renderAll();
+</script>
+</body>
+</html>
