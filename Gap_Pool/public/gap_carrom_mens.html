@@ -952,7 +952,6 @@ document.getElementById('ko-modal').addEventListener('click',e=>{if(e.target===e
 document.getElementById('pwd-modal').addEventListener('click',e=>{if(e.target===e.currentTarget)closePwdModal();});
 
 function renderAll(){renderGroups();renderBracket();renderStandings();renderRankings();}
-renderAll();
 
 // ── Rankings ──────────────────────────────────────────────────
 const STAGE_CLS_RK={
@@ -1018,6 +1017,8 @@ function renderRankings(){
   const countEl=document.getElementById('rk-count');
   if(countEl)countEl.textContent=`${played.length} played · ${pending.length} pending`;
 }
+
+renderAll();
 </script>
 </body>
 </html>
