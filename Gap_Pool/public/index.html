@@ -1197,13 +1197,24 @@ function renderOvEvents(){
   const HCOL={orion:'#60a5fa',aquilla:'#a78bfa',cygnus:'#f87171',draco:'#4ade80'};
   const HEM={orion:'⭐',aquilla:'🦅',cygnus:'🦢',draco:'🐉'};
   const cols=['cygnus','draco','aquilla','orion'];
+  const RK_COL=['#ffd700','#94a3b8','#c4884a','#475569'];
+  const RK_LBL=['1st','2nd','3rd','4th'];
+  function evtRanks(e){
+    const sorted=[...cols].sort((a,b)=>e[b]-e[a]);
+    const rm={};
+    sorted.forEach((h,i)=>{rm[h]=i===0?0:e[h]===e[sorted[i-1]]?rm[sorted[i-1]]:i;});
+    return rm;
+  }
   const totals={orion:0,aquilla:0,cygnus:0,draco:0};
   OV_EVENTS.forEach(e=>{totals.orion+=e.orion;totals.aquilla+=e.aquilla;totals.cygnus+=e.cygnus;totals.draco+=e.draco;});
-  const rows=OV_EVENTS.map((e,i)=>`
-    <tr>
+  const rows=OV_EVENTS.map((e,i)=>{
+    const rm=evtRanks(e);
+    return`<tr>
       <td>E${i+1} &nbsp;·&nbsp; ${e.name}</td>
-      ${cols.map(h=>`<td style="color:${HCOL[h]}">${e[h]}</td>`).join('')}
-    </tr>`).join('');
+      ${cols.map(h=>`<td style="color:${HCOL[h]}"><span style="font-size:.58rem;font-weight:800;color:${RK_COL[rm[h]]};margin-right:4px;opacity:.9">${RK_LBL[rm[h]]}</span>${e[h]}</td>`).join('')}
+    </tr>`;
+  }).join('');
+  const tr=evtRanks(totals);
   document.getElementById('ov-events-breakdown').innerHTML=`
     <div class="ov-breakdown">
       <div class="ov-breakdown-title">Past Events Breakdown</div>
@@ -1217,7 +1228,7 @@ function renderOvEvents(){
             ${rows}
             <tr class="evt-total">
               <td>Subtotal (Past Events)</td>
-              ${cols.map(h=>`<td style="color:${HCOL[h]}">${totals[h]}</td>`).join('')}
+              ${cols.map(h=>`<td style="color:${HCOL[h]}"><span style="font-size:.58rem;font-weight:800;color:${RK_COL[tr[h]]};margin-right:4px;opacity:.9">${RK_LBL[tr[h]]}</span>${totals[h]}</td>`).join('')}
             </tr>
           </tbody>
         </table>
