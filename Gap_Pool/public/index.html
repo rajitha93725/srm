@@ -773,7 +773,13 @@ footer{position:relative;z-index:5;text-align:center;padding:14px 20px 18px;
     </div>
     <!-- Carrom Standings -->
     <div class="carrom-std-wrap">
-      <div class="pool-std-title" style="color:#f59e0b;border-bottom-color:rgba(245,158,11,.12)">House Standings · Open Double <span style="background:linear-gradient(90deg,rgba(245,158,11,.25),transparent)"></span></div>
+      <div class="pool-std-hdr" style="border-bottom-color:rgba(245,158,11,.14)">
+        <span class="pool-std-trophy" style="filter:drop-shadow(0 0 14px rgba(245,158,11,.75))">🏆</span>
+        <div class="pool-std-hdr-text">
+          <span class="pool-std-title" style="color:#f59e0b">House Standings</span>
+          <span class="pool-std-final-badge" style="background:rgba(245,158,11,.12);border-color:rgba(245,158,11,.28);color:rgba(245,158,11,.65)">Carrom · Open Double</span>
+        </div>
+      </div>
       <div id="carrom-std-rows"></div>
     </div>
   </div>
@@ -1120,22 +1126,28 @@ renderPoolStandings();
 // ── Carrom standings (reads totals saved by gap_carrom_mens.html) ─────────────
 function renderCarromStandings(){
   const HCOL={orion:'#60a5fa',aquilla:'#a78bfa',cygnus:'#f87171',draco:'#4ade80'};
-  const HBAR={orion:'#1d4ed8',aquilla:'#6d28d9',cygnus:'#b91c1c',draco:'#15803d'};
-  const HNAME={orion:'⭐ Orion',aquilla:'🦅 Aquilla',cygnus:'🦢 Cygnus',draco:'🐉 Draco'};
+  const HEM={orion:'⭐',aquilla:'🦅',cygnus:'🦢',draco:'🐉'};
+  const HNME={orion:'Orion',aquilla:'Aquilla',cygnus:'Cygnus',draco:'Draco'};
+  const ranks=['🥇','🥈','🥉','4️⃣'];
   const data=JSON.parse(localStorage.getItem('gapstars_house_carrom')||'{}');
   const totals={orion:data.orion||0,aquilla:data.aquilla||0,cygnus:data.cygnus||0,draco:data.draco||0};
   const sorted=Object.entries(totals).sort((a,b)=>b[1]-a[1]);
-  const max=Math.max(...sorted.map(([,v])=>v),1);
   const hasData=sorted.some(([,v])=>v>0);
-  const ranks=['🥇','🥈','🥉','4️⃣'];
   document.getElementById('carrom-std-rows').innerHTML=hasData
-    ?sorted.map(([h,pts],i)=>`
-      <div class="pool-std-row">
-        <span class="pool-std-rank">${ranks[i]}</span>
-        <span class="pool-std-name" style="color:${HCOL[h]}">${HNAME[h]}</span>
-        <div class="pool-std-bar-wrap"><div class="pool-std-bar" style="width:${Math.round(pts/max*100)}%;background:${HBAR[h]}"></div></div>
-        <span class="pool-std-pts" style="color:${HCOL[h]}">${pts}</span>
-      </div>`).join('')
+    ?`<div class="pstd-grid">`+sorted.map(([h,pts],i)=>`
+      <div class="pstd-card h-${h}${i===0?' rank-1':''}">
+        <div class="pstd-rank">${ranks[i]}</div>
+        <span class="pstd-em">${HEM[h]}</span>
+        <div class="pstd-name h-${h}">${HNME[h]}</div>
+        <div class="pstd-total" style="color:${HCOL[h]}">${Math.round(Number(pts)*10)/10}</div>
+        <div class="pstd-divider"></div>
+        <div class="pstd-breakdown">
+          <div class="pstd-brow" style="background:rgba(245,158,11,.09);border:1px solid rgba(245,158,11,.2)">
+            <span class="pstd-lbl" style="color:#f59e0b">OD</span>
+            <span class="pstd-val" style="color:#f59e0b">${Math.round(Number(pts)*10)/10} pts</span>
+          </div>
+        </div>
+      </div>`).join('')+`</div>`
     :'<div style="text-align:center;color:#64748b;font-size:.78rem;padding:8px 0">No data yet — matches begin soon 🎯</div>';
 }
 renderCarromStandings();
