@@ -155,6 +155,25 @@ h2{font-size:1rem;font-weight:600;margin-bottom:14px;color:#f1f5f9}
 .hbk-foot-item strong{color:#e2e8f0}
 .final-section{background:#1e293b;border:1px solid #f59e0b;border-radius:12px;padding:16px;margin-top:16px;text-align:center}
 .final-section h3{color:#f59e0b;margin-bottom:12px;font-size:.95rem}
+
+/* Rankings */
+.rk-filter-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.rk-filter{padding:4px 13px;border-radius:7px;font-size:.72rem;font-weight:600;cursor:pointer;border:1px solid #334155;background:transparent;color:#94a3b8;transition:.15s;font-family:inherit}
+.rk-filter:hover{background:#334155;color:#e2e8f0}
+.rk-filter.active{background:#3b82f6;color:#fff;border-color:#3b82f6}
+.rk-filter.f-orion.active{background:var(--orion-d);color:var(--orion);border-color:var(--orion)}
+.rk-filter.f-aquilla.active{background:var(--aquilla-d);color:var(--aquilla);border-color:var(--aquilla)}
+.rk-filter.f-cygnus.active{background:var(--cygnus-d);color:var(--cygnus);border-color:var(--cygnus)}
+.rk-filter.f-draco.active{background:var(--draco-d);color:var(--draco);border-color:var(--draco)}
+.rk-wrap{overflow-x:auto}
+.rk-table{width:100%;border-collapse:collapse;min-width:420px}
+.rk-table th{font-size:.63rem;color:#64748b;font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:7px 10px;border-bottom:1px solid #334155;text-align:left;background:#1e293b;white-space:nowrap}
+.rk-table th.th-r{text-align:right}
+.rk-table td{padding:7px 10px;border-bottom:1px solid #1e293b;font-size:.78rem;vertical-align:middle}
+.rk-table tr:last-child td{border-bottom:none}
+.rk-table tbody tr:hover td{background:rgba(255,255,255,.02)}
+.rk-num{font-size:.8rem;font-weight:800;color:#475569;text-align:center;width:36px}
+.rk-medal{font-size:1rem;line-height:1}
 </style>
 </head>
 <body>
@@ -196,6 +215,7 @@ h2{font-size:1rem;font-weight:600;margin-bottom:14px;color:#f1f5f9}
 
 <nav>
   <button class="tab active" onclick="showTab('groups')">Groups</button>
+  <button class="tab" onclick="showTab('rankings')">Rankings</button>
   <button class="tab" onclick="showTab('bracket')">Bracket</button>
   <button class="tab" onclick="showTab('standings')">House Standings</button>
   <div class="nav-sep"></div>
@@ -227,6 +247,30 @@ h2{font-size:1rem;font-weight:600;margin-bottom:14px;color:#f1f5f9}
   <div class="hs-grid" id="house-summary"></div>
   <h2>House Breakdown</h2>
   <div id="standings-overview"></div>
+</div>
+
+<div id="tab-rankings" class="section">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+    <h2 style="margin-bottom:0">Pair Rankings</h2>
+    <span id="rk-count" style="font-size:.78rem;color:#64748b;font-weight:600;background:#1e293b;padding:4px 12px;border-radius:8px;border:1px solid #334155"></span>
+  </div>
+  <div class="rk-filter-row">
+    <button class="rk-filter active" onclick="filterRankings('all')">All</button>
+    <button class="rk-filter f-orion" onclick="filterRankings('orion')">⭐ Orion</button>
+    <button class="rk-filter f-aquilla" onclick="filterRankings('aquilla')">🦅 Aquilla</button>
+    <button class="rk-filter f-cygnus" onclick="filterRankings('cygnus')">🦢 Cygnus</button>
+    <button class="rk-filter f-draco" onclick="filterRankings('draco')">🐉 Draco</button>
+  </div>
+  <div class="rk-wrap"><table class="rk-table" id="rk-table">
+    <thead><tr>
+      <th style="text-align:center">#</th>
+      <th>Pair</th>
+      <th>Board</th>
+      <th>Stage</th>
+      <th class="th-r">Pts</th>
+    </tr></thead>
+    <tbody id="rk-tbody"></tbody>
+  </table></div>
 </div>
 
 <!-- Score entry modal -->
@@ -888,8 +932,58 @@ document.getElementById('name-modal').addEventListener('click',e=>{if(e.target==
 document.getElementById('ko-modal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeKOModal();});
 document.getElementById('pwd-modal').addEventListener('click',e=>{if(e.target===e.currentTarget)closePwdModal();});
 
-function renderAll(){renderGroups();renderBracket();renderStandings();}
+function renderAll(){renderGroups();renderBracket();renderStandings();renderRankings();}
 renderAll();
+
+// ── Rankings ──────────────────────────────────────────────────
+const STAGE_CLS_RK={
+  'Champion':'s200','Finalist':'s100','3rd Place':'s75','4th Place':'s50',
+  'Semifinals':'s50','Super 8':'s25','Super 8 Out':'s25','KO Loser':'s15','Knockout':'s15',
+  'Board 1st':'s15','Board 2nd':'s10','Board 3rd':'s5','Not Started':'s5','No Data':'s5'
+};
+let _rkFilter='all';
+
+function filterRankings(h){
+  _rkFilter=h;
+  document.querySelectorAll('.rk-filter').forEach(b=>b.classList.remove('active'));
+  const btn=document.querySelector(`.rk-filter[onclick="filterRankings('${h}')"]`);
+  if(btn) btn.classList.add('active');
+  renderRankings();
+}
+
+function renderRankings(){
+  const all=[];
+  BASE_GROUPS.forEach(bg=>{
+    for(let pi=0;pi<3;pi++){
+      const p=getPair(bg.id,pi);
+      const res=getPairTotalPoints(p.n);
+      all.push({name:p.n,house:p.h,gId:bg.id,pts:res.pts,stage:res.stage});
+    }
+  });
+  const list=_rkFilter==='all'?all:all.filter(p=>p.h===_rkFilter);
+  list.sort((a,b)=>b.pts-a.pts||a.name.localeCompare(b.name));
+
+  // Assign ranks with tie handling
+  let curRank=1;
+  list.forEach((p,i)=>{
+    if(i>0&&list[i-1].pts===p.pts) p.rank=list[i-1].rank;
+    else p.rank=curRank;
+    curRank++;
+  });
+
+  const MEDAL=['🥇','🥈','🥉'];
+  document.getElementById('rk-tbody').innerHTML=list.map(p=>`
+    <tr>
+      <td class="rk-num">${p.rank<=3?`<span class="rk-medal">${MEDAL[p.rank-1]}</span>`:p.rank}</td>
+      <td>${hDot(p.house)}<span style="color:${hc(p.house)};font-weight:600;margin-left:5px">${p.name}</span></td>
+      <td style="color:#64748b;font-size:.72rem">B${p.gId}</td>
+      <td><span class="stage-pill ${STAGE_CLS_RK[p.stage]||'s5'}">${p.stage}</span></td>
+      <td class="th-r" style="font-weight:700;color:${hc(p.house)}">${p.pts}</td>
+    </tr>`).join('');
+
+  const countEl=document.getElementById('rk-count');
+  if(countEl) countEl.textContent=`${list.length} pair${list.length!==1?'s':''}`;
+}
 </script>
 </body>
 </html>
