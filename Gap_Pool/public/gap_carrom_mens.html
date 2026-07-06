@@ -569,8 +569,7 @@ function countHouseCompletedPairs(house){
       if(getPair(bg.id,pi).h!==house) continue;
       const done=GROUP_MATCHES.every((m,mi)=>{
         if(!m.includes(pi)) return true;
-        const r=calcMatchup(STATE.groupScores[`g${bg.id}_m${mi}`]);
-        return r&&r.winner!==null;
+        return calcMatchup(STATE.groupScores[`g${bg.id}_m${mi}`])!==null;
       });
       if(done) n++;
     }
@@ -631,6 +630,23 @@ function getPairTotalPoints(pairName){
   return ko||getGroupPairPoints(pairName);
 }
 
+function getPairRealPoints(pairName){
+  let pts=0;
+  for(const bg of BASE_GROUPS){
+    const st=getGroupStandings(bg.id);
+    const found=st.find(p=>p.n===pairName);
+    if(found){pts+=found.pts;break;}
+  }
+  Object.values(STATE.knockout).forEach(ko=>{
+    if(!ko||!ko.score)return;
+    const parts=ko.score.split('-').map(Number);
+    if(parts.length!==2||isNaN(parts[0])||isNaN(parts[1]))return;
+    if(ko.t1&&ko.t1.name===pairName)pts+=parts[0];
+    else if(ko.t2&&ko.t2.name===pairName)pts+=parts[1];
+  });
+  return Math.round(pts*10)/10;
+}
+
 // ── Render Standings ──────────────────────────────────────────────────────────
 function renderStandings(){
   const STAGE_CLS={
@@ -642,19 +658,21 @@ function renderStandings(){
   const hd={};
   Object.keys(HOUSES).forEach(h=>{hd[h]={pairs:[],total:0,bonus:0,completed:0};});
 
+  const fmt=v=>Math.round(v*10)/10;
   BASE_GROUPS.forEach(bg=>{
     const gc=isGroupComplete(bg.id);
     for(let pi=0;pi<3;pi++){
       const p=getPair(bg.id,pi);
-      const res=getPairTotalPoints(p.n);
-      hd[p.h].pairs.push({name:p.n,gId:bg.id,groupComplete:gc,res});
+      const stage=getPairTotalPoints(p.n).stage;
+      const pts=getPairRealPoints(p.n);
+      hd[p.h].pairs.push({name:p.n,gId:bg.id,groupComplete:gc,pts,stage});
     }
   });
 
   Object.keys(HOUSES).forEach(h=>{
     hd[h].completed=countHouseCompletedPairs(h);
     hd[h].bonus=hd[h].completed>=12?100:0;
-    hd[h].total=hd[h].pairs.reduce((s,p)=>s+p.res.pts,0)+hd[h].bonus;
+    hd[h].total=fmt(hd[h].pairs.reduce((s,p)=>s+p.pts,0)+hd[h].bonus);
   });
 
   const sorted=Object.entries(hd).sort((a,b)=>b[1].total-a[1].total);
@@ -663,25 +681,25 @@ function renderStandings(){
   document.getElementById('house-summary').innerHTML=sorted.map(([h,d],rank)=>`
     <div class="hs-card ${h}">
       <h4>${rankEmoji[rank]} ${HOUSES[h].name}</h4>
-      <div class="sc">${d.total}</div>
+      <div class="sc">${fmt(d.total)}</div>
       <div class="sc-sub">${d.completed}/12 pairs completed</div>
       ${d.bonus?'<div class="bonus-tag">+100 Participation Bonus</div>':''}
     </div>`).join('');
 
   document.getElementById('standings-overview').innerHTML=`<div class="hbk-wrap">${
     sorted.map(([h,d])=>{
-      const pairTotal=d.pairs.reduce((s,p)=>s+p.res.pts,0);
-      const rows=d.pairs.slice().sort((a,b)=>b.res.pts-a.res.pts).map(p=>`
+      const pairTotal=fmt(d.pairs.reduce((s,p)=>s+p.pts,0));
+      const rows=d.pairs.slice().sort((a,b)=>b.pts-a.pts).map(p=>`
         <tr>
           <td style="color:${hc(h)};font-weight:600">${p.name}</td>
           <td style="color:#64748b;font-size:.72rem">B${p.gId}</td>
-          <td><span class="stage-pill ${STAGE_CLS[p.res.stage]||'s5'}">${p.res.stage}</span></td>
-          <td style="font-weight:700;color:${hc(h)};text-align:right">${p.res.pts}</td>
+          <td><span class="stage-pill ${STAGE_CLS[p.stage]||'s5'}">${p.stage}</span></td>
+          <td style="font-weight:700;color:${hc(h)};text-align:right">${fmt(p.pts)}</td>
         </tr>`).join('');
       return`<div class="hbk-card">
         <div class="hbk-head" style="border-left:3px solid ${hc(h)}">
           <h3 style="color:${hc(h)}">${HOUSES[h].name}</h3>
-          <span class="hbk-pts" style="color:${hc(h)}">${d.total} pts</span>
+          <span class="hbk-pts" style="color:${hc(h)}">${fmt(d.total)} pts</span>
         </div>
         <table class="hbk-table">
           <thead><tr>
@@ -692,7 +710,7 @@ function renderStandings(){
         <div class="hbk-foot">
           <span class="hbk-foot-item">Pairs: <strong>${d.pairs.length}</strong></span>
           <span class="hbk-foot-item">Completed: <strong>${d.completed}/12</strong></span>
-          <span class="hbk-foot-item">Achievement: <strong>${pairTotal}</strong></span>
+          <span class="hbk-foot-item">Total Pts: <strong>${pairTotal}</strong></span>
           ${d.bonus?`<span class="hbk-foot-item" style="color:#fbbf24">Participation Bonus: <strong>+100</strong></span>`:''}
         </div>
       </div>`;
@@ -953,37 +971,52 @@ function filterRankings(h){
 }
 
 function renderRankings(){
+  const fmt=v=>Math.round(v*10)/10;
   const all=[];
   BASE_GROUPS.forEach(bg=>{
     for(let pi=0;pi<3;pi++){
       const p=getPair(bg.id,pi);
-      const res=getPairTotalPoints(p.n);
-      all.push({name:p.n,house:p.h,gId:bg.id,pts:res.pts,stage:res.stage});
+      const stage=getPairTotalPoints(p.n).stage;
+      const pts=getPairRealPoints(p.n);
+      const hasPlayed=GROUP_MATCHES.some((m,mi)=>
+        m.includes(pi)&&calcMatchup(STATE.groupScores[`g${bg.id}_m${mi}`])!==null);
+      all.push({name:p.n,house:p.h,gId:bg.id,pts,stage,started:hasPlayed||!!getKnockoutPoints(p.n)});
     }
   });
-  const list=_rkFilter==='all'?all:all.filter(p=>p.h===_rkFilter);
-  list.sort((a,b)=>b.pts-a.pts||a.name.localeCompare(b.name));
 
-  // Assign ranks with tie handling
+  const list=_rkFilter==='all'?all:all.filter(p=>p.h===_rkFilter);
+  const played=list.filter(p=>p.started).sort((a,b)=>b.pts-a.pts||a.name.localeCompare(b.name));
+  const pending=list.filter(p=>!p.started).sort((a,b)=>a.name.localeCompare(b.name));
+
   let curRank=1;
-  list.forEach((p,i)=>{
-    if(i>0&&list[i-1].pts===p.pts) p.rank=list[i-1].rank;
+  played.forEach((p,i)=>{
+    if(i>0&&played[i-1].pts===p.pts)p.rank=played[i-1].rank;
     else p.rank=curRank;
     curRank++;
   });
 
   const MEDAL=['🥇','🥈','🥉'];
-  document.getElementById('rk-tbody').innerHTML=list.map(p=>`
+  document.getElementById('rk-tbody').innerHTML=[
+    ...played.map(p=>`
     <tr>
       <td class="rk-num">${p.rank<=3?`<span class="rk-medal">${MEDAL[p.rank-1]}</span>`:p.rank}</td>
       <td>${hDot(p.house)}<span style="color:${hc(p.house)};font-weight:600;margin-left:5px">${p.name}</span></td>
       <td style="color:#64748b;font-size:.72rem">B${p.gId}</td>
       <td><span class="stage-pill ${STAGE_CLS_RK[p.stage]||'s5'}">${p.stage}</span></td>
-      <td class="th-r" style="font-weight:700;color:${hc(p.house)}">${p.pts}</td>
-    </tr>`).join('');
+      <td class="th-r" style="font-weight:700;color:${hc(p.house)}">${fmt(p.pts)}</td>
+    </tr>`),
+    ...pending.map(p=>`
+    <tr style="opacity:.4">
+      <td class="rk-num" style="color:#475569">—</td>
+      <td>${hDot(p.house)}<span style="color:${hc(p.house)};font-weight:600;margin-left:5px">${p.name}</span></td>
+      <td style="color:#64748b;font-size:.72rem">B${p.gId}</td>
+      <td><span class="stage-pill s5">Not Started</span></td>
+      <td class="th-r" style="color:#475569">—</td>
+    </tr>`)
+  ].join('');
 
   const countEl=document.getElementById('rk-count');
-  if(countEl) countEl.textContent=`${list.length} pair${list.length!==1?'s':''}`;
+  if(countEl)countEl.textContent=`${played.length} played · ${pending.length} pending`;
 }
 </script>
 </body>
