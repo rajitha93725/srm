@@ -504,6 +504,16 @@ footer{position:relative;z-index:5;text-align:center;padding:14px 20px 18px;
   border:1px solid rgba(191,95,255,.2);border-radius:8px;padding:4px 12px;
   transition:.2s}
 #funny-toast .toast-close:hover{color:#c084fc;border-color:rgba(191,95,255,.5)}
+/* ── Overall events breakdown ───────────────────────────── */
+.ov-breakdown{margin-top:24px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.07);border-radius:16px;overflow:hidden;margin-bottom:16px}
+.ov-breakdown-title{font-size:.65rem;letter-spacing:2.5px;text-transform:uppercase;color:#64748b;padding:12px 18px;border-bottom:1px solid rgba(255,255,255,.06);font-weight:700}
+.ov-evt-table{width:100%;border-collapse:collapse}
+.ov-evt-table th{padding:9px 16px;background:rgba(255,255,255,.03);font-size:.6rem;letter-spacing:1.5px;text-transform:uppercase;font-weight:700;text-align:right;white-space:nowrap}
+.ov-evt-table th:first-child{text-align:left;color:#475569}
+.ov-evt-table td{padding:8px 16px;border-top:1px solid rgba(255,255,255,.04);font-size:.78rem;text-align:right;font-weight:600}
+.ov-evt-table td:first-child{text-align:left;color:#94a3b8;font-size:.73rem;font-weight:400}
+.ov-evt-table .evt-total td{font-weight:800;background:rgba(255,215,0,.04);border-top:1px solid rgba(255,215,0,.15)}
+.ov-evt-table .evt-total td:first-child{color:#94a3b8}
 </style>
 </head>
 <body>
@@ -778,6 +788,7 @@ footer{position:relative;z-index:5;text-align:center;padding:14px 20px 18px;
     <div class="ov-subtitle">Grand House Standings</div>
   </div>
   <div class="ov-grid" id="ov-grid"></div>
+  <div id="ov-events-breakdown"></div>
   <div class="ov-foot">
     <button class="ov-act-btn exp" onclick="ovExport()">⬇ Export</button>
     <button class="ov-act-btn imp" onclick="ovImport()">⬆ Import</button>
@@ -1140,6 +1151,14 @@ const OV_EM={orion:'⭐',aquilla:'🦅',cygnus:'🦢',draco:'🐉'};
 const OV_NM={orion:'Orion',aquilla:'Aquilla',cygnus:'Cygnus',draco:'Draco'};
 const OV_RNK=['🥇','🥈','🥉','4️⃣'];
 const OV_RCL=['rank-1','rank-2','rank-3','rank-4'];
+const OV_EVENTS=[
+  {name:'Cinema Night 2026',       orion:100,aquilla:100,cygnus:100,draco:100},
+  {name:'Pick your Captains 2026', orion:100,aquilla:100,cygnus:100,draco:100},
+  {name:'Smash the Shuttle 2026',  orion:200,aquilla:250,cygnus:300,draco:150},
+  {name:'Awrudu Olympics 2026',    orion:125,aquilla:200,cygnus:175,draco:175},
+  {name:'AI Hackathon 2026',       orion:185,aquilla:185,cygnus:200,draco:200},
+  {name:'Trivia Night 2026',       orion:200,aquilla:100,cygnus:150,draco:250},
+];
 const OV_DEF={orion:910,aquilla:935,cygnus:1025,draco:975};
 
 let OV_STATE=null;
@@ -1171,6 +1190,39 @@ function ovRender(){
         onblur="ovOnBlur('${h}',this.value)">
       <div class="ov-pts-lbl">pts</div>
     </div>`).join('');
+  renderOvEvents();
+}
+
+function renderOvEvents(){
+  const HCOL={orion:'#60a5fa',aquilla:'#a78bfa',cygnus:'#f87171',draco:'#4ade80'};
+  const HEM={orion:'⭐',aquilla:'🦅',cygnus:'🦢',draco:'🐉'};
+  const cols=['cygnus','draco','aquilla','orion'];
+  const totals={orion:0,aquilla:0,cygnus:0,draco:0};
+  OV_EVENTS.forEach(e=>{totals.orion+=e.orion;totals.aquilla+=e.aquilla;totals.cygnus+=e.cygnus;totals.draco+=e.draco;});
+  const rows=OV_EVENTS.map((e,i)=>`
+    <tr>
+      <td>E${i+1} &nbsp;·&nbsp; ${e.name}</td>
+      ${cols.map(h=>`<td style="color:${HCOL[h]}">${e[h]}</td>`).join('')}
+    </tr>`).join('');
+  document.getElementById('ov-events-breakdown').innerHTML=`
+    <div class="ov-breakdown">
+      <div class="ov-breakdown-title">Past Events Breakdown</div>
+      <div style="overflow-x:auto">
+        <table class="ov-evt-table">
+          <thead><tr>
+            <th>Event</th>
+            ${cols.map(h=>`<th style="color:${HCOL[h]}">${HEM[h]} ${h.charAt(0).toUpperCase()+h.slice(1)}</th>`).join('')}
+          </tr></thead>
+          <tbody>
+            ${rows}
+            <tr class="evt-total">
+              <td>Subtotal (Past Events)</td>
+              ${cols.map(h=>`<td style="color:${HCOL[h]}">${totals[h]}</td>`).join('')}
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>`;
 }
 
 function ovOnInput(h,val){
