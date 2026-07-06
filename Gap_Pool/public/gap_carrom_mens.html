@@ -168,12 +168,18 @@ h2{font-size:1rem;font-weight:600;margin-bottom:14px;color:#f1f5f9}
 .rk-wrap{overflow-x:auto}
 .rk-table{width:100%;border-collapse:collapse;min-width:420px}
 .rk-table th{font-size:.63rem;color:#64748b;font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:7px 10px;border-bottom:1px solid #334155;text-align:left;background:#1e293b;white-space:nowrap}
-.rk-table th.th-r{text-align:right}
+.rk-table .th-r{text-align:right}
 .rk-table td{padding:7px 10px;border-bottom:1px solid #1e293b;font-size:.78rem;vertical-align:middle}
 .rk-table tr:last-child td{border-bottom:none}
 .rk-table tbody tr:hover td{background:rgba(255,255,255,.02)}
 .rk-num{font-size:.8rem;font-weight:800;color:#475569;text-align:center;width:36px}
 .rk-medal{font-size:1rem;line-height:1}
+.rk-sort-row{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+.rk-sort-lbl{font-size:.62rem;color:#475569;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-right:2px}
+.rk-sort{padding:3px 11px;border-radius:7px;font-size:.7rem;font-weight:600;cursor:pointer;border:1px solid #334155;background:transparent;color:#94a3b8;transition:.15s;font-family:inherit}
+.rk-sort:hover{background:#334155;color:#e2e8f0}
+.rk-sort.active{background:rgba(234,179,8,.18);border-color:#ca8a04;color:#fbbf24}
+.rk-table th.sort-active{color:#fbbf24}
 </style>
 </head>
 <body>
@@ -261,13 +267,20 @@ h2{font-size:1rem;font-weight:600;margin-bottom:14px;color:#f1f5f9}
     <button class="rk-filter f-cygnus" onclick="filterRankings('cygnus')">🦢 Cygnus</button>
     <button class="rk-filter f-draco" onclick="filterRankings('draco')">🐉 Draco</button>
   </div>
+  <div class="rk-sort-row">
+    <span class="rk-sort-lbl">Sort by:</span>
+    <button class="rk-sort active" id="rks-pts" onclick="sortRankings('pts')">Total Score</button>
+    <button class="rk-sort" id="rks-avg" onclick="sortRankings('avg')">Avg / Game</button>
+  </div>
   <div class="rk-wrap"><table class="rk-table" id="rk-table">
     <thead><tr>
       <th style="text-align:center">#</th>
       <th>Pair</th>
       <th>Board</th>
       <th>Stage</th>
-      <th class="th-r">Pts</th>
+      <th class="th-r" id="th-pts">Scores</th>
+      <th class="th-r">Games</th>
+      <th class="th-r" id="th-avg">Avg</th>
     </tr></thead>
     <tbody id="rk-tbody"></tbody>
   </table></div>
@@ -442,6 +455,17 @@ function getGroupWinner(gId){
 function getKnockoutTeam(lbl){
   const gm=lbl.match(/^B(\d+) Winner$/);
   if(gm){const w=getGroupWinner(+gm[1]);return w?{name:w.n,house:w.h}:null;}
+  // plain pair name → look up house from groups first, then KO history
+  for(const bg of BASE_GROUPS){
+    for(let pi=0;pi<3;pi++){
+      const p=getPair(bg.id,pi);
+      if(p.n===lbl)return{name:lbl,house:p.h};
+    }
+  }
+  for(const m of Object.values(STATE.knockout)){
+    if(m&&m.t1&&m.t1.name===lbl)return{name:lbl,house:m.t1.house};
+    if(m&&m.t2&&m.t2.name===lbl)return{name:lbl,house:m.t2.house};
+  }
   return null;
 }
 function getKOWinner(id){const m=STATE.knockout[id];return m&&m.winner!=null?m.winner===0?m.t1:m.t2:null;}
@@ -645,6 +669,33 @@ function getPairRealPoints(pairName){
     else if(ko.t2&&ko.t2.name===pairName)pts+=parts[1];
   });
   return Math.round(pts*10)/10;
+}
+
+function getPairStats(pairName){
+  let pts=0,games=0;
+  for(const bg of BASE_GROUPS){
+    const grp=getGroup(bg.id);
+    const pi=grp.pairs.findIndex(p=>p.n===pairName);
+    if(pi===-1) continue;
+    GROUP_MATCHES.forEach((m,mi)=>{
+      if(!m.includes(pi)) return;
+      const sc=STATE.groupScores[`g${bg.id}_m${mi}`];
+      if(!sc) return;
+      const myArr=m[0]===pi?(sc.t1||[]):(sc.t2||[]);
+      myArr.forEach(s=>{pts+=Number(s)||0;games++;});
+    });
+    break;
+  }
+  Object.values(STATE.knockout).forEach(ko=>{
+    if(!ko) return;
+    const isT1=ko.t1&&ko.t1.name===pairName;
+    const isT2=ko.t2&&ko.t2.name===pairName;
+    if(!isT1&&!isT2) return;
+    const arr=isT1?(ko.t1s||[]):(ko.t2s||[]);
+    arr.forEach(s=>{pts+=Number(s)||0;games++;});
+  });
+  const avg=games>0?Math.round(pts/games*10)/10:0;
+  return{pts:Math.round(pts*10)/10,games,avg};
 }
 
 // ── Render Standings ──────────────────────────────────────────────────────────
@@ -958,12 +1009,21 @@ const STAGE_CLS_RK={
   'Board 1st':'s15','Board 2nd':'s10','Board 3rd':'s5','Not Started':'s5','No Data':'s5'
 };
 let _rkFilter='all';
+let _rkSort='pts';
 
 function filterRankings(h){
   _rkFilter=h;
   document.querySelectorAll('.rk-filter').forEach(b=>b.classList.remove('active'));
   const btn=document.querySelector(`.rk-filter[onclick="filterRankings('${h}')"]`);
   if(btn) btn.classList.add('active');
+  renderRankings();
+}
+function sortRankings(s){
+  _rkSort=s;
+  document.getElementById('rks-pts').classList.toggle('active',s==='pts');
+  document.getElementById('rks-avg').classList.toggle('active',s==='avg');
+  document.getElementById('th-pts').classList.toggle('sort-active',s==='pts');
+  document.getElementById('th-avg').classList.toggle('sort-active',s==='avg');
   renderRankings();
 }
 
@@ -974,20 +1034,26 @@ function renderRankings(){
     for(let pi=0;pi<3;pi++){
       const p=getPair(bg.id,pi);
       const stage=getPairTotalPoints(p.n).stage;
-      const pts=getPairRealPoints(p.n);
+      const stats=getPairStats(p.n);
       const hasPlayed=GROUP_MATCHES.some((m,mi)=>
         m.includes(pi)&&calcMatchup(STATE.groupScores[`g${bg.id}_m${mi}`])!==null);
-      all.push({name:p.n,house:p.h,gId:bg.id,pts,stage,started:hasPlayed||!!getKnockoutPoints(p.n)});
+      all.push({name:p.n,house:p.h,gId:bg.id,pts:stats.pts,games:stats.games,avg:stats.avg,stage,
+        started:hasPlayed||!!getKnockoutPoints(p.n)});
     }
   });
 
-  const list=_rkFilter==='all'?all:all.filter(p=>p.h===_rkFilter);
-  const played=list.filter(p=>p.started).sort((a,b)=>b.pts-a.pts||a.name.localeCompare(b.name));
+  const list=_rkFilter==='all'?all:all.filter(p=>p.house===_rkFilter);
+  const sortFn=_rkSort==='avg'
+    ?(a,b)=>b.avg-a.avg||b.pts-a.pts||a.name.localeCompare(b.name)
+    :(a,b)=>b.pts-a.pts||b.avg-a.avg||a.name.localeCompare(b.name);
+  const played=list.filter(p=>p.started).sort(sortFn);
   const pending=list.filter(p=>!p.started).sort((a,b)=>a.name.localeCompare(b.name));
 
   let curRank=1;
   played.forEach((p,i)=>{
-    if(i>0&&played[i-1].pts===p.pts)p.rank=played[i-1].rank;
+    const key=_rkSort==='avg'?p.avg:p.pts;
+    const prevKey=i>0?(_rkSort==='avg'?played[i-1].avg:played[i-1].pts):null;
+    if(i>0&&prevKey===key)p.rank=played[i-1].rank;
     else p.rank=curRank;
     curRank++;
   });
@@ -1001,6 +1067,8 @@ function renderRankings(){
       <td style="color:#64748b;font-size:.72rem">B${p.gId}</td>
       <td><span class="stage-pill ${STAGE_CLS_RK[p.stage]||'s5'}">${p.stage}</span></td>
       <td class="th-r" style="font-weight:700;color:${hc(p.house)}">${fmt(p.pts)}</td>
+      <td class="th-r" style="color:#64748b">${p.games}</td>
+      <td class="th-r" style="color:#94a3b8">${p.games>0?fmt(p.avg):'—'}</td>
     </tr>`),
     ...pending.map(p=>`
     <tr style="opacity:.4">
@@ -1008,6 +1076,8 @@ function renderRankings(){
       <td>${hDot(p.house)}<span style="color:${hc(p.house)};font-weight:600;margin-left:5px">${p.name}</span></td>
       <td style="color:#64748b;font-size:.72rem">B${p.gId}</td>
       <td><span class="stage-pill s5">Not Started</span></td>
+      <td class="th-r" style="color:#475569">—</td>
+      <td class="th-r" style="color:#475569">—</td>
       <td class="th-r" style="color:#475569">—</td>
     </tr>`)
   ].join('');
