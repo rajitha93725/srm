@@ -658,21 +658,19 @@ function renderStandings(){
   const hd={};
   Object.keys(HOUSES).forEach(h=>{hd[h]={pairs:[],total:0,bonus:0,completed:0};});
 
-  const fmt=v=>Math.round(v*10)/10;
   BASE_GROUPS.forEach(bg=>{
     const gc=isGroupComplete(bg.id);
     for(let pi=0;pi<3;pi++){
       const p=getPair(bg.id,pi);
-      const stage=getPairTotalPoints(p.n).stage;
-      const pts=getPairRealPoints(p.n);
-      hd[p.h].pairs.push({name:p.n,gId:bg.id,groupComplete:gc,pts,stage});
+      const res=getPairTotalPoints(p.n);
+      hd[p.h].pairs.push({name:p.n,gId:bg.id,groupComplete:gc,pts:res.pts,stage:res.stage});
     }
   });
 
   Object.keys(HOUSES).forEach(h=>{
     hd[h].completed=countHouseCompletedPairs(h);
     hd[h].bonus=hd[h].completed>=12?100:0;
-    hd[h].total=fmt(hd[h].pairs.reduce((s,p)=>s+p.pts,0)+hd[h].bonus);
+    hd[h].total=hd[h].pairs.reduce((s,p)=>s+p.pts,0)+hd[h].bonus;
   });
 
   const sorted=Object.entries(hd).sort((a,b)=>b[1].total-a[1].total);
@@ -681,25 +679,25 @@ function renderStandings(){
   document.getElementById('house-summary').innerHTML=sorted.map(([h,d],rank)=>`
     <div class="hs-card ${h}">
       <h4>${rankEmoji[rank]} ${HOUSES[h].name}</h4>
-      <div class="sc">${fmt(d.total)}</div>
+      <div class="sc">${d.total}</div>
       <div class="sc-sub">${d.completed}/12 pairs completed</div>
       ${d.bonus?'<div class="bonus-tag">+100 Participation Bonus</div>':''}
     </div>`).join('');
 
   document.getElementById('standings-overview').innerHTML=`<div class="hbk-wrap">${
     sorted.map(([h,d])=>{
-      const pairTotal=fmt(d.pairs.reduce((s,p)=>s+p.pts,0));
+      const pairTotal=d.pairs.reduce((s,p)=>s+p.pts,0);
       const rows=d.pairs.slice().sort((a,b)=>b.pts-a.pts).map(p=>`
         <tr>
           <td style="color:${hc(h)};font-weight:600">${p.name}</td>
           <td style="color:#64748b;font-size:.72rem">B${p.gId}</td>
           <td><span class="stage-pill ${STAGE_CLS[p.stage]||'s5'}">${p.stage}</span></td>
-          <td style="font-weight:700;color:${hc(h)};text-align:right">${fmt(p.pts)}</td>
+          <td style="font-weight:700;color:${hc(h)};text-align:right">${p.pts}</td>
         </tr>`).join('');
       return`<div class="hbk-card">
         <div class="hbk-head" style="border-left:3px solid ${hc(h)}">
           <h3 style="color:${hc(h)}">${HOUSES[h].name}</h3>
-          <span class="hbk-pts" style="color:${hc(h)}">${fmt(d.total)} pts</span>
+          <span class="hbk-pts" style="color:${hc(h)}">${d.total} pts</span>
         </div>
         <table class="hbk-table">
           <thead><tr>
