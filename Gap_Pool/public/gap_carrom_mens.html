@@ -68,16 +68,9 @@ h2{font-size:1rem;font-weight:600;margin-bottom:14px;color:#f1f5f9}
 .score-txt.done{color:#4ade80}
 .score-btn{padding:4px 10px;background:#3b82f6;color:#fff;border:none;border-radius:5px;cursor:pointer;font-size:.72rem;font-weight:600;flex-shrink:0;margin-left:auto}
 .score-btn:hover{background:#2563eb}
-.match-deadline{display:inline-flex;align-items:center;gap:4px}
-.deadline-lbl{font-size:.6rem;color:#64748b;flex-shrink:0;line-height:1.25;white-space:normal;max-width:36px;word-break:break-word}
-.deadline-val-wrap{position:relative;display:inline-flex;align-items:center}
-.deadline-val{font-size:.72rem;font-weight:600;color:#7dd3fc;padding:2px 9px;background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.3);border-radius:6px;cursor:pointer;white-space:nowrap;transition:.15s}
-.deadline-val:hover{background:rgba(56,189,248,.16);border-color:#38bdf8;color:#e0f2fe}
-.deadline-inp-overlay{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;border:none;padding:0}
-.deadline-inp-overlay::-webkit-calendar-picker-indicator{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer}
-.deadline-time-sel{font-size:.72rem;font-weight:600;color:#7dd3fc;padding:2px 6px;background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.3);border-radius:6px;cursor:pointer;outline:none;font-family:inherit;-webkit-appearance:none;appearance:none;text-align:center;min-width:72px}
-.deadline-time-sel:hover,.deadline-time-sel:focus{background:rgba(56,189,248,.16);border-color:#38bdf8;color:#e0f2fe}
-.deadline-time-sel option{background:#1e293b;color:#e2e8f0}
+.game-chip{display:inline-flex;align-items:center;gap:3px;padding:2px 6px;background:rgba(51,65,85,.5);border:1px solid #334155;border-radius:5px;font-size:.68rem;white-space:nowrap}
+.game-num{color:#475569;font-size:.6rem;margin-right:2px}
+.game-sep{color:#475569;margin:0 1px}
 
 /* Bracket */
 .bracket-wrap{overflow-x:auto;padding-bottom:10px}
@@ -343,22 +336,20 @@ const GROUP_MATCHES=[[0,1],[0,2],[1,2]];
 
 // R16: all 16 group winners seed into knockout
 const R16=[
-  {id:'r16_1',left:'G1 Winner',  right:'G2 Winner'},
-  {id:'r16_2',left:'G3 Winner',  right:'G4 Winner'},
-  {id:'r16_3',left:'G5 Winner',  right:'G6 Winner'},
-  {id:'r16_4',left:'G7 Winner',  right:'G8 Winner'},
-  {id:'r16_5',left:'G9 Winner',  right:'G10 Winner'},
-  {id:'r16_6',left:'G11 Winner', right:'G12 Winner'},
-  {id:'r16_7',left:'G13 Winner', right:'G14 Winner'},
-  {id:'r16_8',left:'G15 Winner', right:'G16 Winner'},
+  {id:'r16_1',left:'B1 Winner',  right:'B2 Winner'},
+  {id:'r16_2',left:'B3 Winner',  right:'B4 Winner'},
+  {id:'r16_3',left:'B5 Winner',  right:'B6 Winner'},
+  {id:'r16_4',left:'B7 Winner',  right:'B8 Winner'},
+  {id:'r16_5',left:'B9 Winner',  right:'B10 Winner'},
+  {id:'r16_6',left:'B11 Winner', right:'B12 Winner'},
+  {id:'r16_7',left:'B13 Winner', right:'B14 Winner'},
+  {id:'r16_8',left:'B15 Winner', right:'B16 Winner'},
 ];
 
 // ── State ─────────────────────────────────────────────────────────────────────
 const _SEED={groupScores:{},knockout:{},customNames:{},matchDates:{},matchTimes:{}};
 let STATE=JSON.parse(localStorage.getItem('gapstars_carrom_open_2026')||'null')||JSON.parse(JSON.stringify(_SEED));
 if(!STATE.customNames) STATE.customNames={};
-if(!STATE.matchDates)  STATE.matchDates={};
-if(!STATE.matchTimes)  STATE.matchTimes={};
 function save(){localStorage.setItem('gapstars_carrom_open_2026',JSON.stringify(STATE));}
 
 // ── Pair data (with name overrides) ──────────────────────────────────────────
@@ -405,45 +396,12 @@ function getGroupWinner(gId){
 
 // ── Knockout helpers ──────────────────────────────────────────────────────────
 function getKnockoutTeam(lbl){
-  const gm=lbl.match(/^G(\d+) Winner$/);
+  const gm=lbl.match(/^B(\d+) Winner$/);
   if(gm){const w=getGroupWinner(+gm[1]);return w?{name:w.n,house:w.h}:null;}
   return null;
 }
 function getKOWinner(id){const m=STATE.knockout[id];return m&&m.winner!=null?m.winner===0?m.t1:m.t2:null;}
 
-// ── Match Dates ───────────────────────────────────────────────────────────────
-function setMatchDate(key,val){
-  if(!STATE.matchDates)STATE.matchDates={};
-  if(val)STATE.matchDates[key]=val;
-  else delete STATE.matchDates[key];
-  save();renderGroups();
-}
-function fmtMatchDate(val){
-  if(!val)return null;
-  const d=new Date(val+'T00:00:00');
-  return d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
-}
-function setMatchTime(key,val){
-  if(!STATE.matchTimes)STATE.matchTimes={};
-  if(val)STATE.matchTimes[key]=val;
-  else delete STATE.matchTimes[key];
-  save();renderGroups();
-}
-function fmtMatchTime(val){
-  if(!val)return null;
-  const [h,m]=val.split(':').map(Number);
-  const ampm=h<12?'AM':'PM', h12=h===0?12:h>12?h-12:h;
-  return`${h12}:${String(m).padStart(2,'0')} ${ampm}`;
-}
-function genTimeOpts(selected){
-  let o='<option value="">Time</option>';
-  for(let h=0;h<24;h++)for(const m of[0,30]){
-    const val=`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
-    const ampm=h<12?'AM':'PM', h12=h===0?12:h>12?h-12:h;
-    o+=`<option value="${val}"${selected===val?' selected':''}>${h12}:${String(m).padStart(2,'0')} ${ampm}</option>`;
-  }
-  return o;
-}
 
 // ── Render Groups ─────────────────────────────────────────────────────────────
 function renderGroups(){
@@ -476,14 +434,16 @@ function renderGroups(){
       </div>`).join('');
     const matchHtml=GROUP_MATCHES.map((m,mi)=>{
       const p1=grp.pairs[m[0]],p2=grp.pairs[m[1]], key=`g${bg.id}_m${mi}`;
-      const res=calcMatchup(STATE.groupScores[key]), done=res&&res.winner!==null;
+      const sc=STATE.groupScores[key]||{};
+      const res=calcMatchup(sc), done=res&&res.winner!==null;
       const winHex=done?(res.winner===0?hc(p1.h):hc(p2.h)):null;
       const summary=done
         ?`<span style="color:${hc(p1.h)};font-weight:700">${res.t1pts.toFixed(1)}</span> - <span style="color:${hc(p2.h)};font-weight:700">${res.t2pts.toFixed(1)}</span> <span style="font-size:.72rem;padding:1px 5px;border-radius:8px;background:${winHex}22;color:${winHex};font-weight:700;margin-left:4px">✓</span>`
         :'<span style="font-size:.62rem;padding:1px 6px;border-radius:8px;background:rgba(100,116,139,.15);color:#64748b;font-weight:700">!Played</span>';
-      const dateVal=(STATE.matchDates&&STATE.matchDates[key])||'';
-      const timeVal=(STATE.matchTimes&&STATE.matchTimes[key])||'';
-      const dateDisp=fmtMatchDate(dateVal)||'—';
+      const gameChips=done&&sc.t1&&sc.t1.length?sc.t1.map((s1,i)=>{
+        const s2=Number(sc.t2[i])||0,w=s1>s2?0:s2>s1?1:null;
+        return`<span class="game-chip"><span class="game-num">G${i+1}</span><span style="color:${w===0?hc(p1.h):'#94a3b8'};font-weight:${w===0?700:400}">${s1}</span><span class="game-sep">–</span><span style="color:${w===1?hc(p2.h):'#94a3b8'};font-weight:${w===1?700:400}">${s2}</span></span>`;
+      }).join(''):'';
       return`<div class="match-row${done?' match-done':''}"${done?` style="border-left-color:${winHex}99;background:linear-gradient(90deg,${winHex}14 0%,rgba(15,23,42,0) 65%)"`:''}>
         <div class="match-names">
           <span style="color:${hc(p1.h)};font-weight:700">${p1.n}</span>
@@ -492,18 +452,13 @@ function renderGroups(){
           <span class="score-txt ${done?'done':''}" style="margin-left:auto;flex-shrink:0">${summary}</span>
         </div>
         <div class="match-meta">
-          <span class="deadline-lbl">On or<br>before</span>
-          <span class="deadline-val-wrap">
-            <span class="deadline-val">${dateDisp}</span>
-            <input type="date" class="deadline-inp-overlay" value="${dateVal}" onchange="setMatchDate('${key}',this.value)">
-          </span>
-          <select class="deadline-time-sel" onchange="setMatchTime('${key}',this.value)">${genTimeOpts(timeVal)}</select>
-          <button class="score-btn${done?' score-btn-done':''}" onclick="openScoreModal(${bg.id},${mi},${m[0]},${m[1]})">Score</button>
+          ${gameChips}
+          <button class="score-btn${done?' score-btn-done':''}" style="margin-left:auto" onclick="openScoreModal(${bg.id},${mi},${m[0]},${m[1]})">${done?'Edit':'Score'}</button>
         </div>
       </div>`;
     }).join('');
     return`<div class="group-card">
-      <div class="group-header"><span>Group ${bg.id}</span><span style="font-size:.68rem;color:#64748b">3 pairs</span></div>
+      <div class="group-header"><span>Board ${bg.id}</span><span style="font-size:.68rem;color:#64748b">3 pairs</span></div>
       <div class="group-body">
         <div class="group-standings">${standHtml}</div>
         <div class="matches-section"><div class="sec-label">Matches</div>${matchHtml}</div>
@@ -618,9 +573,9 @@ function getGroupPairPoints(pairName){
       if(st[rank].n!==pairName)continue;
       const anyPlayed=GROUP_MATCHES.some((_,mi)=>calcMatchup(STATE.groupScores[`g${bg.id}_m${mi}`])!==null);
       if(!anyPlayed)return{pts:0,stage:'Not Started'};
-      if(rank===0)return{pts:15,stage:'Group 1st'};
-      if(rank===1)return{pts:10,stage:'Group 2nd'};
-      return{pts:5,stage:'Group 3rd'};
+      if(rank===0)return{pts:15,stage:'Board 1st'};
+      if(rank===1)return{pts:10,stage:'Board 2nd'};
+      return{pts:5,stage:'Board 3rd'};
     }
   }
   return{pts:0,stage:'No Data'};
@@ -636,7 +591,7 @@ function renderStandings(){
   const STAGE_CLS={
     'Champion':'s200','Finalist':'s100','3rd Place':'s75','4th Place':'s50',
     'Semifinals':'s50','Super 8':'s25','Super 8 Out':'s25','KO Loser':'s15','Knockout':'s15',
-    'Group 1st':'s15','Group 2nd':'s10','Group 3rd':'s5','Not Started':'s5','No Data':'s5'
+    'Board 1st':'s15','Board 2nd':'s10','Board 3rd':'s5','Not Started':'s5','No Data':'s5'
   };
 
   const hd={};
@@ -674,7 +629,7 @@ function renderStandings(){
       const rows=d.pairs.slice().sort((a,b)=>b.res.pts-a.res.pts).map(p=>`
         <tr>
           <td style="color:${hc(h)};font-weight:600">${p.name}</td>
-          <td style="color:#64748b;font-size:.72rem">G${p.gId}</td>
+          <td style="color:#64748b;font-size:.72rem">B${p.gId}</td>
           <td><span class="stage-pill ${STAGE_CLS[p.res.stage]||'s5'}">${p.res.stage}</span></td>
           <td style="font-weight:700;color:${hc(h)};text-align:right">${p.res.pts}</td>
         </tr>`).join('');
@@ -685,7 +640,7 @@ function renderStandings(){
         </div>
         <table class="hbk-table">
           <thead><tr>
-            <th>Pair</th><th>Group</th><th>Stage</th><th style="text-align:right">Pts</th>
+            <th>Pair</th><th>Board</th><th>Stage</th><th style="text-align:right">Pts</th>
           </tr></thead>
           <tbody>${rows}</tbody>
         </table>
@@ -712,7 +667,7 @@ function openScoreModal(gId,mi,p1i,p2i){
   const grp=getGroup(gId), p1=grp.pairs[p1i], p2=grp.pairs[p2i];
   const key=`g${gId}_m${mi}`, sc=STATE.groupScores[key]||{t1:[],t2:[]};
   currentModal={type:'group',key,p1,p2};
-  document.getElementById('modal-title').textContent=`Group ${gId} · Match Score Entry`;
+  document.getElementById('modal-title').textContent=`Board ${gId} · Match Score Entry`;
   buildScoreTable('modal-content',p1,p2,sc,'lp');
   document.getElementById('modal').classList.add('open');
   livePreview('lp',p1,p2);
@@ -838,7 +793,7 @@ let nameEditState=null;
 function openNameEdit(gId,pIdx){
   const p=getPair(gId,pIdx);
   nameEditState={gId,pIdx};
-  document.getElementById('ne-title').textContent=`Edit · Group ${gId} · Pair ${pIdx+1}`;
+  document.getElementById('ne-title').textContent=`Edit · Board ${gId} · Pair ${pIdx+1}`;
   document.getElementById('ne-content').innerHTML=`
     <div class="ne-field">
       <label class="ne-label">Pair Name (e.g. Player1 &amp; Player2)</label>
