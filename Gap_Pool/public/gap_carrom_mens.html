@@ -277,7 +277,7 @@ h2{font-size:1rem;font-weight:600;margin-bottom:14px;color:#f1f5f9}
 <div class="modal-bg" id="modal">
   <div class="modal">
     <div class="modal-title" id="modal-title">Match Score Entry</div>
-    <div class="modal-sub">Best of 3 games · First to 8 pts wins a game · Winner earns remaining opponent pieces (+3 if red pot win)</div>
+    <div class="modal-sub">Enter points scored per game · Highest total points across all games wins the match</div>
     <div id="modal-content"></div>
     <div class="btn-row">
       <button class="btn btn-danger" onclick="clearMatch()">Clear</button>
@@ -303,7 +303,7 @@ h2{font-size:1rem;font-weight:600;margin-bottom:14px;color:#f1f5f9}
 <div class="modal-bg" id="ko-modal">
   <div class="modal">
     <div class="modal-title" id="ko-title">Knockout Match Score</div>
-    <div class="modal-sub">Best of 3 games · First to 8 pts wins a game · Winner earns remaining opponent pieces (+3 if red pot win)</div>
+    <div class="modal-sub">Enter points scored per game · Highest total points across all games wins the match</div>
     <div id="ko-content"></div>
     <div class="btn-row">
       <button class="btn btn-danger" onclick="clearKO()">Clear</button>
@@ -415,7 +415,7 @@ function calcMatchup(sc){
     t1pts+=s1; t2pts+=s2;
     if(s1>s2) t1w++; else if(s2>s1) t2w++;
   });
-  const winner=t1w>t2w?0:t2w>t1w?1:null;
+  const winner=t1pts>t2pts?0:t2pts>t1pts?1:null;
   return{t1pts:Math.round(t1pts*10)/10, t2pts:Math.round(t2pts*10)/10, t1w, t2w, winner};
 }
 
@@ -451,8 +451,7 @@ function getKOWinner(id){const m=STATE.knockout[id];return m&&m.winner!=null?m.w
 function renderGroups(){
   const totalM=BASE_GROUPS.length*GROUP_MATCHES.length;
   const playedM=BASE_GROUPS.reduce((n,bg)=>n+GROUP_MATCHES.filter((_,mi)=>{
-    const r=calcMatchup(STATE.groupScores[`g${bg.id}_m${mi}`]);
-    return r&&r.winner!==null;
+    return calcMatchup(STATE.groupScores[`g${bg.id}_m${mi}`])!==null;
   }).length,0);
   const el=document.getElementById('match-count-display');
   if(el) el.textContent=`${playedM} / ${totalM} matches played`;
@@ -479,25 +478,27 @@ function renderGroups(){
     const matchHtml=GROUP_MATCHES.map((m,mi)=>{
       const p1=grp.pairs[m[0]],p2=grp.pairs[m[1]], key=`g${bg.id}_m${mi}`;
       const sc=STATE.groupScores[key]||{};
-      const res=calcMatchup(sc), done=res&&res.winner!==null;
+      const res=calcMatchup(sc), played=res!==null, done=res&&res.winner!==null, tied=played&&!done;
       const winHex=done?(res.winner===0?hc(p1.h):hc(p2.h)):null;
       const summary=done
         ?`<span style="color:${hc(p1.h)};font-weight:700">${res.t1pts.toFixed(1)}</span> - <span style="color:${hc(p2.h)};font-weight:700">${res.t2pts.toFixed(1)}</span> <span style="font-size:.72rem;padding:1px 5px;border-radius:8px;background:${winHex}22;color:${winHex};font-weight:700;margin-left:4px">✓</span>`
-        :'<span style="font-size:.62rem;padding:1px 6px;border-radius:8px;background:rgba(100,116,139,.15);color:#64748b;font-weight:700">!Played</span>';
-      const gameChips=done&&sc.t1&&sc.t1.length?sc.t1.map((s1,i)=>{
+        :tied
+          ?`<span style="color:${hc(p1.h)};font-weight:700">${res.t1pts.toFixed(1)}</span> - <span style="color:${hc(p2.h)};font-weight:700">${res.t2pts.toFixed(1)}</span> <span style="font-size:.72rem;padding:1px 5px;border-radius:8px;background:rgba(100,116,139,.2);color:#94a3b8;font-weight:700;margin-left:4px">Draw</span>`
+          :'<span style="font-size:.62rem;padding:1px 6px;border-radius:8px;background:rgba(100,116,139,.15);color:#64748b;font-weight:700">!Played</span>';
+      const gameChips=played&&sc.t1&&sc.t1.length?sc.t1.map((s1,i)=>{
         const s2=Number(sc.t2[i])||0,w=s1>s2?0:s2>s1?1:null;
         return`<span class="game-chip"><span class="game-num">G${i+1}</span><span style="color:${w===0?hc(p1.h):'#94a3b8'};font-weight:${w===0?700:400}">${s1}</span><span class="game-sep">–</span><span style="color:${w===1?hc(p2.h):'#94a3b8'};font-weight:${w===1?700:400}">${s2}</span></span>`;
       }).join(''):'';
-      return`<div class="match-row${done?' match-done':''}"${done?` style="border-left-color:${winHex}99;background:linear-gradient(90deg,${winHex}14 0%,rgba(15,23,42,0) 65%)"`:''}>
+      return`<div class="match-row${played?' match-done':''}"${done?` style="border-left-color:${winHex}99;background:linear-gradient(90deg,${winHex}14 0%,rgba(15,23,42,0) 65%)"`:tied?' style="border-left-color:#47556988;background:linear-gradient(90deg,rgba(71,85,105,.18) 0%,rgba(15,23,42,0) 65%)"':''}>
         <div class="match-names">
           <span style="color:${hc(p1.h)};font-weight:700">${p1.n}</span>
           <span class="vs">vs</span>
           <span style="color:${hc(p2.h)};font-weight:700">${p2.n}</span>
-          <span class="score-txt ${done?'done':''}" style="margin-left:auto;flex-shrink:0">${summary}</span>
+          <span class="score-txt ${played?'done':''}" style="margin-left:auto;flex-shrink:0">${summary}</span>
         </div>
         <div class="match-meta">
           ${gameChips}
-          <button class="score-btn${done?' score-btn-done':''}" style="margin-left:auto" onclick="openScoreModal(${bg.id},${mi},${m[0]},${m[1]})">${done?'Edit':'Score'}</button>
+          <button class="score-btn${played?' score-btn-done':''}" style="margin-left:auto" onclick="openScoreModal(${bg.id},${mi},${m[0]},${m[1]})">${played?'Edit':'Score'}</button>
         </div>
       </div>`;
     }).join('');
@@ -559,7 +560,7 @@ function renderBracket(){
 
 // ── House Standings Helpers ───────────────────────────────────────────────────
 function isGroupComplete(gId){
-  return GROUP_MATCHES.every((_,mi)=>{const r=calcMatchup(STATE.groupScores[`g${gId}_m${mi}`]);return r&&r.winner!==null;});
+  return GROUP_MATCHES.every((_,mi)=>calcMatchup(STATE.groupScores[`g${gId}_m${mi}`])!==null);
 }
 function countHouseCompletedPairs(house){
   let n=0;
@@ -798,8 +799,8 @@ function livePreview(pfx,p1,p2){
   let p1pts=0,p2pts=0;
   t1.forEach((s1,i)=>{p1pts+=s1;p2pts+=t2[i];});
   p1pts=Math.round(p1pts*10)/10; p2pts=Math.round(p2pts*10)/10;
-  const wlabel=t1w>t2w?`<span style="color:${hc(lp1.h)}">${lp1.n}</span> wins (${t1w}-${t2w})`:
-               t2w>t1w?`<span style="color:${hc(lp2.h)}">${lp2.n}</span> wins (${t2w}-${t1w})`:'Tied';
+  const wlabel=t1b>t2b?`<span style="color:${hc(lp1.h)}">${lp1.n}</span> wins (${Math.round(t1b*10)/10}–${Math.round(t2b*10)/10})`:
+               t2b>t1b?`<span style="color:${hc(lp2.h)}">${lp2.n}</span> wins (${Math.round(t2b*10)/10}–${Math.round(t1b*10)/10})`:'Tied';
   sumEl.innerHTML=`
     <div class="sum-row"><span style="color:${hc(lp1.h)};font-weight:600">${lp1.n}</span><span style="font-weight:700;color:${hc(lp1.h)}">${p1pts.toFixed(1)} pts</span></div>
     <div class="sum-row"><span style="color:${hc(lp2.h)};font-weight:600">${lp2.n}</span><span style="font-weight:700;color:${hc(lp2.h)}">${p2pts.toFixed(1)} pts</span></div>
@@ -819,7 +820,7 @@ function saveMatch(){
   if(!t1.length){alert('Enter at least Game 1 scores.');return;}
   requirePwd(()=>{
     const res=calcMatchup({t1,t2});
-    const sc={t1,t2,winner:res?res.winner:null,score:res?`${res.t1w}-${res.t2w}`:''};
+    const sc={t1,t2,winner:res?res.winner:null,score:res?`${res.t1pts}-${res.t2pts}`:''};
     if(currentModal.type==='group') STATE.groupScores[currentModal.key]=sc;
     save();closeModal();renderAll();
   });
@@ -891,7 +892,7 @@ function saveKO(){
   requirePwd(()=>{
     const res=calcMatchup({t1,t2});
     STATE.knockout[koState.id]={t1:koState.t1,t2:koState.t2,winner:res?res.winner:null,
-      score:res?`${res.t1w}-${res.t2w}`:''};
+      score:res?`${res.t1pts}-${res.t2pts}`:''};
     save();closeKOModal();renderAll();
   });
 }
