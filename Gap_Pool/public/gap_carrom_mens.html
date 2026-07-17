@@ -150,7 +150,6 @@ h2{font-size:1rem;font-weight:600;margin-bottom:14px;color:#f1f5f9}
 .stage-pill{display:inline-block;padding:2px 7px;border-radius:8px;font-size:.66rem;font-weight:700;white-space:nowrap}
 .s5{background:rgba(100,116,139,.15);color:#94a3b8}
 .s10{background:rgba(100,116,139,.25);color:#cbd5e1}
-.s15{background:rgba(59,130,246,.15);color:#60a5fa}
 .s20{background:rgba(168,85,247,.15);color:#c084fc}
 .s30{background:rgba(168,85,247,.25);color:#d8b4fe}
 .s50{background:rgba(251,146,60,.15);color:#fb923c}
@@ -734,8 +733,8 @@ function getGroupPairPoints(pairName){
       const anyPlayed=GROUP_MATCHES.some((_,mi)=>calcMatchup(STATE.groupScores[`g${bg.id}_m${mi}`])!==null);
       if(!anyPlayed)return{pts:0,stage:'Not Started'};
       if(rank===0)return{pts:20,stage:'Board 1st'};
-      if(rank===1)return{pts:15,stage:'Board 2nd'};
-      return{pts:10,stage:'Board 3rd'};
+      if(rank===1)return{pts:10,stage:'Board 2nd'};
+      return{pts:5,stage:'Board 3rd'};
     }
   }
   return{pts:0,stage:'No Data'};
@@ -795,7 +794,7 @@ function renderStandings(){
   const STAGE_CLS={
     'Champion':'s200','Finalist':'s125','3rd Place':'s75','4th Place':'s50',
     'Semifinals':'s50','Super 8':'s30','Super 8 Out':'s30','KO Loser':'s20','Knockout':'s20',
-    'Board 1st':'s20','Board 2nd':'s15','Board 3rd':'s10','Not Started':'s5','No Data':'s5'
+    'Board 1st':'s20','Board 2nd':'s10','Board 3rd':'s5','Not Started':'s5','No Data':'s5'
   };
 
   const hd={};
