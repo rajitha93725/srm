@@ -410,7 +410,62 @@ const R16=[
 ];
 
 // ── State ─────────────────────────────────────────────────────────────────────
-const _SEED={groupScores:{},knockout:{},customNames:{},matchDates:{},matchTimes:{}};
+const _SEED={
+  groupScores:{},
+  knockout:{},
+  customNames:{
+    "g1_p0":{"n":"Lasith & Rizan","h":"orion"},
+    "g1_p1":{"n":"Jayadith & Mazar","h":"aquilla"},
+    "g1_p2":{"n":"Dulani & Izhan","h":"cygnus"},
+    "g2_p0":{"n":"Deesara & Kasun","h":"draco"},
+    "g2_p1":{"n":"Janath & Chandra","h":"orion"},
+    "g2_p2":{"n":"Ridmal & Sameera","h":"aquilla"},
+    "g3_p0":{"n":"Farook & Abilash","h":"cygnus"},
+    "g3_p1":{"n":"DhanushkaP & AshenA","h":"draco"},
+    "g3_p2":{"n":"Haady & Maneth","h":"orion"},
+    "g4_p0":{"n":"Rafath & Yaqub","h":"aquilla"},
+    "g4_p1":{"n":"Shamila & Chathura","h":"cygnus"},
+    "g4_p2":{"n":"Ganesh & Sachith","h":"draco"},
+    "g5_p0":{"n":"Rishan & Shehan","h":"orion"},
+    "g5_p1":{"n":"Aadhil & Thivanujan","h":"aquilla"},
+    "g5_p2":{"n":"AshanK & Ishara","h":"cygnus"},
+    "g6_p0":{"n":"Malindu & Chehan","h":"draco"},
+    "g6_p1":{"n":"Asanka & Sachintha","h":"orion"},
+    "g6_p2":{"n":"Rasindu & Ryan","h":"aquilla"},
+    "g7_p0":{"n":"Dasun & Lasantha","h":"cygnus"},
+    "g7_p1":{"n":"Kavindu & Mahesh","h":"draco"},
+    "g7_p2":{"n":"Asitha & Risira","h":"orion"},
+    "g8_p0":{"n":"Yumna & Tharindya","h":"aquilla"},
+    "g8_p1":{"n":"KasunG & Jawad","h":"cygnus"},
+    "g8_p2":{"n":"Adrian & Jeroen","h":"draco"},
+    "g9_p0":{"n":"Shaadil & Imfy","h":"orion"},
+    "g9_p1":{"n":"Dimantha & Milinda","h":"aquilla"},
+    "g9_p2":{"n":"Suli & Sumudu","h":"cygnus"},
+    "g10_p0":{"n":"Amani & Thifya","h":"draco"},
+    "g10_p1":{"n":"Amindu & Visura","h":"orion"},
+    "g10_p2":{"n":"Dilan & Ayodya","h":"aquilla"},
+    "g11_p0":{"n":"Minoj & Tharindu","h":"cygnus"},
+    "g11_p1":{"n":"Sanjula & Dilshan","h":"draco"},
+    "g11_p2":{"n":"Thilan & Sahan","h":"orion"},
+    "g12_p0":{"n":"Pasan & Praveen","h":"aquilla"},
+    "g12_p1":{"n":"Lakshan & Rajitha","h":"cygnus"},
+    "g12_p2":{"n":"AmithM & Abrar","h":"draco"},
+    "g13_p0":{"n":"Nabil & Nimesha","h":"orion"},
+    "g13_p1":{"n":"Jeewaka & Chathura","h":"aquilla"},
+    "g13_p2":{"n":"Sahan & Sukith","h":"cygnus"},
+    "g14_p0":{"n":"Sachin & Lahiru","h":"draco"},
+    "g14_p1":{"n":"Harini & Ruwindya","h":"orion"},
+    "g14_p2":{"n":"Hansaka & Gayan","h":"aquilla"},
+    "g15_p0":{"n":"Shashi & DasunBNS","h":"cygnus"},
+    "g15_p1":{"n":"Thilini & Sanara","h":"draco"},
+    "g15_p2":{"n":"Arun & Dureksha","h":"orion"},
+    "g16_p0":{"n":"Tamara & Thilanka","h":"aquilla"},
+    "g16_p1":{"n":"Arqam & Manujaya","h":"cygnus"},
+    "g16_p2":{"n":"Raveen & Yasindu","h":"draco"}
+  },
+  matchDates:{},
+  matchTimes:{}
+};
 let STATE=JSON.parse(localStorage.getItem('gapstars_carrom_open_2026')||'null')||JSON.parse(JSON.stringify(_SEED));
 if(!STATE.customNames) STATE.customNames={};
 function save(){localStorage.setItem('gapstars_carrom_open_2026',JSON.stringify(STATE));}
