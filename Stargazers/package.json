@@ -1,0 +1,14 @@
+{
+  "name": "stargazers-constitution",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Generates the Stargazers Constitution as PDF and DOCX from constitution.js",
+  "scripts": {
+    "build": "node generate.js",
+    "build:pdf": "node generate.js pdf",
+    "build:docx": "node generate.js docx"
+  },
+  "dependencies": {
+    "docx": "^9.8.1"
+  }
+}
