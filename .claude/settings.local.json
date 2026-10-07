@@ -11,7 +11,10 @@
       "Bash(node -e \"const d=require\\('fs'\\).readFileSync\\('/dev/stdin','utf8'\\); console.log\\(JSON.parse\\(d\\).base ? 'Server OK' : 'bad response'\\)\")",
       "Bash(node -c server.js)",
       "Bash(Rename-Item *)",
-      "PowerShell(Rename-Item *)"
+      "PowerShell(Rename-Item *)",
+      "Bash(Remove-Item *)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)"
     ]
   }
 }
