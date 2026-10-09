@@ -1,4 +1,8 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Interhouse Futsal 2026</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -33,6 +37,7 @@
   --board:#07100b; --board-ink:#f4f8f5; --board-muted:#8aa294;
   color-scheme:dark }
 *{box-sizing:border-box}
+[hidden]{display:none!important}
 body{background:var(--bg);color:var(--ink);font:16px/1.45 var(--body);margin:0}
 #app{max-width:1180px;margin:0 auto;padding-inline:16px;padding-block:14px 48px;display:flex;flex-direction:column;gap:16px}
 h1,h2,h3{font-family:var(--display);margin:0;text-wrap:balance;letter-spacing:.01em}
@@ -44,7 +49,11 @@ button{cursor:pointer}
 .top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px}
 .brand h1{font-size:clamp(26px,4.4vw,38px);font-weight:800;text-transform:uppercase;line-height:1}
 .brand p{margin:4px 0 0;color:var(--muted);font-size:14px}
-.top-actions{display:flex;gap:8px;flex-wrap:wrap}
+.top-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.sync{font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:5px 10px;border-radius:999px;background:var(--sunk);color:var(--muted)}
+.sync.ok{background:var(--accent-soft);color:var(--accent)}
+.sync.saving{background:var(--warn-soft);color:var(--warn)}
+.sync.offline{background:var(--live-soft);color:var(--live)}
 .btn{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:8px 14px;font-weight:600;font-size:14px;display:inline-flex;align-items:center;gap:6px;min-height:40px}
 .btn:hover{border-color:var(--muted)}
 .btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
@@ -146,6 +155,7 @@ td.pts{font-weight:800;font-family:var(--display);font-size:19px}
 .fx .st{justify-self:end;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
 .fx .st.live{color:var(--live)}
 .fx.final{border-color:var(--accent);background:var(--accent-soft)}
+.fxnote{grid-column:1/-1;font-size:13px;color:var(--muted);text-align:center}
 @media (max-width:560px){.fx{grid-template-columns:minmax(0,1fr) auto minmax(0,1fr)}.fx .c,.fx .st{grid-column:span 3;justify-self:start}.fx .st{order:-1}}
 
 /* Awards */
@@ -174,6 +184,8 @@ td.pts{font-weight:800;font-family:var(--display);font-size:19px}
 .ctrl{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
 .evlist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
 .evlist li{display:grid;grid-template-columns:40px 22px minmax(0,1fr) auto;gap:8px;align-items:center;padding:7px 0;border-bottom:1px solid var(--line);font-size:14px}
+.minbtn{border:1px dashed var(--line);background:none;border-radius:6px;padding:2px 4px;color:var(--muted);font-weight:600;font-size:13px}
+.minbtn:hover{border-color:var(--accent);color:var(--accent)}
 .x{border:0;background:none;color:var(--muted);font-size:18px;padding:4px 8px;border-radius:6px}
 .x:hover{background:var(--sunk);color:var(--red)}
 .field{display:flex;flex-direction:column;gap:4px;min-width:0}
@@ -204,6 +216,8 @@ body.tv .clock{font-size:clamp(34px,4vw,60px)}
 body.tv .team .tn{font-size:clamp(26px,3vw,46px)}
 </style>
 
+</head>
+<body>
 <div id="app">
   <header class="top">
     <div class="brand">
@@ -211,7 +225,8 @@ body.tv .team .tn{font-size:clamp(26px,3vw,46px)}
       <p id="sub">Champ Turf · Friday 9 October 2026</p>
     </div>
     <div class="top-actions">
-      <button class="btn hide-tv" id="exportBtn" type="button">Export to Excel</button>
+      <span class="sync" id="sync" hidden></span>
+      <button class="btn hide-tv" id="exportBtn" type="button">Export CSV</button>
       <button class="btn" id="tvBtn" type="button">TV mode</button>
     </div>
   </header>
@@ -223,6 +238,13 @@ body.tv .team .tn{font-size:clamp(26px,3vw,46px)}
 <div class="toast" id="toast" hidden></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
+/* ============================================================
+   GOOGLE SHEET CONNECTION (for your own hosting)
+   Paste your Apps Script Web app URL (ends in /exec) between the quotes.
+   Leave it empty to run on one device only.
+   ============================================================ */
+window.FUTSAL_SHEET_API = window.FUTSAL_SHEET_API || "https://script.google.com/macros/s/AKfycbyc5gEkK4PHV_eT6O026DoDuoxOrZ-8FNBlTwUQQxiJQQUeIZ9wqDpD2wqBq1JC96s_6A/exec";
+
 /* ---------- Tournament logic (pure, no DOM) ---------- */
 const L = (() => {
   const DEFAULTS = {
@@ -313,6 +335,12 @@ const L = (() => {
     return { kicks: counted, first, second, tally: t, winner, next, suddenDeath: t[first].n >= 3 && t[second].n >= 3 };
   }
 
+  function halfTime(S, m) {
+    if (!m || m.status === "scheduled" || ((m.period || 1) === 1 && m.status === "live")) return null;
+    const s = { h: 0, a: 0 };
+    for (const e of matchEvents(S, m.id)) if (e.type === "goal" && (e.period || 1) === 1) { if (e.houseId === m.homeId) s.h++; else if (e.houseId === m.awayId) s.a++; }
+    return s;
+  }
   function result(S, m) {
     const s = score(S, m);
     let winner = null, pens = null;
@@ -462,7 +490,7 @@ const L = (() => {
     const P = {};
     for (const p of Object.values(S.players)) {
       P[p.id] = { id: p.id, name: p.name, houseId: p.houseId, gender: p.gender, goals: 0, assists: 0, saves: 0, yellow: 0, red: 0,
-        cs: 0, conceded: 0, gkApps: 0, apps: 0, wins: 0, shootSaves: 0, shootGoals: 0, best: 0, gkPts: 0 };
+        cs: 0, gkCs: 0, conceded: 0, gkApps: 0, apps: 0, wins: 0, shootSaves: 0, shootGoals: 0, best: 0, gkPts: 0 };
     }
     const bump = (id, k, n = 1) => { if (id && P[id]) P[id][k] += n; };
     for (const m of Object.values(S.matches)) {
@@ -485,15 +513,18 @@ const L = (() => {
       }
       if (m.status === "finished") {
         const r = result(S, m);
-        if (r.h === 0 && kt.appeared[m.awayId]) kt.appeared[m.awayId].forEach(id => bump(id, "cs"));
-        if (r.a === 0 && kt.appeared[m.homeId]) kt.appeared[m.homeId].forEach(id => bump(id, "cs"));
+        // clean sheet: every player who played in a match where their house conceded nothing
+        if (r.h === 0 && lu[m.awayId]) lu[m.awayId].appeared.forEach(id => bump(id, "cs"));
+        if (r.a === 0 && lu[m.homeId]) lu[m.homeId].appeared.forEach(id => bump(id, "cs"));
+        if (r.h === 0 && kt.appeared[m.awayId]) kt.appeared[m.awayId].forEach(id => bump(id, "gkCs"));
+        if (r.a === 0 && kt.appeared[m.homeId]) kt.appeared[m.homeId].forEach(id => bump(id, "gkCs"));
         if (r.winner && lu[r.winner]) lu[r.winner].appeared.forEach(id => bump(id, "wins"));
       }
     }
     const w = c.weights, g = c.gkWeights;
     Object.values(P).forEach(p => {
       p.best = p.goals * w.goal + p.assists * w.assist + p.saves * w.save + p.cs * w.cleanSheet + p.wins * w.win + p.yellow * w.yellow + p.red * w.red;
-      p.gkPts = p.saves * g.save + p.cs * g.cleanSheet + p.conceded * g.conceded + p.shootSaves * g.shootoutSave;
+      p.gkPts = p.saves * g.save + p.gkCs * g.cleanSheet + p.conceded * g.conceded + p.shootSaves * g.shootoutSave;
     });
     return P;
   }
@@ -503,7 +534,8 @@ const L = (() => {
     const name = (a, b) => String(a.name).localeCompare(b.name);
     return {
       scorers: P.filter(p => p.goals > 0).sort((a, b) => b.goals - a.goals || b.assists - a.assists || (a.yellow + a.red) - (b.yellow + b.red) || name(a, b)),
-      keepers: P.filter(p => p.gkApps > 0).sort((a, b) => b.gkPts - a.gkPts || b.cs - a.cs || a.conceded - b.conceded || b.saves - a.saves || name(a, b)),
+      keepers: P.filter(p => p.gkApps > 0).sort((a, b) => b.gkPts - a.gkPts || b.gkCs - a.gkCs || a.conceded - b.conceded || b.saves - a.saves || name(a, b)),
+      assists: P.filter(p => p.assists > 0).sort((a, b) => b.assists - a.assists || b.goals - a.goals || name(a, b)),
       best: P.filter(p => p.best !== 0 || p.goals || p.assists).sort((a, b) => b.best - a.best || b.goals - a.goals || b.assists - a.assists || name(a, b)),
       all: P
     };
@@ -542,7 +574,7 @@ const L = (() => {
   }
 
   return { MAX_SQUAD, defaultLineup, lineupState, DEFAULTS, cfg, halfMs, clockMs, minuteOf, matchEvents, matchKicks, other, housePlayers, started, score, shootout,
-    result, leagueMatches, leagueComplete, standings, keeperTimeline, defaultKeeper, playerStats, awards, suspensions, courtMatch, fmtClock };
+    result, halfTime, leagueMatches, leagueComplete, standings, keeperTimeline, defaultKeeper, playerStats, awards, suspensions, courtMatch, fmtClock };
 })();
 
 
@@ -661,7 +693,7 @@ function render() {
   let html;
   if (!db) html = `<div class="empty">The scoreboard needs live data. Open this page signed in to claude.ai.</div>`;
   else if (!ready) html = `<div class="empty">Loading the tournament…</div>`;
-  else if (!matchList().length) html = `<div class="empty">No fixtures yet. The organiser loads houses, players and the 12 league matches from the Scorer tab.</div>`;
+  else if (!matchList().length && tab !== "scorer") html = `<div class="empty">No fixtures yet. Open the Scorer tab, unlock it, and use Setup to load starter data or restore a backup.</div>`;
   else if (tv) html = viewTV();
   else html = ({ live: viewLive, fixtures: viewFixtures, table: viewTable, awards: viewAwards, squads: viewSquads, scorer: viewScorer })[tab]();
   const keep = {};
@@ -677,8 +709,16 @@ function render() {
 /* ---------- live boards ---------- */
 function finalTeams(m) {
   if (m.stage !== "final" || m.homeId) return { h: m.homeId, a: m.awayId, provisional: false };
-  const st = L.standings(S);
-  return { h: st[0] && st[0].id, a: st[1] && st[1].id, provisional: true };
+  const st = L.standings(S), done = L.leagueComplete(S);
+  const played = L.leagueMatches(S).filter(x => x.status === "finished").length;
+  const tied = !!(st[1] && st[1].reason && st[1].reason.tied);
+  return { h: done ? st[0] && st[0].id : null, a: done ? st[1] && st[1].id : null, provisional: true, done, played,
+    lead: played ? [st[0] && st[0].id, st[1] && st[1].id] : null, tied };
+}
+function finalNote(ft) {
+  if (!ft.provisional) return "";
+  if (ft.done) return ft.tied ? "2nd and 3rd are level on every criterion. Settle it with a penalty shootout and set the rank in Setup." : "League complete. Table toppers confirmed.";
+  return `1st v 2nd in the league table · ${ft.played} of 12 league matches played${ft.lead ? ` · currently ${esc(hname(ft.lead[0]))} and ${esc(hname(ft.lead[1]))}` : ""}`;
 }
 function onCourt(m, hid) {
   if (!hid || !["live", "halftime", "shootout"].includes(m.status)) return "";
@@ -724,7 +764,7 @@ function board(ci) {
       <div class="team away" style="--hc:${hcolor(ft.a)}"><span class="bar"></span><span class="tn">${esc(ft.a ? hname(ft.a) : "2nd place")}</span>${onCourt(m, ft.a)}</div>
     </div>
     ${["live", "halftime"].includes(m.status) ? `<div class="clockrow"><span class="clock" data-clock="${m.id}">--:--</span><span class="period">${m.status === "halftime" ? "Half-time" : (m.period === 2 ? "2nd half" : "1st half")}${m.running ? "" : (m.status === "live" ? " · paused" : "")}</span></div><div class="susp" data-susp="${m.id}"></div>` : ""}
-    ${ft.provisional ? `<p class="foot" style="text-align:center">Top two after the league phase. ${L.leagueComplete(S) ? "League complete." : "Decided once all 12 league matches finish."}</p>` : ""}
+    ${ft.provisional ? `<p class="foot" style="text-align:center">${finalNote(ft)}</p>` : ""}
     ${m.stage === "final" ? pensBlock(m) : ""}
     ${ev.length ? `<ul class="timeline">${ev.map(e => `<li class="${e.houseId === m.awayId ? "away" : ""}"><span class="mn">${L.minuteOf(e, m, c)}′</span><span class="ic ${evIcon(e)}"></span><span class="tx">${evText(e, m)}</span></li>`).join("")}</ul>` : ""}
   </article>`;
@@ -753,11 +793,12 @@ function viewTV() {
 function fxRow(m) {
   const c = C(), ft = finalTeams(m);
   let sc = `<span class="muted">vs</span>`;
-  if (L.started(m)) { const r = L.result(S, m); sc = `${r.h}–${r.a}${r.pens ? `<small class="muted" style="display:block;font-size:12px;font-family:var(--body)">${r.pens.tally[m.homeId].g}–${r.pens.tally[m.awayId].g} pens</small>` : ""}`; }
+  if (L.started(m)) { const r = L.result(S, m), ht = L.halfTime(S, m); sc = `${r.h}–${r.a}${r.pens ? `<small class="muted" style="display:block;font-size:12px;font-family:var(--body)">${r.pens.tally[m.homeId].g}–${r.pens.tally[m.awayId].g} pens</small>` : ""}${ht ? `<small class="muted" style="display:block;font-size:12px;font-family:var(--body);font-weight:500">HT ${ht.h}–${ht.a}</small>` : ""}`; }
   const st = { live: "Live", halftime: "Half-time", shootout: "Penalties", finished: "Full time", scheduled: m.time ? esc(m.time) : "Scheduled" }[m.status] || "";
   return `<div class="fx ${m.stage === "final" ? "final" : ""}"><span class="c">${esc(c.courts[m.court || 0] || "")}</span>
     <span class="h">${ft.h ? chip(ft.h) : `<span class="muted">1st place</span>`}</span><span class="sc">${sc}</span>
-    <span>${ft.a ? chip(ft.a) : `<span class="muted">2nd place</span>`}</span><span class="st ${["live", "shootout"].includes(m.status) ? "live" : ""}">${st}</span></div>`;
+    <span>${ft.a ? chip(ft.a) : `<span class="muted">2nd place</span>`}</span><span class="st ${["live", "shootout"].includes(m.status) ? "live" : ""}">${st}</span>
+    ${ft.provisional ? `<span class="fxnote">${finalNote(ft)}</span>` : ""}</div>`;
 }
 function viewFixtures() {
   const ms = matchList(), rounds = {};
@@ -792,9 +833,23 @@ function viewAwards() {
   };
   return `<section class="stack"><div class="section-head"><h2>Award races</h2><span class="muted">Updates as each event is logged</span></div><div class="awards">
     ${block("Top goal scorer", aw.scorers, p => p.goals, p => `${p.assists} assists`, "Goals in match time only. Own goals and shootout kicks don't count. Ties go to more assists, then fewer cards.")}
-    ${block("Best goalkeeper", aw.keepers, p => p.gkPts, p => `${p.saves} saves · ${p.cs} clean sheets · ${p.conceded} conceded`, `Points: save ${sg(g.save)}, clean sheet ${sg(g.cleanSheet)}, goal conceded ${sg(g.conceded)}, shootout save ${sg(g.shootoutSave)}. Goals count against whoever was in goal at the time.`)}
+    ${block("Best goalkeeper", aw.keepers, p => p.gkPts, p => `${p.saves} saves · ${p.gkCs} clean sheets · ${p.conceded} conceded`, `Points: save ${sg(g.save)}, clean sheet ${sg(g.cleanSheet)}, goal conceded ${sg(g.conceded)}, shootout save ${sg(g.shootoutSave)}. Goals count against whoever was in goal at the time.`)}
     ${block("Best player", aw.best, p => p.best, p => `${p.goals}G ${p.assists}A${p.saves ? ` ${p.saves}Sv` : ""}${p.cs ? ` ${p.cs}CS` : ""} · ${p.wins}W${p.yellow ? ` ${p.yellow}YC` : ""}${p.red ? ` ${p.red}RC` : ""}`, `Points: goal ${sg(w.goal)}, assist ${sg(w.assist)}, save ${sg(w.save)}, clean sheet ${sg(w.cleanSheet)}, win ${sg(w.win)}, yellow ${sg(w.yellow)}, red ${sg(w.red)}.`)}
+    ${block("Top assists", aw.assists, p => p.assists, p => `${p.goals} goals`, "Assists in match time. Ties go to more goals.")}
+    ${champCard()}
   </div></section>`;
+}
+function champion() {
+  const f = matchList().find(m => m.stage === "final");
+  if (!f || f.status !== "finished") return null;
+  const r = L.result(S, f);
+  return r.winner ? { id: r.winner, r, f } : null;
+}
+function champCard() {
+  const ch = champion(), f = matchList().find(m => m.stage === "final"), ft = f ? finalTeams(f) : {};
+  return `<div class="panel award stack"><h3>Champion house</h3>${ch ? `<div class="leader"><span class="label">Winner of the Final</span><span class="nm">${chip(ch.id)}</span>
+    <span class="muted" style="font-size:13px">${esc(hname(ch.f.homeId))} ${ch.r.h}–${ch.r.a} ${esc(hname(ch.f.awayId))}${ch.r.pens ? ` · ${ch.r.pens.tally[ch.f.homeId].g}–${ch.r.pens.tally[ch.f.awayId].g} on penalties` : ""}</span></div>`
+    : `<p class="muted">Decided by the Final${ft.h && ft.a ? `: ${esc(hname(ft.h))} v ${esc(hname(ft.a))}` : ", once the top two are known"}.</p>`}</div>`;
 }
 const sg = n => (n > 0 ? "+" : "") + n;
 
@@ -802,7 +857,7 @@ const sg = n => (n > 0 ? "+" : "") + n;
 function viewSquads() {
   const st = L.playerStats(S, C());
   return `<section class="stack"><div class="section-head"><h2>Squads</h2><span class="muted">Points = Best Player points</span></div><div class="squads">
-    ${houseList().map(h => { const ps = L.housePlayers(S, h.id); return `<div class="panel stack"><div class="section-head"><h3 style="font-size:22px;text-transform:uppercase">${chip(h.id)}</h3><span class="muted">${ps.length} players</span></div>
+    ${houseList().map(h => { const ps = L.housePlayers(S, h.id); return `<div class="panel stack"><div class="section-head"><h3 style="font-size:22px;text-transform:uppercase">${chip(h.id)}</h3><span class="muted">${ps.length} players${h.captain ? ` · Captain ${esc(h.captain)}` : ""}${h.manager ? ` · Manager ${esc(h.manager)}` : ""}</span></div>
       ${ps.length ? `<div class="tw"><table><thead><tr><th class="l">Player</th><th>Apps</th><th>G</th><th>A</th><th>Sv</th><th>Cards</th><th>Pts</th></tr></thead><tbody>${ps.map(p => { const s = st[p.id]; return `<tr><td class="l">${esc(p.name)} <span class="muted">${p.number ? "#" + esc(p.number) : ""}${p.gk ? " · GK" : ""}${p.gender === "F" ? " · W" : ""}</span></td><td>${s.apps}</td><td>${s.goals}</td><td>${s.assists}</td><td>${s.saves}</td><td>${s.yellow ? `<span class="ic yc"></span>${s.yellow}` : ""}${s.red ? ` <span class="ic rc"></span>${s.red}` : ""}</td><td class="pts">${s.best}</td></tr>`; }).join("")}</tbody></table></div>` : `<p class="muted">No players added.</p>`}</div>`; }).join("")}
   </div></section>`;
 }
@@ -810,6 +865,7 @@ function viewSquads() {
 /* ---------- scorer ---------- */
 function viewScorer() {
   const c = C();
+  if (!matchList().length) scorerView = "setup";
   if (!unlocked) return `<form class="pin panel" id="pinForm"><h2>Scorer access</h2><p class="muted" style="margin:0">Enter the scorer PIN to log goals, cards and results.</p>
     <input type="password" inputmode="numeric" id="pinIn" autocomplete="off" aria-label="Scorer PIN"><button class="btn primary big" type="submit">Unlock</button></form>`;
   const warn = (canWrite === false || readOnly) ? `<div class="notice">Your account can view this page but can't save changes. Ask the organiser to invite you as an Editor, or score from the organiser's account.</div>` : "";
@@ -838,19 +894,21 @@ function matchConsole(m) {
   const ft = finalTeams(m);
   const scoreboard = miniBoard(m);
   if (m.status === "scheduled") {
-    if (!ft.h || !ft.a) return scoreboard + `<div class="empty">The Final's teams are set once the league table has a top two.</div>`;
+    if (!ft.h || !ft.a) return scoreboard + `<div class="empty">The Final is between the top two in the league table. It unlocks when all 12 league matches are finished (${ft.played} of 12 so far)${ft.lead ? `. Currently ${esc(hname(ft.lead[0]))} and ${esc(hname(ft.lead[1]))}` : ""}.</div>`;
     const sel = hid => { const start = new Set(L.defaultLineup(S, hid)); return `<div class="panel stack" style="background:var(--sunk)"><div class="section-head"><span>${chip(hid)}</span><span class="muted" style="font-size:13px">Tick the starting players</span></div>
       <div class="lineup">${L.housePlayers(S, hid).map(p => `<label class="lu"><input type="checkbox" id="lu_${hid}_${p.id}" data-lu="${hid}" value="${p.id}" ${start.has(p.id) ? "checked" : ""}><span>${esc(p.name)}</span><small>${p.gender === "F" ? "W" : ""}${p.number ? " #" + esc(p.number) : ""}</small></label>`).join("")}</div>
       <div class="field"><label for="gk_${hid}">Goalkeeper</label><select id="gk_${hid}">${L.housePlayers(S, hid).map(p => `<option value="${p.id}" ${p.id === L.defaultKeeper(S, hid) ? "selected" : ""}>${esc(p.name)}</option>`).join("")}</select></div></div>`; };
     return scoreboard + `<div class="panel stack"><h3>Before kick-off</h3>
-      ${ft.provisional && !L.leagueComplete(S) ? `<div class="notice">Not all league matches are finished. Kicking off now locks in the current top two: ${esc(hname(ft.h))} and ${esc(hname(ft.a))}.</div>` : ""}
+      ${ft.provisional ? `<div class="notice">Final: ${esc(hname(ft.h))} (1st) v ${esc(hname(ft.a))} (2nd). ${ft.tied ? "2nd and 3rd are level on every criterion. Settle it with a shootout and set the rank in Setup before kicking off." : "Kicking off locks these two in."}</div>` : ""}
       <p class="muted" style="margin:0;font-size:14px">Law 1: 5 men on court, one in goal, plus an optional 6th spot for a woman player. If only one team fields a woman, the match is 6 v 5. Unticked players start on the bench.</p>
       <div class="console">${sel(ft.h)}${sel(ft.a)}</div>
-      <div class="field" style="max-width:220px"><label for="mtime">Kick-off time (optional)</label><input type="time" id="mtime" value="${esc(m.time || "")}"></div>
+      <div class="grid2"><div class="field"><label for="mtime">Kick-off time</label><input type="time" id="mtime" value="${esc(m.time || "")}"></div>
+        <div class="field"><label for="mref">Referee</label><input type="text" id="mref" value="${esc(m.referee || "")}" placeholder="Name"></div>
+        <div class="field"><label for="mscorer">Scorer</label><input type="text" id="mscorer" value="${esc(m.scorer || ls.get("scorerName") || "")}" placeholder="Your name"></div></div>
       <button class="btn primary big" type="button" data-act="kickoff" data-m="${m.id}">Kick off · start ${c.durations[m.stage === "final" ? "final" : "league"].half}′ clock</button></div>`;
   }
   const evs = L.matchEvents(S, m.id).slice().reverse();
-  const evList = evs.length ? `<ul class="evlist">${evs.map(e => `<li><span class="muted">${L.minuteOf(e, m, c)}′</span><span class="ic ${evIcon(e)}"></span><span>${chip(e.houseId)} ${evText(e, m)}</span><button class="x" type="button" title="Delete this event" aria-label="Delete event" data-act="delev" data-e="${e.id}">×</button></li>`).join("")}</ul>` : `<p class="muted">No events yet.</p>`;
+  const evList = evs.length ? `<ul class="evlist">${evs.map(e => `<li><button class="minbtn" type="button" title="Change the minute" data-act="editmin" data-e="${e.id}">${L.minuteOf(e, m, c)}′</button><span class="ic ${evIcon(e)}"></span><span>${chip(e.houseId)} ${evText(e, m)}</span><button class="x" type="button" title="Delete this event" aria-label="Delete event" data-act="delev" data-e="${e.id}">×</button></li>`).join("")}</ul>` : `<p class="muted">No events yet.</p>`;
   let controls = "";
   if (m.status === "live") controls = `<div class="ctrl">${m.running ? `<button class="btn big" type="button" data-act="pause" data-m="${m.id}">Pause clock</button>` : `<button class="btn primary big" type="button" data-act="resume" data-m="${m.id}">Resume clock</button>`}
       ${m.period === 1 ? `<button class="btn big" type="button" data-act="endhalf" data-m="${m.id}">End 1st half</button>` : `<button class="btn big" type="button" data-act="fulltime" data-m="${m.id}">Full time</button>`}
@@ -916,6 +974,8 @@ function setupView() {
   const hs = houseList();
   const houseRows = hs.map(h => `<div class="grid2" style="align-items:end"><div class="field"><label for="hn_${h.id}">House name</label><input type="text" id="hn_${h.id}" value="${esc(h.name)}"></div>
     <div class="field"><label for="hc_${h.id}">Colour</label><select id="hc_${h.id}">${Object.entries(COLORS).map(([k, v]) => `<option value="${k}" ${h.color === k ? "selected" : ""}>${v}</option>`).join("")}</select></div>
+    <div class="field"><label for="hcap_${h.id}">Captain</label><input type="text" id="hcap_${h.id}" value="${esc(h.captain || "")}"></div>
+    <div class="field"><label for="hman_${h.id}">Manager</label><input type="text" id="hman_${h.id}" value="${esc(h.manager || "")}"></div>
     <div class="field"><label for="ht_${h.id}">Shootout tie-break rank</label><input type="number" id="ht_${h.id}" min="0" value="${esc(h.tiebreakRank || "")}" placeholder="Only if needed"></div>
     <button class="btn" type="button" data-act="savehouse" data-h="${h.id}">Save</button></div>`).join("");
   const playerRows = hs.map(h => `<div class="stack"><span class="label">${esc(h.name)}</span>${L.housePlayers(S, h.id).map(p => `<div class="prow">
@@ -925,16 +985,29 @@ function setupView() {
       <input type="text" id="pj_${p.id}" value="${esc(p.number || "")}" placeholder="#" aria-label="Jersey number">
       <label class="row" style="gap:4px;font-size:13px"><input type="checkbox" id="pk_${p.id}" ${p.gk ? "checked" : ""}>GK</label>
       <div class="row" style="gap:4px"><button class="btn" type="button" data-act="saveplayer" data-p="${p.id}">Save</button><button class="x" type="button" aria-label="Remove player" data-act="delplayer" data-p="${p.id}">×</button></div></div>`).join("")}
-      ${L.housePlayers(S, h.id).length < L.MAX_SQUAD ? `<button class="btn ghost" type="button" data-act="addplayer" data-h="${h.id}" style="align-self:flex-start">+ Add player to ${esc(h.name)}</button>` : `<span class="muted" style="font-size:13px">Squad full (12 players max)</span>`}</div>`).join("");
-  const fixtureRows = matchList().map(m => { const ft = finalTeams(m); return `<div class="prow" style="grid-template-columns:minmax(0,2fr) minmax(0,1fr) minmax(0,1fr) auto"><span>${m.stage === "final" ? "Final" : "M" + m.no + " · R" + m.round}: ${esc(ft.h ? hname(ft.h) : "1st")} v ${esc(ft.a ? hname(ft.a) : "2nd")}</span>
+      ${L.housePlayers(S, h.id).length < L.MAX_SQUAD ? `<button class="btn ghost" type="button" data-act="addplayer" data-h="${h.id}" style="align-self:flex-start">+ Add player to ${esc(h.name)}</button>` : `<span class="muted" style="font-size:13px">Squad full (12 players max)</span>`}
+      ${L.housePlayers(S, h.id).length < 6 ? `<span class="notice" style="font-size:13px">${esc(h.name)} has ${L.housePlayers(S, h.id).length} players. Squads need at least 6.</span>` : ""}</div>`).join("");
+  const hsel = (id, cur) => `<select id="${id}" aria-label="House">${hs.map(x => `<option value="${x.id}" ${x.id === cur ? "selected" : ""}>${esc(x.name)}</option>`).join("")}</select>`;
+  const fixtureRows = matchList().map(m => { const ft = finalTeams(m); const editable = m.stage === "league" && m.status === "scheduled"; return `<div class="prow" style="grid-template-columns:minmax(0,2fr) minmax(0,1fr) minmax(0,1fr) auto">${editable
+      ? `<div class="row" style="gap:6px;flex-wrap:nowrap;min-width:0"><span class="muted" style="white-space:nowrap">M${m.no}</span>${hsel("fh_" + m.id, m.homeId)}<span class="muted">v</span>${hsel("fa_" + m.id, m.awayId)}</div>`
+      : `<span>${m.stage === "final" ? "Final" : "M" + m.no + " · R" + m.round}: ${esc(ft.h ? hname(ft.h) : "1st")} v ${esc(ft.a ? hname(ft.a) : "2nd")}</span>`}
     <select id="fc_${m.id}" aria-label="Court">${c.courts.map((cn, i) => `<option value="${i}" ${(m.court || 0) === i ? "selected" : ""}>${esc(cn)}</option>`).join("")}</select>
     <input type="time" id="ft_${m.id}" value="${esc(m.time || "")}" aria-label="Kick-off time"><button class="btn" type="button" data-act="savefix" data-m="${m.id}">Save</button></div>`; }).join("");
   const wf = (k, label, src) => `<div class="field"><label for="w_${src}_${k}">${label}</label><input type="number" id="w_${src}_${k}" value="${esc(c[src][k])}"></div>`;
-  return `<div class="panel stack"><div class="section-head"><h3>Players</h3><div class="row"><button class="btn" type="button" data-act="template">Download player template</button>
-      <label class="btn primary" for="importFile" style="cursor:pointer">Import players from Excel</label><input type="file" id="importFile" accept=".xlsx,.xls,.csv" hidden></div></div>
-      <p class="muted" style="margin:0;font-size:14px">Placeholder names are loaded. Fill in the template (House, Player Name, Gender, Jersey No, Goalkeeper) and import it, or edit each player below.</p>${playerRows}</div>
+  const lb = Number(ls.get("lastBackup")) || 0;
+  const ago = lb ? Math.round((Date.now() - lb) / 60000) : null;
+  const backupPanel = `<div class="panel stack"><div class="section-head"><h3>Backup & restore</h3><span class="muted" style="font-size:13px">${ago === null ? "No backup downloaded on this device yet" : `Last backup from this device: ${ago < 1 ? "just now" : ago + " min ago"}`}</span></div>
+    <p class="muted" style="margin:0;font-size:14px">The backup CSV holds everything: houses, players, fixtures, every goal, card and sub, and shootout kicks. Download one after each round. Restoring replaces all current data${sheetMode ? " in the Google Sheet" : ""}.</p>
+    <div class="row"><button class="btn primary" type="button" data-act="backup">Download backup (CSV)</button>
+      <label class="btn" for="restoreFile" style="cursor:pointer">Restore from backup</label><input type="file" id="restoreFile" accept=".csv,text/csv" hidden>
+      <button class="btn ghost" type="button" data-act="starter">Load starter data</button></div>
+    <p class="muted" style="margin:0;font-size:13px">${sheetMode ? "Connected to the Google Sheet. Changes from every device are shared." : offline ? "Offline mode: data is saved in this browser only." : "Live data is shared through claude.ai."}</p></div>`;
+  return backupPanel + `<div class="panel stack"><div class="section-head"><h3>Players</h3><div class="row"><button class="btn" type="button" data-act="template">Download player template</button>
+      <label class="btn primary" for="importFile" style="cursor:pointer">Import players (CSV)</label><input type="file" id="importFile" accept=".xlsx,.xls,.csv" hidden></div></div>
+      <p class="muted" style="margin:0;font-size:14px">Placeholder names are loaded. Fill in the CSV template (opens in Excel or Google Sheets, save as CSV) (House, Player Name, Gender, Jersey No, Goalkeeper) and import it, or edit each player below.</p>${playerRows}</div>
     <div class="panel stack"><h3>Houses</h3>${houseRows}<p class="muted" style="margin:0;font-size:13px">Tie-break rank is only used if houses are level on every Law 6 criterion and a penalty shootout decided it: 1 for the winner, 2 for the next.</p></div>
-    <div class="panel stack"><h3>Fixtures</h3>${fixtureRows}</div>
+    <div class="panel stack"><div class="section-head"><h3>Fixtures</h3><button class="btn danger" type="button" data-act="resetfix">Reset fixtures to the starting draw</button></div>${fixtureRows}
+      <p class="muted" style="margin:0;font-size:13px">Reset puts all 13 matches back to the original draw, courts and rounds, clears kick-off times, and sets every match to not started. Houses and players stay.</p></div>
     <div class="panel stack"><h3>Award points</h3><span class="label">Best player</span><div class="grid2">${wf("goal", "Goal", "weights")}${wf("assist", "Assist", "weights")}${wf("save", "Save", "weights")}${wf("cleanSheet", "Clean sheet", "weights")}${wf("win", "Win", "weights")}${wf("yellow", "Yellow card", "weights")}${wf("red", "Red card", "weights")}</div>
       <span class="label">Best goalkeeper</span><div class="grid2">${wf("save", "Save", "gkWeights")}${wf("cleanSheet", "Clean sheet", "gkWeights")}${wf("conceded", "Goal conceded", "gkWeights")}${wf("shootoutSave", "Shootout save", "gkWeights")}</div>
       <button class="btn primary" type="button" data-act="saveweights" style="align-self:flex-start">Save points</button></div>
@@ -988,7 +1061,8 @@ async function act(a, d) {
       if (issues.some(x => /max/.test(x))) return toast(issues.find(x => /max/.test(x)));
       if (issues.length && !(await confirmSheet("Kick off anyway?", issues.map(esc).join("<br>"), "Kick off"))) return;
       const t = $("#mtime");
-      await updD("matches", m.id, { homeId: ft.h, awayId: ft.a, status: "live", period: 1, running: true, startedAt: now(), elapsedMs: 0, gk, lineup, time: t ? t.value : (m.time || "") });
+      await updD("matches", m.id, { homeId: ft.h, awayId: ft.a, status: "live", period: 1, running: true, startedAt: now(), elapsedMs: 0, gk, lineup, time: t ? t.value : (m.time || ""), referee: ($("#mref") || {}).value || "", scorer: ($("#mscorer") || {}).value || "" });
+      if ($("#mscorer") && $("#mscorer").value) ls.set("scorerName", $("#mscorer").value);
       return toast("Kick-off. Clock running.");
     }
     case "pause": return updD("matches", m.id, { running: false, elapsedMs: L.clockMs(m, now()), startedAt: null });
@@ -1074,6 +1148,21 @@ async function act(a, d) {
       if (!(await confirmSheet("Delete this event?", `${evText(e, S.matches[e.matchId]).replace(/<[^>]+>/g, "")} (${esc(hname(e.houseId))})`, "Delete", true))) return;
       return delD("events", e.id);
     }
+    case "editmin": {
+      const e = S.events[d.e]; if (!e) return;
+      const em = S.matches[e.matchId], halfMin = L.halfMs(em, c) / 60000;
+      let val = null;
+      const v = await openSheet(`<h3>Change the minute</h3><p class="muted" style="margin:0">${evText(e, em).replace(/<[^>]+>/g, "")} (${esc(hname(e.houseId))}). Use this when copying a paper match sheet. Minutes 1–${halfMin} are the 1st half, ${halfMin + 1}–${halfMin * 2} the 2nd.</p>
+        <input type="number" id="minIn" min="1" max="${halfMin * 2}" value="${L.minuteOf(e, em, c)}" aria-label="Minute">
+        <div class="row" style="justify-content:flex-end"><button class="btn" type="button" data-v="no">Cancel</button><button class="btn primary" type="button" data-v="ok">Save minute</button></div>`,
+        (k, b) => { if (k === "ok") val = b.querySelector("#minIn").value; });
+      if (v !== "ok") return;
+      const n = Math.round(Number(val));
+      if (!(n >= 1 && n <= halfMin * 2)) return toast(`Enter a minute from 1 to ${halfMin * 2}.`);
+      const period = n > halfMin ? 2 : 1, local = period === 2 ? n - halfMin : n;
+      await updD("events", e.id, { period, clockMs: (local - 1) * 60000 + 1000 });
+      return toast(`Moved to ${n}′`);
+    }
     case "shootfirst": return updD("matches", m.id, { shootFirst: d.h });
     case "kick": {
       const kicker = ($("#kicker") || {}).value, keeper = ($("#keeper") || {}).value;
@@ -1090,7 +1179,7 @@ async function act(a, d) {
     }
     case "savehouse": {
       const r = Number($("#ht_" + d.h).value) || 0;
-      await updD("houses", d.h, { name: $("#hn_" + d.h).value.trim() || hname(d.h), color: $("#hc_" + d.h).value, tiebreakRank: r });
+      await updD("houses", d.h, { name: $("#hn_" + d.h).value.trim() || hname(d.h), color: $("#hc_" + d.h).value, tiebreakRank: r, captain: $("#hcap_" + d.h).value.trim(), manager: $("#hman_" + d.h).value.trim() });
       return toast("House saved");
     }
     case "saveplayer": {
@@ -1110,7 +1199,17 @@ async function act(a, d) {
       return delD("players", d.p);
     }
     case "savefix": {
-      await updD("matches", m.id, { court: Number($("#fc_" + m.id).value), time: $("#ft_" + m.id).value });
+      const patch = { court: Number($("#fc_" + m.id).value), time: $("#ft_" + m.id).value };
+      if ($("#fh_" + m.id) && m.status === "scheduled") {
+        const h = $("#fh_" + m.id).value, a = $("#fa_" + m.id).value;
+        if (h === a) return toast("A house can't play itself. Pick two different houses.");
+        patch.homeId = h; patch.awayId = a;
+        const pairs = {}; matchList().filter(x => x.stage === "league").forEach(x => { const k = [x.id === m.id ? h : x.homeId, x.id === m.id ? a : x.awayId].sort().join("-"); pairs[k] = (pairs[k] || 0) + 1; });
+        const odd = Object.entries(pairs).filter(([, n]) => n !== 2);
+        await updD("matches", m.id, patch);
+        return toast(odd.length ? "Fixture saved. Check the draw: every pairing should appear exactly twice." : "Fixture saved");
+      }
+      await updD("matches", m.id, patch);
       return toast("Fixture saved");
     }
     case "saveweights": {
@@ -1123,7 +1222,9 @@ async function act(a, d) {
     }
     case "savepin": {
       const v = $("#newPin").value.trim(); if (v.length < 4) return toast("Use at least 4 digits.");
-      await saveConfig({ pin: v }); $("#newPin").value = "";
+      if (sheetMode) { try { await db.changePin(v); } catch (e) { return toast("Couldn't change the PIN. Check the connection."); } }
+      else await saveConfig({ pin: v });
+      $("#newPin").value = "";
       return toast("PIN changed");
     }
     case "reset": {
@@ -1134,7 +1235,28 @@ async function act(a, d) {
         homeId: x.stage === "final" ? null : x.homeId, awayId: x.stage === "final" ? null : x.awayId, status: "scheduled", period: 1, running: false, elapsedMs: 0 });
       return toast("All results cleared");
     }
+    case "resetfix": {
+      const hs = houseList();
+      if (hs.length !== 4) return toast("The starting draw needs exactly 4 houses.");
+      const logged = Object.keys(S.events).length + Object.keys(S.kicks).length;
+      const started = matchList().filter(x => x.status !== "scheduled").length;
+      if (!(await confirmSheet("Reset fixtures to the starting draw?",
+        `All 12 league matches go back to the original pairings, courts and rounds, and the Final goes back to 1st v 2nd.${started || logged ? `<br><br><b>This also clears ${started} started match${started === 1 ? "" : "es"} and ${logged} logged event${logged === 1 ? "" : "s"}</b> (goals, cards, subs, shootout kicks). Download a backup first if you might need them.` : ""}<br><br>Houses and players stay. This can't be undone.`,
+        "Reset fixtures", true))) return;
+      toast("Resetting fixtures…");
+      try {
+        for (const e of Object.values(S.events)) await delD("events", e.id);
+        for (const k of Object.values(S.kicks)) await delD("kicks", k.id);
+        const fresh = starterMatches(hs.map(h => h.id));
+        for (const x of matchList()) if (!fresh["matches/" + x.id]) await delD("matches", x.id);
+        for (const [p, d] of Object.entries(fresh)) await db.doc(p).set(d);
+        selMatch = { 0: null, 1: null };
+        return toast("Fixtures reset to the starting draw");
+      } catch (e) { return toast("Reset didn't finish. Check the connection and try again."); }
+    }
     case "template": return downloadTemplate();
+    case "backup": return downloadBackup();
+    case "starter": return loadStarter();
   }
 }
 async function saveConfig(patch) {
@@ -1168,21 +1290,21 @@ async function saveFile(name, wb) {
   catch (e) { if (e && e.code !== "declined") toast("Couldn't save the file."); }
 }
 function downloadTemplate() {
-  if (!needXLSX()) return;
   const rows = [["House", "Player Name", "Gender (M/F)", "Jersey No", "Goalkeeper (Y/N)"]];
   houseList().forEach(h => { for (let i = 1; i <= 6; i++) rows.push([h.name, "", i === 6 ? "F" : "M", "", i === 1 ? "Y" : "N"]); });
-  const wb = XLSX.utils.book_new(), ws = XLSX.utils.aoa_to_sheet(rows);
-  ws["!cols"] = [{ wch: 12 }, { wch: 28 }, { wch: 14 }, { wch: 10 }, { wch: 16 }];
-  XLSX.utils.book_append_sheet(wb, ws, "Players");
-  saveFile("Futsal-2026-player-template.xlsx", wb);
+  saveText("Futsal-2026-player-template.csv", toCSV(rows));
 }
 async function importPlayers(file) {
-  if (!needXLSX() || !guard()) return;
+  if (!guard()) return;
   if (Object.keys(S.events).length || Object.keys(S.kicks).length) return toast("Results are already logged. Edit players one by one instead, or reset results first.");
-  const buf = await file.arrayBuffer();
-  const wb = XLSX.read(buf, { type: "array" });
-  const ws = wb.Sheets["Players"] || wb.Sheets[wb.SheetNames[0]];
-  const rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: "" }).slice(1);
+  let rows;
+  if (/\.csv$/i.test(file.name) || file.type === "text/csv") rows = parseCSV(await file.text()).slice(1);
+  else {
+    if (!needXLSX()) return;
+    const wb = XLSX.read(await file.arrayBuffer(), { type: "array" });
+    const ws = wb.Sheets["Players"] || wb.Sheets[wb.SheetNames[0]];
+    rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: "" }).slice(1);
+  }
   const byName = {}; houseList().forEach(h => { byName[h.name.trim().toLowerCase()] = h.id; });
   const good = [], bad = [];
   rows.forEach((r, i) => {
@@ -1202,14 +1324,13 @@ async function importPlayers(file) {
   toast(`Imported ${good.length} players`);
 }
 function exportAll() {
-  if (!needXLSX()) return;
   const c = C(), st = L.standings(S), aw = L.awards(S, c), stats = L.playerStats(S, c);
-  const wb = XLSX.utils.book_new();
-  const add = (name, rows, cols) => { const ws = XLSX.utils.aoa_to_sheet(rows); if (cols) ws["!cols"] = cols.map(w => ({ wch: w })); XLSX.utils.book_append_sheet(wb, ws, name); };
-  const res = [["Match", "Stage", "Round", "Court", "Time", "Home", "Home goals", "Away goals", "Away", "Penalties", "Winner", "Status"]];
+  const sections = [];
+  const add = (name, rows) => { sections.push(name, rows); };
+  const res = [["Match", "Stage", "Round", "Court", "Time", "Home", "Home goals", "Away goals", "Away", "Half-time", "Penalties", "Winner", "Status", "Referee", "Scorer"]];
   matchList().forEach(m => { const ft = finalTeams(m); const r = L.started(m) ? L.result(S, m) : null;
-    res.push([m.stage === "final" ? "Final" : m.no, m.stage, m.round || "", c.courts[m.court || 0], m.time || "", hname(ft.h), r ? r.h : "", r ? r.a : "", hname(ft.a),
-      r && r.pens ? `${r.pens.tally[m.homeId].g}-${r.pens.tally[m.awayId].g}` : "", r && m.status === "finished" ? (r.winner ? hname(r.winner) : "Draw") : "", m.status]); });
+    res.push([m.stage === "final" ? "Final" : m.no, m.stage, m.round || "", c.courts[m.court || 0], m.time || "", hname(ft.h), r ? r.h : "", r ? r.a : "", hname(ft.a), (ht => ht ? `${ht.h}-${ht.a}` : "")(L.halfTime(S, m)),
+      r && r.pens ? `${r.pens.tally[m.homeId].g}-${r.pens.tally[m.awayId].g}` : "", r && m.status === "finished" ? (r.winner ? hname(r.winner) : "Draw") : "", m.status, m.referee || "", m.scorer || ""]); });
   add("Results", res, [7, 8, 6, 9, 7, 12, 10, 10, 12, 10, 12, 10]);
   const ev = [["Match", "Minute", "Half", "Event", "House", "Player", "Assist / player off", "Note"]];
   matchList().forEach(m => L.matchEvents(S, m.id).forEach(e => ev.push([m.stage === "final" ? "Final" : m.no, L.minuteOf(e, m, c), e.period, e.type === "sub" ? "substitution" : e.type, hname(e.houseId), e.playerId ? pname(e.playerId) : "", e.assistId ? pname(e.assistId) : (e.outId ? pname(e.outId) : ""), e.ownGoal ? "Own goal" : (e.auto ? "Second yellow" : (e.type === "sub" && !e.outId ? "Replaced sent-off player" : ""))])));
@@ -1223,15 +1344,20 @@ function exportAll() {
   const tb = [["Pos", "House", "P", "W", "D", "L", "GF", "GA", "GD", "Pts", "Separated by"]];
   st.forEach(r => tb.push([r.pos, hname(r.id), r.P, r.W, r.D, r.L, r.GF, r.GA, r.GD, r.Pts, r.reason ? r.reason.by : ""]));
   add("Standings", tb, [5, 12, 4, 4, 4, 4, 4, 4, 5, 5, 20]);
-  const ps = [["Player", "House", "Gender", "Jersey", "GK", "Apps", "Goals", "Assists", "Saves", "Clean sheets", "Conceded (in goal)", "Shootout saves", "Wins", "Yellow", "Red", "Best Player pts", "Goalkeeper pts"]];
-  houseList().forEach(h => L.housePlayers(S, h.id).forEach(p => { const s = stats[p.id]; ps.push([p.name, h.name, p.gender === "F" ? "W" : "M", p.number || "", p.gk ? "Y" : "", s.apps, s.goals, s.assists, s.saves, s.cs, s.conceded, s.shootSaves, s.wins, s.yellow, s.red, s.best, s.gkApps ? s.gkPts : ""]); }));
+  const ps = [["Player", "House", "Gender", "Jersey", "GK", "Apps", "Goals", "Assists", "Saves", "Clean sheets", "GK matches", "GK clean sheets", "Conceded (in goal)", "Shootout saves", "Wins", "Yellow", "Red", "Best Player pts", "Goalkeeper pts"]];
+  houseList().forEach(h => L.housePlayers(S, h.id).forEach(p => { const s = stats[p.id]; ps.push([p.name, h.name, p.gender === "F" ? "W" : "M", p.number || "", p.gk ? "Y" : "", s.apps, s.goals, s.assists, s.saves, s.cs, s.gkApps || "", s.gkApps ? s.gkCs : "", s.conceded, s.shootSaves, s.wins, s.yellow, s.red, s.best, s.gkApps ? s.gkPts : ""]); }));
   add("Player stats", ps, [24, 12, 7, 7, 4, 5, 6, 7, 6, 11, 16, 13, 5, 6, 5, 14, 13]);
   const awr = [["Award", "Rank", "Player", "House", "Value", "Detail"]];
   aw.scorers.slice(0, 5).forEach((p, i) => awr.push(["Top goal scorer", i + 1, p.name, hname(p.houseId), p.goals, `${p.assists} assists`]));
-  aw.keepers.slice(0, 5).forEach((p, i) => awr.push(["Best goalkeeper", i + 1, p.name, hname(p.houseId), p.gkPts, `${p.saves} saves, ${p.cs} clean sheets, ${p.conceded} conceded`]));
+  aw.assists.slice(0, 5).forEach((p, i) => awr.push(["Top assists", i + 1, p.name, hname(p.houseId), p.assists, `${p.goals} goals`]));
+  aw.keepers.slice(0, 5).forEach((p, i) => awr.push(["Best goalkeeper", i + 1, p.name, hname(p.houseId), p.gkPts, `${p.saves} saves, ${p.gkCs} clean sheets, ${p.conceded} conceded, ${p.shootSaves} shootout saves`]));
   aw.best.slice(0, 5).forEach((p, i) => awr.push(["Best player", i + 1, p.name, hname(p.houseId), p.best, `${p.goals}G ${p.assists}A ${p.wins}W`]));
+  const ch = champion(); awr.push(["Champion house", 1, "", ch ? hname(ch.id) : "Not decided", "", ch ? `Won the Final ${ch.r.h}-${ch.r.a}${ch.r.pens ? " (" + ch.r.pens.tally[ch.f.homeId].g + "-" + ch.r.pens.tally[ch.f.awayId].g + " pens)" : ""}` : ""]);
   add("Awards", awr, [16, 5, 24, 12, 7, 36]);
-  saveFile("Gapstars-Interhouse-Futsal-2026.xlsx", wb);
+  const order = ["Standings", "Results", "Awards", "Player stats", "Events", "Lineups", "Shootout"];
+  const out = [[c.title, c.venue, c.date, "Exported " + new Date().toLocaleString()]];
+  order.forEach(name => { const i = sections.indexOf(name); if (i < 0) return; out.push([], ["== " + name.toUpperCase() + " =="], ...sections[i + 1]); });
+  saveText(`futsal-report-${stamp()}.csv`, toCSV(out));
 }
 
 /* ---------- events ---------- */
@@ -1243,12 +1369,19 @@ document.addEventListener("click", e => {
 });
 document.addEventListener("change", e => {
   if (e.target.id === "matchSel") { selMatch[court] = e.target.value; render(); }
+  if (e.target.id === "restoreFile" && e.target.files[0]) { restoreBackup(e.target.files[0]).catch(() => toast("Couldn't read that backup.")); e.target.value = ""; }
   if (e.target.id === "importFile" && e.target.files[0]) { importPlayers(e.target.files[0]).catch(() => toast("Couldn't read that file. Use the template's .xlsx format.")); e.target.value = ""; }
 });
 document.addEventListener("submit", e => {
   if (e.target.id !== "pinForm") return;
   e.preventDefault();
   const v = $("#pinIn").value.trim();
+  if (sheetMode) {
+    if (!v) return;
+    db.auth(v).then(() => { unlocked = true; ls.set("unlocked", "1"); render(); toast("Scorer unlocked"); })
+      .catch(err => { if (err && err.error === "bad_pin") { toast("That PIN isn't right."); $("#pinIn").value = ""; } else toast("Can't reach the Google Sheet. Check the connection."); });
+    return;
+  }
   if (v && v === String(C().pin)) { unlocked = true; ls.set("unlocked", "1"); render(); toast("Scorer unlocked"); }
   else { toast("That PIN isn't right."); $("#pinIn").value = ""; }
 });
@@ -1270,10 +1403,14 @@ function seedData() {
     d["houses/" + id] = { name: n, color: c, order: i, tiebreakRank: 0 };
     for (let j = 1; j <= 6; j++) d[`players/${id}${j}`] = { name: `${n} Player ${j}`, houseId: id, gender: j === 6 ? "F" : "M", number: String(j), gk: j === 1 };
   });
-  const R = [[["cygnus", "aquila"], ["draco", "orion"]], [["aquila", "orion"], ["cygnus", "draco"]], [["cygnus", "orion"], ["aquila", "draco"]],
-    [["orion", "draco"], ["aquila", "cygnus"]], [["draco", "cygnus"], ["orion", "aquila"]], [["draco", "aquila"], ["orion", "cygnus"]]];
-  let no = 1;
-  R.forEach((r, ri) => r.forEach(([h, a], ci) => { d["matches/m" + String(no).padStart(2, "0")] = { no, round: ri + 1, court: ci, stage: "league", homeId: h, awayId: a, status: "scheduled", period: 1, running: false, elapsedMs: 0, time: "" }; no++; }));
+  Object.assign(d, starterMatches(["cygnus", "aquila", "draco", "orion"]));
+  return d;
+}
+/* The starting draw: 6 rounds, both courts busy every round, every pairing twice. ids = the 4 houses in order. */
+function starterMatches(ids) {
+  const P = [[[0, 1], [2, 3]], [[1, 3], [0, 2]], [[0, 3], [1, 2]], [[3, 2], [1, 0]], [[2, 0], [3, 1]], [[2, 1], [3, 0]]];
+  const d = {}; let no = 1;
+  P.forEach((r, ri) => r.forEach(([h, a], ci) => { d["matches/m" + String(no).padStart(2, "0")] = { no, round: ri + 1, court: ci, stage: "league", homeId: ids[h], awayId: ids[a], status: "scheduled", period: 1, running: false, elapsedMs: 0, time: "" }; no++; }));
   d["matches/final"] = { no: 13, round: 7, court: 0, stage: "final", homeId: null, awayId: null, status: "scheduled", period: 1, running: false, elapsedMs: 0, time: "" };
   return d;
 }
@@ -1305,18 +1442,191 @@ const localDownloads = { async save({ filename, data }) {
   return { status: "saved" };
 } };
 
+/* ---------- Google Sheet mode: shared data through a Google Apps Script web app ---------- */
+let sheetMode = false;
+function setSync(state, n) {
+  const el = $("#sync"); if (!el) return;
+  el.hidden = false;
+  el.className = "sync " + state;
+  el.textContent = state === "ok" ? "Synced" : state === "saving" ? `Saving ${n} change${n === 1 ? "" : "s"}…` : state === "offline" ? (n ? `Offline · ${n} change${n === 1 ? "" : "s"} waiting` : "Offline · showing last synced data") : "Connecting…";
+}
+function sheetDB(api) {
+  const QK = "futsal:sheet-queue", CK = "futsal:sheet-cache";
+  let mem = {}, v = -1, key = ls.get("key") || "", queue = [], busy = false, again = false, timer = null, pinBad = false, fired = false;
+  try { queue = JSON.parse(localStorage.getItem(QK) || "[]"); } catch (e) { queue = []; }
+  try { const c = JSON.parse(localStorage.getItem(CK) || "null"); if (c && c.docs) mem = c.docs; } catch (e) {}
+  const subs = [];
+  const clone = o => JSON.parse(JSON.stringify(o));
+  const saveQ = () => { try { localStorage.setItem(QK, JSON.stringify(queue)); } catch (e) {} };
+  const saveC = () => { try { localStorage.setItem(CK, JSON.stringify({ v, docs: mem })); } catch (e) {} };
+  const fire = () => { fired = true; subs.forEach(f => f()); };
+  const apply = w => {
+    if (w.op === "set") mem[w.path] = clone(w.data);
+    else if (w.op === "update") { if (mem[w.path]) Object.assign(mem[w.path], clone(w.data)); }
+    else if (w.op === "delete") delete mem[w.path];
+  };
+  async function post(body) {
+    const r = await fetch(api, { method: "POST", body: JSON.stringify(body) });
+    const j = await r.json();
+    if (!j.ok) throw j;
+    return j;
+  }
+  async function flush() {
+    while (queue.length && !pinBad) {
+      const chunk = queue.slice(0, 40);
+      setSync("saving", queue.length);
+      try { await post({ op: "batch", key, writes: chunk }); }
+      catch (e) {
+        if (e && e.error === "bad_pin") { pinBad = true; unlocked = false; ls.set("unlocked", "0"); toast("The sheet rejected the PIN. Unlock the Scorer again to send waiting changes."); schedule(); }
+        throw e;
+      }
+      queue.splice(0, chunk.length); saveQ();
+    }
+  }
+  async function pull() {
+    const r = await fetch(api + (api.includes("?") ? "&" : "?") + "v=" + v + "&t=" + Date.now());
+    const j = await r.json();
+    if (!j.ok) throw j;
+    if (!j.unchanged) { mem = j.docs || {}; v = j.v; queue.forEach(apply); saveC(); fire(); }
+  }
+  async function cycle() {
+    if (busy) { again = true; return; }
+    busy = true;
+    try { await flush(); await pull(); setSync(queue.length ? "offline" : "ok", queue.length); }
+    catch (e) { setSync("offline", queue.length); if (!fired) fire(); }
+    busy = false;
+    if (again) { again = false; setTimeout(cycle, 50); }
+  }
+  const kick = () => { clearTimeout(timer); timer = setTimeout(cycle, 120); };
+  setInterval(cycle, 3000);
+  window.addEventListener("online", kick);
+  setSync("wait");
+  setTimeout(() => { if (Object.keys(mem).length) fire(); cycle(); }, 0);
+  const write = (op, path, data) => { const w = { op, path }; if (data) w.data = clone(data); apply(w); queue.push(w); saveQ(); fire(); kick(); };
+  const doc = p => ({ id: p.split("/").pop(), path: p,
+    async set(d) { write("set", p, d); },
+    async update(d) { if (!mem[p]) throw { code: "invalid_argument" }; write("update", p, d); },
+    async delete() { write("delete", p); },
+    onSnapshot(next) { const f = () => next({ id: p.split("/").pop(), exists: !!mem[p], data: () => mem[p] }); subs.push(f); return () => {}; } });
+  return {
+    doc,
+    collection: c => ({
+      doc: id => doc(c + "/" + (id || ("x" + Date.now().toString(36) + Math.random().toString(36).slice(2, 7)))),
+      onSnapshot(next) { const f = () => next({ docs: Object.keys(mem).filter(k => k.startsWith(c + "/") && k.split("/").length === 2).map(k => ({ id: k.split("/")[1], exists: true, data: () => mem[k] })) }); subs.push(f); return () => {}; } }),
+    async auth(pin) { await post({ op: "auth", key: pin }); key = pin; ls.set("key", pin); pinBad = false; kick(); },
+    async changePin(pin) { await flush(); await post({ op: "update", key, path: "meta/config", data: { pin } }); key = pin; ls.set("key", pin); kick(); },
+    async replaceAll(docs) { await post({ op: "replaceAll", key, docs }); queue = []; saveQ(); v = -1; await pull(); },
+    pending: () => queue.length
+  };
+}
+
+/* ---------- CSV backup & restore ---------- */
+function csvCell(x) { const t = x == null ? "" : String(x); return /[",\r\n]/.test(t) ? '"' + t.replace(/"/g, '""') + '"' : t; }
+function toCSV(rows) { return "\uFEFF" + rows.map(r => r.map(csvCell).join(",")).join("\r\n"); }
+function parseCSV(text) {
+  text = text.replace(/^\uFEFF/, "");
+  const rows = []; let row = [], cell = "", q = false;
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if (q) {
+      if (ch === '"') { if (text[i + 1] === '"') { cell += '"'; i++; } else q = false; }
+      else cell += ch;
+    } else if (ch === '"') q = true;
+    else if (ch === ",") { row.push(cell); cell = ""; }
+    else if (ch === "\n" || ch === "\r") { if (ch === "\r" && text[i + 1] === "\n") i++; row.push(cell); rows.push(row); row = []; cell = ""; }
+    else cell += ch;
+  }
+  if (cell !== "" || row.length) { row.push(cell); rows.push(row); }
+  return rows.filter(r => r.some(c => c !== ""));
+}
+function allDocs() {
+  const out = {};
+  if (S.config) out["meta/config"] = { ...S.config };
+  ["houses", "players", "matches", "events", "kicks"].forEach(cn => Object.values(S[cn]).forEach(d => { const x = { ...d }; delete x.id; out[cn + "/" + d.id] = x; }));
+  return out;
+}
+function docSummary(path, d) {
+  const [cn] = path.split("/");
+  if (cn === "meta") return `${d.title || ""} · ${d.venue || ""}`;
+  if (cn === "houses") return d.name;
+  if (cn === "players") return `${d.name} · ${hname(d.houseId)}${d.gk ? " · GK" : ""}${d.gender === "F" ? " · W" : ""}`;
+  if (cn === "matches") { const m = S.matches[path.split("/")[1]]; const sc = m && L.started(m) ? L.score(S, m) : null; return `${d.stage === "final" ? "Final" : "M" + d.no} · ${hname(d.homeId)} ${sc ? sc.h + "-" + sc.a : "v"} ${hname(d.awayId)} · ${d.status}`; }
+  if (cn === "events") { const m = S.matches[d.matchId]; return `${m ? (m.stage === "final" ? "Final" : "M" + m.no) : ""} ${m ? L.minuteOf(d, m, C()) + "'" : ""} · ${d.type}${d.ownGoal ? " (own goal)" : ""} · ${hname(d.houseId)} · ${d.playerId ? pname(d.playerId) : ""}${d.assistId ? " (assist " + pname(d.assistId) + ")" : ""}${d.outId ? " for " + pname(d.outId) : ""}`; }
+  if (cn === "kicks") return `Shootout · ${hname(d.houseId)} · ${pname(d.kickerId)} · ${d.result}`;
+  return "";
+}
+async function saveText(name, text) {
+  if (!dl) return toast("Downloads aren't available in this view.");
+  try { await dl.save({ filename: name, data: new Blob([text], { type: "text/csv" }) }); toast("Saved " + name); return true; }
+  catch (e) { if (e && e.code !== "declined") toast("Couldn't save the file."); return false; }
+}
+const stamp = () => { const d = new Date(), z = n => String(n).padStart(2, "0"); return `${d.getFullYear()}${z(d.getMonth() + 1)}${z(d.getDate())}-${z(d.getHours())}${z(d.getMinutes())}`; };
+async function downloadBackup() {
+  const docs = allDocs();
+  const order = ["meta", "houses", "players", "matches", "events", "kicks"];
+  const rows = [["collection", "id", "summary", "data"]];
+  Object.keys(docs).sort((a, b) => order.indexOf(a.split("/")[0]) - order.indexOf(b.split("/")[0]) || a.localeCompare(b))
+    .forEach(p => { const i = p.indexOf("/"); rows.push([p.slice(0, i), p.slice(i + 1), docSummary(p, docs[p]), JSON.stringify(docs[p])]); });
+  if (await saveText(`futsal-backup-${stamp()}.csv`, toCSV(rows))) { ls.set("lastBackup", String(Date.now())); if (tab === "scorer") render(); }
+}
+async function restoreBackup(file) {
+  if (!guard()) return;
+  let rows;
+  try { rows = parseCSV(await file.text()); } catch (e) { return toast("Couldn't read that file."); }
+  const head = (rows.shift() || []).map(h => h.trim().toLowerCase());
+  const ci = head.indexOf("collection"), ii = head.indexOf("id"), di = head.indexOf("data");
+  if (ci < 0 || ii < 0 || di < 0) return toast("That isn't a futsal backup. Use a file from Download backup.");
+  const allowed = ["meta", "houses", "players", "matches", "events", "kicks"];
+  const docs = {}; let bad = 0;
+  rows.forEach(r => {
+    const cn = (r[ci] || "").trim(), id = (r[ii] || "").trim();
+    if (!allowed.includes(cn) || !/^[A-Za-z0-9_\-.~:@+]+$/.test(id)) { bad++; return; }
+    try { const d = JSON.parse(r[di]); if (d && typeof d === "object" && !Array.isArray(d)) docs[cn + "/" + id] = d; else bad++; } catch (e) { bad++; }
+  });
+  const count = cn => Object.keys(docs).filter(k => k.startsWith(cn + "/")).length;
+  if (!count("houses") || !count("matches")) return toast("That backup has no houses or fixtures, so it can't be restored.");
+  const played = Object.entries(docs).filter(([k, d]) => k.startsWith("matches/") && d.status !== "scheduled").length;
+  const ok = await confirmSheet("Restore this backup?",
+    `${count("houses")} houses · ${count("players")} players · ${count("matches")} matches (${played} started) · ${count("events")} match events · ${count("kicks")} shootout kicks${bad ? `<br>${bad} unreadable rows skipped.` : ""}<br><br>This replaces everything currently saved${sheetMode ? " in the Google Sheet, for every device" : ""}. The PIN stays the same.`, "Replace with backup", true);
+  if (!ok) return;
+  if (S.config && S.config.pin && docs["meta/config"]) docs["meta/config"].pin = S.config.pin;
+  toast("Restoring…");
+  try {
+    if (db.replaceAll) await db.replaceAll(docs);
+    else {
+      const cur = allDocs();
+      const jobs = [...Object.keys(cur).filter(p => !docs[p]).map(p => () => db.doc(p).delete()), ...Object.keys(docs).map(p => () => db.doc(p).set(docs[p]))];
+      for (let i = 0; i < jobs.length; i += 10) await Promise.all(jobs.slice(i, i + 10).map(f => f()));
+    }
+    toast(`Restored ${Object.keys(docs).length} records`);
+  } catch (e) { toast(e && e.error === "bad_pin" ? "The sheet rejected the PIN. Unlock again and retry." : "Restore didn't finish. Check the connection and try again."); }
+}
+async function loadStarter() {
+  if (!guard()) return;
+  if (!(await confirmSheet("Load starter data?", "Sets up the 4 houses with placeholder players and all 13 fixtures. Anything currently saved is replaced.", "Load starter data", matchList().length > 0))) return;
+  const docs = seedData();
+  try {
+    if (db.replaceAll) await db.replaceAll(docs);
+    else { for (const p of Object.keys(allDocs())) await db.doc(p).delete(); for (const [p, d] of Object.entries(docs)) await db.doc(p).set(d); }
+    toast("Starter data loaded");
+  } catch (e) { toast("Couldn't load starter data. Check the connection and try again."); }
+}
+
 /* ---------- boot ---------- */
 async function boot() {
   render();
   const inClaude = !!(window.claude && window.claude.use);
   const use = n => inClaude ? window.claude.use(n).catch(() => null) : Promise.resolve(null);
   db = await use("db");
-  if (!db && !inClaude) {
+  const api = String(window.FUTSAL_SHEET_API || "").trim();
+  if (!db && !inClaude && api) {
+    sheetMode = true; db = sheetDB(api); dl = localDownloads; canWrite = true;
+  } else if (!db && !inClaude) {
     offline = true; db = localDB(); dl = localDownloads; canWrite = true;
     const n = $("#notice"); n.hidden = false;
     n.textContent = "Offline mode: this copy saves results in this browser on this device only. Other phones won't see them. Use the claude.ai link for live scoring on two courts, or export to Excel to keep a record.";
   } else if (!db) { render(); return; }
-  if (!offline) {
+  if (!offline && !sheetMode) {
     [userCap, dl] = await Promise.all([use("user"), use("downloads")]);
     if (userCap) { try { canWrite = await userCap.can("data.write"); } catch (e) { canWrite = null; } }
   }
@@ -1331,4 +1641,5 @@ boot();
 
 </script>
 
-</body></html>
+</body>
+</html>
